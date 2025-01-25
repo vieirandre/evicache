@@ -1,6 +1,6 @@
 ﻿namespace LruCache;
 
-public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>
+public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnull
 {
     private readonly int _capacity;
 
