@@ -19,11 +19,23 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
 
     public TValue Get(TKey key)
     {
-        throw new NotImplementedException();
+        if (_cacheMap.TryGetValue(key, out var node))
+        {
+            _lruList.Remove(node);
+            _lruList.AddFirst(node);
+
+            return node.Value.Value;
+        }
+
+        return default;
     }
 
     public void Put(TKey key, TValue value)
     {
-        throw new NotImplementedException();
+        var newItem = new CacheItem<TKey, TValue>(key, value);
+        var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
+
+        _lruList.AddFirst(newNode);
+        _cacheMap[key] = newNode;
     }
 }
