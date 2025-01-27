@@ -17,17 +17,21 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
         _lruList = new LinkedList<CacheItem<TKey, TValue>>();
     }
 
-    public TValue Get(TKey key)
+    public bool TryGet(TKey key, out TValue value)
     {
         if (_cacheMap.TryGetValue(key, out var node))
         {
             _lruList.Remove(node);
             _lruList.AddFirst(node);
 
-            return node.Value.Value;
+            value = node.Value.Value;
+
+            return true;
         }
 
-        return default;
+        value = default;
+
+        return false;
     }
 
     public void Put(TKey key, TValue value)

@@ -12,7 +12,7 @@ public class LruCacheTests
         // act
 
         cache.Put(1, "value");
-        var result = cache.Get(1);
+        cache.TryGet(1, out var result);
 
         // assert
 

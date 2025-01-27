@@ -2,6 +2,6 @@
 
 public interface ILruCache<TKey, TValue>
 {
-    TValue Get(TKey key);
+    bool TryGet(TKey key, out TValue value);
     void Put(TKey key, TValue value);
 }
