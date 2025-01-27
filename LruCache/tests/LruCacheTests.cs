@@ -53,4 +53,22 @@ public class LruCacheTests
 
         Assert.Throws<ArgumentOutOfRangeException>(() => new LruCache<int, string>(invalidCapacity));
     }
+
+    [Fact]
+    public void Should_StoreAndRetrieve_WhenKeyIsStringAndValueIsInt()
+    {
+        // arrange
+
+        var cache = new LruCache<string, int>(2);
+
+        // act
+
+        cache.Put("this", 10);
+        cache.Put("that", 20);
+        cache.TryGet("that", out var thatValue);
+
+        // assert
+
+        Assert.Equal(20, thatValue);
+    }
 }
