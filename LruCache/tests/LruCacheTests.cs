@@ -3,7 +3,7 @@ namespace LruCache.Tests;
 public class LruCacheTests
 {
     [Fact]
-    public void Test1()
+    public void Should_ReturnValue_WhenKeyIsInsertedAndRetrieved()
     {
         // arrange
 
@@ -20,7 +20,7 @@ public class LruCacheTests
     }
 
     [Fact]
-    public void Test2()
+    public void Should_EvictLeastRecentlyUsed_WhenCapacityIsExceeded()
     {
         // arrange
 
