@@ -26,21 +26,21 @@ public class LruCacheTests
 
         var cache = new LruCache<int, string>(2);
 
-        cache.Put(1, "valueOne");
-        cache.Put(2, "valueTwo");
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
 
         // act
 
-        cache.TryGet(1, out var valueOne);
-        cache.Put(3, "valueThree");
-        cache.TryGet(2, out var valueTwo);
-        cache.TryGet(3, out var valueThree);
+        cache.TryGet(1, out var value1);
+        cache.Put(3, "value3");
+        cache.TryGet(2, out var value2);
+        cache.TryGet(3, out var value3);
 
         // assert
 
-        Assert.Null(valueTwo);
-        Assert.Equal("valueOne", valueOne);
-        Assert.Equal("valueThree", valueThree);
+        Assert.Null(value2);
+        Assert.Equal("value1", value1);
+        Assert.Equal("value3", value3);
     }
 
     [Theory]
@@ -70,5 +70,31 @@ public class LruCacheTests
         // assert
 
         Assert.Equal(20, thatValue);
+    }
+
+    [Fact]
+    public void Should_UpdateExistingKeyAndEvictLeastRecentlyUsed_WhenReinsertingKeyOverCapacity()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(2);
+        cache.Put(1, "oldValue");
+        cache.Put(2, "value2");
+
+        // act
+
+        cache.Put(1, "newValue");
+        cache.Put(3, "value3");
+
+        // assert
+
+        cache.TryGet(1, out var value1);
+        Assert.Equal("newValue", value1);
+
+        cache.TryGet(2, out var value2);
+        Assert.Null(value2);
+
+        cache.TryGet(3, out var value3);
+        Assert.Equal("value3", value3);
     }
 }
