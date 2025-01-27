@@ -97,4 +97,24 @@ public class LruCacheTests
         cache.TryGet(3, out var value3);
         Assert.Equal("value3", value3);
     }
+
+    [Fact]
+    public void Should_NotExceedCapacity_WhenCacheIsFull()
+    {
+        // arrange
+
+        int capacity = 2;
+        var cache = new LruCache<int, string>(capacity);
+
+        // act & assert
+
+        cache.Put(1, "value1");
+        Assert.True(cache.Count <= capacity);
+
+        cache.Put(2, "value2");
+        Assert.True(cache.Count <= capacity);
+
+        cache.Put(3, "value3");
+        Assert.True(cache.Count <= capacity);
+    }
 }
