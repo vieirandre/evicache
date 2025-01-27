@@ -40,15 +40,25 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
             existingNode.Value.Value = value;
 
             MoveToFront(existingNode);
-
-            return;
         }
+        else
+        {
+            if (_cacheMap.Count >= _capacity)
+            {
+                var lruNode = _lruList.Last;
+                if (lruNode != null)
+                {
+                    _cacheMap.Remove(lruNode.Value.Key);
+                    _lruList.RemoveLast();
+                }
+            }
 
-        var newItem = new CacheItem<TKey, TValue>(key, value);
-        var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
+            var newItem = new CacheItem<TKey, TValue>(key, value);
+            var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
 
-        _lruList.AddFirst(newNode);
-        _cacheMap[key] = newNode;
+            _lruList.AddFirst(newNode);
+            _cacheMap[key] = newNode;
+        }
     }
 
     private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
