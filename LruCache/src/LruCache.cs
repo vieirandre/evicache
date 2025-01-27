@@ -35,6 +35,15 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
 
     public void Put(TKey key, TValue value)
     {
+        if (_cacheMap.TryGetValue(key, out var existingNode))
+        {
+            existingNode.Value.Value = value;
+
+            MoveToFront(existingNode);
+
+            return;
+        }
+
         var newItem = new CacheItem<TKey, TValue>(key, value);
         var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
 
