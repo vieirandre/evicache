@@ -21,8 +21,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
     {
         if (_cacheMap.TryGetValue(key, out var node))
         {
-            _lruList.Remove(node);
-            _lruList.AddFirst(node);
+            MoveToFront(node);
 
             value = node.Value.Value;
 
@@ -41,5 +40,11 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
 
         _lruList.AddFirst(newNode);
         _cacheMap[key] = newNode;
+    }
+
+    private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
+    {
+        _lruList.Remove(node);
+        _lruList.AddFirst(node);
     }
 }
