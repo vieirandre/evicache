@@ -42,4 +42,15 @@ public class LruCacheTests
         Assert.Equal("valueOne", valueOne);
         Assert.Equal("valueThree", valueThree);
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-10)]
+    public void Should_ThrowArgumentOutOfRangeException_WhenCapacityIsZeroOrNegative(int invalidCapacity)
+    {
+        // act & assert
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => new LruCache<int, string>(invalidCapacity));
+    }
 }
