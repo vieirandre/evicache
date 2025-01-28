@@ -106,15 +106,15 @@ public class LruCacheTests
         int capacity = 2;
         var cache = new LruCache<int, string>(capacity);
 
-        // act & assert
+        // act
 
-        cache.Put(1, "value1");
-        Assert.True(cache.Count <= capacity);
+        for (int i = 0; i < capacity * 2; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
 
-        cache.Put(2, "value2");
-        Assert.True(cache.Count <= capacity);
+        // assert
 
-        cache.Put(3, "value3");
         Assert.True(cache.Count <= capacity);
     }
 }
