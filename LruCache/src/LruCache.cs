@@ -8,7 +8,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
     private readonly Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>> _cacheMap;
     private readonly LinkedList<CacheItem<TKey, TValue>> _lruList;
 
-    public int Count => _cacheMap.Count;
+    private readonly object _syncLock = new();
 
     public LruCache(int capacity)
     {
@@ -21,46 +21,54 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
 
     public bool TryGet(TKey key, out TValue value)
     {
-        if (_cacheMap.TryGetValue(key, out var node))
+        lock (_syncLock)
         {
-            MoveToFront(node);
+            if (_cacheMap.TryGetValue(key, out var node))
+            {
+                MoveToFront(node);
 
-            value = node.Value.Value;
+                value = node.Value.Value;
+                return true;
+            }
 
-            return true;
+            value = default;
+            return false;
         }
-
-        value = default;
-
-        return false;
     }
 
     public void Put(TKey key, TValue value)
     {
-        if (_cacheMap.TryGetValue(key, out var existingNode))
+        lock (_syncLock)
         {
-            existingNode.Value.Value = value;
-
-            MoveToFront(existingNode);
-        }
-        else
-        {
-            if (_cacheMap.Count >= _capacity)
+            if (_cacheMap.TryGetValue(key, out var existingNode))
             {
-                var lruNode = _lruList.Last;
-                if (lruNode != null)
-                {
-                    _cacheMap.Remove(lruNode.Value.Key);
-                    _lruList.RemoveLast();
-                }
+                existingNode.Value.Value = value;
+                MoveToFront(existingNode);
             }
+            else
+            {
+                if (_cacheMap.Count >= _capacity)
+                {
+                    var lruNode = _lruList.Last;
+                    if (lruNode != null)
+                    {
+                        _cacheMap.Remove(lruNode.Value.Key);
+                        _lruList.RemoveLast();
+                    }
+                }
 
-            var newItem = new CacheItem<TKey, TValue>(key, value);
-            var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
+                var newItem = new CacheItem<TKey, TValue>(key, value);
+                var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
 
-            _lruList.AddFirst(newNode);
-            _cacheMap[key] = newNode;
+                _lruList.AddFirst(newNode);
+                _cacheMap[key] = newNode;
+            }
         }
+    }
+
+    public int Count
+    {
+        get { lock (_syncLock) { return _cacheMap.Count; } }
     }
 
     private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
