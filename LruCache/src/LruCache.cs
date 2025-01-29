@@ -2,7 +2,7 @@
 
 namespace LruCache;
 
-public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnull
+public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where TKey : notnull
 {
     private readonly int _capacity;
     private readonly Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>> _cacheMap;
@@ -17,11 +17,6 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
         _capacity = capacity;
         _cacheMap = new Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>>(capacity);
         _lruList = new LinkedList<CacheItem<TKey, TValue>>();
-    }
-
-    public int Count
-    {
-        get { lock (_syncLock) { return _cacheMap.Count; } }
     }
 
     public bool TryGet(TKey key, out TValue value)
@@ -94,6 +89,17 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
             _cacheMap.Clear();
             _lruList.Clear();
         }
+    }
+
+    public int Count
+    {
+        get { lock (_syncLock) { return _cacheMap.Count; } }
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        Clear();
     }
 
     private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
