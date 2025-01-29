@@ -73,10 +73,14 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
     private void EvictLeastRecentlyUsed()
     {
         var lruNode = _lruList.Last;
-        if (lruNode != null)
-        {
-            _cacheMap.Remove(lruNode.Value.Key);
-            _lruList.RemoveLast();
-        }
+
+        if (lruNode is null)
+            return;
+
+        _cacheMap.Remove(lruNode.Value.Key);
+        _lruList.RemoveLast();
+
+        if (lruNode.Value.Value is IDisposable disposable)
+            disposable.Dispose();
     }
 }
