@@ -64,6 +64,24 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
         }
     }
 
+    public bool Remove(TKey key)
+    {
+        lock (_syncLock)
+        {
+            if (_cacheMap.TryGetValue(key, out var node))
+            {
+                _cacheMap.Remove(key);
+                _lruList.Remove(node);
+
+                DisposeItem(node);
+
+                return true;
+            }
+
+            return false;
+        }
+    }
+
     private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
     {
         _lruList.Remove(node);
@@ -80,7 +98,12 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
         _cacheMap.Remove(lruNode.Value.Key);
         _lruList.RemoveLast();
 
-        if (lruNode.Value.Value is IDisposable disposable)
+        DisposeItem(lruNode);
+    }
+
+    private static void DisposeItem(LinkedListNode<CacheItem<TKey, TValue>> node)
+    {
+        if (node.Value.Value is IDisposable disposable)
             disposable.Dispose();
     }
 }

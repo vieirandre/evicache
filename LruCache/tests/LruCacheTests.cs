@@ -1,3 +1,5 @@
+using LruCache.Tests.Utils;
+
 namespace LruCache.Tests;
 
 public class LruCacheTests
@@ -116,5 +118,27 @@ public class LruCacheTests
         // assert
 
         Assert.True(cache.Count <= capacity);
+    }
+
+    [Fact]
+    public void Should_RemoveKeyAndDisposeItem_WhenKeyExists()
+    {
+        // arrange
+
+        var cache = new LruCache<int, DisposableDummy>(2);
+        var disposableItem = new DisposableDummy();
+
+        cache.Put(1, disposableItem);
+        cache.Put(2, new DisposableDummy());
+
+        // act
+
+        bool removed = cache.Remove(1);
+
+        // assert
+
+        Assert.True(removed);
+        Assert.Equal(1, cache.Count);
+        Assert.True(disposableItem.IsDisposed);
     }
 }
