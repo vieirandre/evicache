@@ -141,4 +141,24 @@ public class LruCacheTests
         Assert.Equal(1, cache.Count);
         Assert.True(disposableItem.IsDisposed);
     }
+
+    [Fact]
+    public void Should_ReturnFalseAndNotDispose_WhenKeyDoesNotExist()
+    {
+        // arrange
+
+        var cache = new LruCache<int, DisposableDummy>(2);
+        var disposableItem = new DisposableDummy();
+
+        cache.Put(1, disposableItem);
+
+        // act
+
+        bool removed = cache.Remove(9);
+
+        // assert
+
+        Assert.False(removed);
+        Assert.False(disposableItem.IsDisposed);
+    }
 }
