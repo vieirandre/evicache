@@ -82,6 +82,20 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnu
         }
     }
 
+    public void Clear()
+    {
+        lock (_syncLock)
+        {
+            foreach (var entry in _cacheMap)
+            {
+                DisposeItem(entry.Value);
+            }
+
+            _cacheMap.Clear();
+            _lruList.Clear();
+        }
+    }
+
     private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
     {
         _lruList.Remove(node);

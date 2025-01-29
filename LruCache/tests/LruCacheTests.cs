@@ -140,6 +140,7 @@ public class LruCacheTests
         Assert.True(removed);
         Assert.Equal(1, cache.Count);
         Assert.True(disposableItem.IsDisposed);
+        Assert.False(cache.TryGet(1, out _));
     }
 
     [Fact]
