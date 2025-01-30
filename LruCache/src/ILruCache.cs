@@ -1,4 +1,6 @@
-﻿namespace LruCache;
+﻿using System.Collections.Immutable;
+
+namespace LruCache;
 
 public interface ILruCache<TKey, TValue>
 {
@@ -8,4 +10,5 @@ public interface ILruCache<TKey, TValue>
     bool Remove(TKey key);
     void Clear();
     int Count { get; }
+    ImmutableList<TKey> GetKeysInOrder();
 }
