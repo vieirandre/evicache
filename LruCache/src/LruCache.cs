@@ -119,6 +119,11 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where
         get { lock (_syncLock) { return _cacheMap.Count; } }
     }
 
+    public IEnumerable<TKey> GetKeysInOrder()
+    {
+        return _lruList.Select(item => item.Key);
+    }
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);

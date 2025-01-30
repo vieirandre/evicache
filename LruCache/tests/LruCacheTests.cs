@@ -232,4 +232,23 @@ public class LruCacheTests
         Assert.True(cache.TryGet(1, out var storedValue));
         Assert.Equal("value1", storedValue);
     }
+
+    [Fact]
+    public void Should_ReturnKeysInMruToLruOrder_WhenItemsAreAdded()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        var keys = cache.GetKeysInOrder();
+
+        // assert
+
+        Assert.Equal([3, 2, 1], keys);
+    }
 }
