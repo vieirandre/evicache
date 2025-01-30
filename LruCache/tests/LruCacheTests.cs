@@ -333,4 +333,25 @@ public class LruCacheTests
         Assert.Empty(keys);
         Assert.Equal(0, cache.Count);
     }
+
+    [Fact]
+    public void Should_NotDuplicateKeysInOrder_WhenAddingExistingKey()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        cache.Put(2, "newValue2");
+        var keys = cache.GetKeysInOrder();
+
+        // assert
+
+        Assert.Equal([2, 3, 1], keys);
+        Assert.Equal("newValue2", cache.TryGet(2, out var value2) ? value2 : null);
+    }
 }
