@@ -251,4 +251,86 @@ public class LruCacheTests
 
         Assert.Equal([3, 2, 1], keys);
     }
+
+    [Fact]
+    public void Should_UpdateKeyOrder_WhenItemsAreAccessed()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        cache.TryGet(1, out var _);
+        var keys = cache.GetKeysInOrder();
+
+        // assert
+
+        Assert.Equal([1, 3, 2], keys);
+    }
+
+    [Fact]
+    public void Should_RemoveEvictedKeyFromOrder_WhenCapacityIsExceeded()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(2);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        cache.Put(3, "value3");
+        var keys = cache.GetKeysInOrder();
+
+        // assert
+
+        Assert.Equal([3, 2], keys);
+        Assert.False(cache.TryGet(1, out _));
+    }
+
+    [Fact]
+    public void Should_RemoveKeyFromOrder_WhenItemIsRemoved()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        cache.Remove(2);
+        var keys = cache.GetKeysInOrder();
+
+        // assert
+
+        Assert.Equal([3, 1], keys);
+        Assert.False(cache.TryGet(2, out _));
+    }
+
+    [Fact]
+    public void Should_ReturnEmptyList_WhenCacheIsCleared()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        cache.Clear();
+        var keys = cache.GetKeysInOrder();
+
+        // assert
+
+        Assert.Empty(keys);
+        Assert.Equal(0, cache.Count);
+    }
 }
