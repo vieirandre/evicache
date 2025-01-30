@@ -59,6 +59,29 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where
         }
     }
 
+    public TValue GetOrAdd(TKey key, TValue value)
+    {
+        lock (_syncLock)
+        {
+            if (_cacheMap.TryGetValue(key, out var node))
+            {
+                MoveToFront(node);
+                return node.Value.Value;
+            }
+
+            if (_cacheMap.Count >= _capacity)
+                EvictLeastRecentlyUsed();
+
+            var newItem = new CacheItem<TKey, TValue>(key, value);
+            var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
+
+            _lruList.AddFirst(newNode);
+            _cacheMap[key] = newNode;
+
+            return value;
+        }
+    }
+
     public bool Remove(TKey key)
     {
         lock (_syncLock)
