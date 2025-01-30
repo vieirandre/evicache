@@ -162,4 +162,56 @@ public class LruCacheTests
         Assert.False(removed);
         Assert.False(disposableItem.IsDisposed);
     }
+
+    [Fact]
+    public void Should_ClearAllItemsAndDisposeThem()
+    {
+        // arrange
+
+        var cache = new LruCache<int, DisposableDummy>(3);
+        var item1 = new DisposableDummy();
+        var item2 = new DisposableDummy();
+        var item3 = new DisposableDummy();
+
+        cache.Put(1, item1);
+        cache.Put(2, item2);
+        cache.Put(3, item3);
+
+        // act
+
+        cache.Clear();
+
+        // assert
+
+        Assert.Equal(0, cache.Count);
+        Assert.True(item1.IsDisposed);
+        Assert.True(item2.IsDisposed);
+        Assert.True(item3.IsDisposed);
+        Assert.False(cache.TryGet(1, out _));
+        Assert.False(cache.TryGet(2, out _));
+        Assert.False(cache.TryGet(3, out _));
+    }
+
+    [Fact]
+    public void Should_ClearAllItemsWithoutDisposing_WhenValuesAreNotDisposable()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(3);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        cache.Clear();
+
+        // assert
+
+        Assert.Equal(0, cache.Count);
+        Assert.False(cache.TryGet(1, out _));
+        Assert.False(cache.TryGet(2, out _));
+        Assert.False(cache.TryGet(3, out _));
+    }
 }
