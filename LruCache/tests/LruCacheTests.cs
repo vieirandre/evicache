@@ -354,4 +354,29 @@ public class LruCacheTests
         Assert.Equal([2, 3, 1], keys);
         Assert.Equal("newValue2", cache.TryGet(2, out var value2) ? value2 : null);
     }
+
+    [Fact]
+    public void Should_HandleGetKeysInOrder_WithDisposableItems()
+    {
+        // arrange
+
+        var cache = new LruCache<int, DisposableDummy>(3);
+        var disposable1 = new DisposableDummy();
+        var disposable2 = new DisposableDummy();
+        var disposable3 = new DisposableDummy();
+
+        cache.Put(1, disposable1);
+        cache.Put(2, disposable2);
+        cache.Put(3, disposable3);
+
+        // act
+
+        cache.TryGet(1, out var _);
+        var keys = cache.GetKeysInOrder();
+
+        // assert
+
+        Assert.Equal([1, 3, 2], keys);
+        Assert.False(disposable1.IsDisposed);
+    }
 }
