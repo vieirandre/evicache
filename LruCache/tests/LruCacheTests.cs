@@ -214,4 +214,22 @@ public class LruCacheTests
         Assert.False(cache.TryGet(2, out _));
         Assert.False(cache.TryGet(3, out _));
     }
+
+    [Fact]
+    public void Should_AddNewValue_WhenKeyDoesNotExistInGetOrAdd()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(2);
+
+        // act
+
+        var result = cache.GetOrAdd(1, "value1");
+
+        // assert
+
+        Assert.Equal("value1", result);
+        Assert.True(cache.TryGet(1, out var storedValue));
+        Assert.Equal("value1", storedValue);
+    }
 }
