@@ -1,4 +1,5 @@
 ﻿using LruCache.Models;
+using System.Collections.Immutable;
 
 namespace LruCache;
 
@@ -119,9 +120,12 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where
         get { lock (_syncLock) { return _cacheMap.Count; } }
     }
 
-    public IEnumerable<TKey> GetKeysInOrder()
+    public ImmutableList<TKey> GetKeysInOrder()
     {
-        return _lruList.Select(item => item.Key);
+        lock (_syncLock)
+        {
+            return _lruList.Select(node => node.Key).ToImmutableList();
+        }
     }
 
     public void Dispose()
