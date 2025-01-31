@@ -143,11 +143,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where
         }
     }
 
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        Clear();
-    }
+    public void Dispose() => Clear();
 
     private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
     {
