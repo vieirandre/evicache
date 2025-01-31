@@ -20,6 +20,20 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where
         _lruList = new LinkedList<CacheItem<TKey, TValue>>();
     }
 
+    public TValue Get(TKey key)
+    {
+        lock (_syncLock)
+        {
+            if (_cacheMap.TryGetValue(key, out var node))
+            {
+                MoveToFront(node);
+                return node.Value.Value;
+            }
+
+            throw new KeyNotFoundException($"The key '{key}' wasn't found in the cache");
+        }
+    }
+
     public bool TryGet(TKey key, out TValue value)
     {
         lock (_syncLock)
@@ -124,7 +138,8 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where
     {
         lock (_syncLock)
         {
-            return _lruList.Select(node => node.Key).ToImmutableList();
+            return _lruList.Select(node => node.Key)
+                .ToImmutableList();
         }
     }
 
