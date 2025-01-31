@@ -234,6 +234,26 @@ public class LruCacheTests
     }
 
     [Fact]
+    public void Should_ReturnExistingValueAndMoveToFront_WhenKeyExistsInGetOrAdd()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(2);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        var result = cache.GetOrAdd(1, "newValue1");
+
+        // assert
+
+        Assert.Equal("value1", result);
+        var keys = cache.GetKeysInOrder();
+        Assert.Equal([1, 2], keys);
+    }
+
+    [Fact]
     public void Should_ReturnKeysInMruToLruOrder_WhenItemsAreAdded()
     {
         // arrange
