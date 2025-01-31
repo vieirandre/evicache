@@ -492,4 +492,38 @@ public class LruCacheTests
         Assert.Equal([1, 3, 2], keys);
         Assert.False(disposable1.IsDisposed);
     }
+
+    [Fact]
+    public void Should_ReturnValue_WhenKeyExists()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        var result = cache.Get(2);
+
+        // assert
+
+        Assert.Equal("value2", result);
+    }
+
+    [Fact]
+    public void Should_ThrowKeyNotFoundException_WhenKeyDoesNotExist()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(2);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act & assert
+
+        var exception = Assert.Throws<KeyNotFoundException>(() => cache.Get(3));
+        Assert.Equal("The key '3' wasn't found in the cache", exception.Message);
+    }
 }
