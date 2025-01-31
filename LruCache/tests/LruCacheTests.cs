@@ -254,6 +254,29 @@ public class LruCacheTests
     }
 
     [Fact]
+    public void Should_EvictLeastRecentlyUsed_WhenAddingNewItemExceedsCapacityInGetOrAdd()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(2);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        var result = cache.GetOrAdd(3, "value3");
+
+        // assert
+
+        Assert.Equal("value3", result);
+        Assert.False(cache.TryGet(1, out _)); // evicted
+        Assert.True(cache.TryGet(2, out var value2));
+        Assert.Equal("value2", value2);
+        Assert.True(cache.TryGet(3, out var value3));
+        Assert.Equal("value3", value3);
+    }
+
+    [Fact]
     public void Should_ReturnKeysInMruToLruOrder_WhenItemsAreAdded()
     {
         // arrange
