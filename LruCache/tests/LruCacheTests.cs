@@ -277,6 +277,51 @@ public class LruCacheTests
     }
 
     [Fact]
+    public void Should_AddAndReturnNewValue_WhenUsingGetOrAddWithDisposableValue()
+    {
+        // arrange
+
+        var cache = new LruCache<int, DisposableDummy>(2);
+
+        // act
+
+        var disposable1 = cache.GetOrAdd(1, new DisposableDummy());
+
+        // assert
+
+        Assert.NotNull(disposable1);
+        Assert.False(disposable1.IsDisposed);
+        Assert.True(cache.TryGet(1, out var retrieved));
+        Assert.Equal(disposable1, retrieved);
+    }
+
+    [Fact]
+    public void Should_DisposeEvictedItem_WhenAddingNewItemExceedsCapacityWithDisposableValue()
+    {
+        // arrange
+
+        var cache = new LruCache<int, DisposableDummy>(2);
+        var disposable1 = new DisposableDummy();
+        var disposable2 = new DisposableDummy();
+
+        cache.Put(1, disposable1);
+        cache.Put(2, disposable2);
+
+        // act
+
+        var disposable3 = cache.GetOrAdd(3, new DisposableDummy());
+
+        // assert
+
+        Assert.True(disposable1.IsDisposed);
+        Assert.False(disposable2.IsDisposed);
+        Assert.True(cache.TryGet(2, out var retrieved2));
+        Assert.Equal(disposable2, retrieved2);
+        Assert.True(cache.TryGet(3, out var retrieved3));
+        Assert.Equal(disposable3, retrieved3);
+    }
+
+    [Fact]
     public void Should_ReturnKeysInMruToLruOrder_WhenItemsAreAdded()
     {
         // arrange
