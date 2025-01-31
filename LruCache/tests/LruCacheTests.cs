@@ -277,6 +277,31 @@ public class LruCacheTests
     }
 
     [Fact]
+    public void Should_AddNewValueAndNotEvict_WhenUnderCapacityInGetOrAdd()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        var result = cache.GetOrAdd(3, "value3");
+
+        // assert
+
+        Assert.Equal("value3", result);
+        Assert.Equal(3, cache.Count);
+        Assert.True(cache.TryGet(1, out var value1));
+        Assert.Equal("value1", value1);
+        Assert.True(cache.TryGet(2, out var value2));
+        Assert.Equal("value2", value2);
+        Assert.True(cache.TryGet(3, out var value3));
+        Assert.Equal("value3", value3);
+    }
+
+    [Fact]
     public void Should_AddAndReturnNewValue_WhenUsingGetOrAddWithDisposableValue()
     {
         // arrange
