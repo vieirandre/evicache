@@ -161,6 +161,12 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ID
         get { lock (_syncLock) { return _cacheMap.Count; } }
     }
 
+    public long HitCount => throw new NotImplementedException();
+
+    public long MissCount => throw new NotImplementedException();
+
+    public long EvictionCount => throw new NotImplementedException();
+
     public void Dispose() => Clear();
 
     private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
