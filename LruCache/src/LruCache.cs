@@ -171,6 +171,8 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ID
         }
     }
 
+    public int Capacity => _capacity;
+
     public int Count
     {
         get { lock (_syncLock) { return _cacheMap.Count; } }

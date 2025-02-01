@@ -2,6 +2,7 @@
 
 public interface ICacheMetrics
 {
+    int Capacity { get; }
     int Count { get; }
     long HitCount { get; }
     long MissCount { get; }

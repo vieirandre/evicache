@@ -592,7 +592,8 @@ public class LruCacheTests
     [Fact]
     public void Teste()
     {
-        var cache = new LruCache<int, string>(2);
+        int capacity = 2;
+        var cache = new LruCache<int, string>(capacity);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -611,5 +612,7 @@ public class LruCacheTests
         Assert.Equal(1, cache.HitCount);
         Assert.Equal(1, cache.MissCount);
         Assert.Equal(1, cache.EvictionCount);
+
+        Assert.Equal(cache.Capacity, capacity);
     }
 }
