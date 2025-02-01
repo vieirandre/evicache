@@ -101,6 +101,26 @@ public class LruCacheTests
     }
 
     [Fact]
+    public void Should_NotDisposeItem_WhenTryGetIsCalled()
+    {
+        // arrange
+
+        var cache = new LruCache<int, DisposableDummy>(2);
+        var disposableItem = new DisposableDummy();
+        cache.Put(1, disposableItem);
+
+        // act
+
+        var result = cache.TryGet(1, out var disposableReturn);
+
+        // assert
+
+        Assert.True(result);
+        Assert.False(disposableItem.IsDisposed);
+        Assert.Equal(disposableItem, disposableReturn);
+    }
+
+    [Fact]
     public void Should_NotExceedCapacity_WhenCacheIsFull()
     {
         // arrange
@@ -546,5 +566,24 @@ public class LruCacheTests
         Assert.Equal("value1", result);
         var keys = cache.GetKeysInOrder();
         Assert.Equal([1, 3, 2], keys);
+    }
+
+    [Fact]
+    public void Should_NotDisposeItem_WhenGetIsCalled()
+    {
+        // arrange
+
+        var cache = new LruCache<int, DisposableDummy>(2);
+        var disposableItem = new DisposableDummy();
+        cache.Put(1, disposableItem);
+
+        // act
+
+        var result = cache.Get(1);
+
+        // assert
+
+        Assert.False(disposableItem.IsDisposed);
+        Assert.Equal(disposableItem, result);
     }
 }
