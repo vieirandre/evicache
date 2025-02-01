@@ -1,9 +1,10 @@
-﻿using LruCache.Models;
+﻿using LruCache.Abstractions;
+using LruCache.Models;
 using System.Collections.Immutable;
 
 namespace LruCache;
 
-public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where TKey : notnull
+public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, IDisposable where TKey : notnull
 {
     private readonly int _capacity;
     private readonly Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>> _cacheMap;
@@ -146,11 +147,6 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where
         });
     }
 
-    public int Count
-    {
-        get { lock (_syncLock) { return _cacheMap.Count; } }
-    }
-
     public ImmutableList<TKey> GetKeysInOrder()
     {
         lock (_syncLock)
@@ -158,6 +154,11 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where
             return _lruList.Select(node => node.Key)
                 .ToImmutableList();
         }
+    }
+
+    public int Count
+    {
+        get { lock (_syncLock) { return _cacheMap.Count; } }
     }
 
     public void Dispose() => Clear();
