@@ -213,7 +213,7 @@ public class LruCacheTests
     }
 
     [Fact]
-    public void Should_ClearAllItemsWithoutDisposing_WhenValuesAreNotDisposable()
+    public void Should_ClearAllItems_WhenClearIsCalled()
     {
         // arrange
 
