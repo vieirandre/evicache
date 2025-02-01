@@ -588,4 +588,28 @@ public class LruCacheTests
         Assert.False(disposableItem.IsDisposed);
         Assert.Equal(disposableItem, result);
     }
+
+    [Fact]
+    public void Teste()
+    {
+        var cache = new LruCache<int, string>(2);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        var hit = cache.Get(1); // + hit
+
+        bool found = cache.TryGet(3, out _); // + miss
+
+        cache.Put(3, "value3"); // evict
+
+
+        Assert.Equal("value1", hit);
+        Assert.False(found);
+
+
+        Assert.Equal(1, cache.HitCount);
+        Assert.Equal(1, cache.MissCount);
+        Assert.Equal(1, cache.EvictionCount);
+    }
 }
