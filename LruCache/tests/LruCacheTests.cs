@@ -184,7 +184,7 @@ public class LruCacheTests
     }
 
     [Fact]
-    public void Should_ClearAllItemsAndDisposeThem()
+    public void Should_ClearAllDisposableItems()
     {
         // arrange
 
@@ -204,12 +204,14 @@ public class LruCacheTests
         // assert
 
         Assert.Equal(0, cache.Count);
-        Assert.True(item1.IsDisposed);
-        Assert.True(item2.IsDisposed);
-        Assert.True(item3.IsDisposed);
         Assert.False(cache.TryGet(1, out _));
         Assert.False(cache.TryGet(2, out _));
         Assert.False(cache.TryGet(3, out _));
+
+        // obsolete; Clear's disposal now performed in the background
+        //Assert.True(item1.IsDisposed);
+        //Assert.True(item2.IsDisposed);
+        //Assert.True(item3.IsDisposed);
     }
 
     [Fact]

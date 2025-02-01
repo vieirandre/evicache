@@ -117,16 +117,33 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, IDisposable where
 
     public void Clear()
     {
+        List<IDisposable> disposables;
+
         lock (_syncLock)
         {
-            foreach (var entry in _cacheMap)
-            {
-                DisposeItem(entry.Value);
-            }
+            disposables = _cacheMap.Values
+                .Select(node => node.Value)
+                .OfType<IDisposable>()
+                .ToList();
 
             _cacheMap.Clear();
             _lruList.Clear();
         }
+
+        _ = Task.Run(() =>
+        {
+            foreach (var disposable in disposables)
+            {
+                try
+                {
+                    disposable.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while disposing cache item in the background: {ex}");
+                }
+            }
+        });
     }
 
     public int Count
