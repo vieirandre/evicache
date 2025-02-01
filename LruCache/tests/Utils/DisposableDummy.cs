@@ -6,7 +6,6 @@ public class DisposableDummy : IDisposable
 
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
         IsDisposed = true;
     }
 }
