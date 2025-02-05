@@ -113,6 +113,11 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ID
         }
     }
 
+    public TValue AddOrUpdate(TKey key, TValue value)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool Remove(TKey key)
     {
         lock (_syncLock)
