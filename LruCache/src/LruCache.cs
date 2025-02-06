@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace LruCache;
 
-public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey>, IDisposable where TKey : notnull
+public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey, TValue>, IDisposable where TKey : notnull
 {
     private readonly int _capacity;
     private readonly Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>> _cacheMap;
@@ -167,15 +167,6 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, IC
         });
     }
 
-    public ImmutableList<TKey> GetKeysInOrder()
-    {
-        lock (_syncLock)
-        {
-            return _lruList.Select(node => node.Key)
-                .ToImmutableList();
-        }
-    }
-
     public int Capacity => _capacity;
 
     public int Count
@@ -186,6 +177,20 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, IC
     public long Hits => Interlocked.Read(ref _hits);
     public long Misses => Interlocked.Read(ref _misses);
     public long Evictions => Interlocked.Read(ref _evictions);
+
+    public ImmutableList<TKey> GetKeysInOrder()
+    {
+        lock (_syncLock)
+        {
+            return _lruList.Select(node => node.Key)
+                .ToImmutableList();
+        }
+    }
+
+    public ImmutableDictionary<TKey, TValue> GetSnapshot()
+    {
+        throw new NotImplementedException();
+    }
 
     public void Dispose() => Clear();
 
