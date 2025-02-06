@@ -189,7 +189,12 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, IC
 
     public ImmutableList<KeyValuePair<TKey, TValue>> GetSnapshot()
     {
-        throw new NotImplementedException();
+        lock (_syncLock)
+        {
+            return _lruList
+                .Select(node => new KeyValuePair<TKey, TValue>(node.Key, node.Value))
+                .ToImmutableList();
+        }
     }
 
     public void Dispose() => Clear();
