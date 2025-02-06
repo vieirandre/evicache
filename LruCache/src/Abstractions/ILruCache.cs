@@ -1,6 +1,6 @@
 ﻿namespace LruCache.Abstractions;
 
-public interface ILruCache<TKey, TValue>
+public interface ILruCache<TKey, TValue> where TKey : notnull
 {
     TValue Get(TKey key);
     bool TryGet(TKey key, out TValue value);
