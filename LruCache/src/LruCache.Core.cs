@@ -1,19 +1,13 @@
 ﻿using LruCache.Abstractions;
 using LruCache.Models;
-using System.Collections.Immutable;
 
 namespace LruCache;
 
-public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey, TValue>, IDisposable where TKey : notnull
+public partial class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey, TValue>, IDisposable where TKey : notnull
 {
     private readonly int _capacity;
     private readonly Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>> _cacheMap;
     private readonly LinkedList<CacheItem<TKey, TValue>> _lruList;
-
-    private long _hits;
-    private long _misses;
-    private long _evictions;
-
     private readonly object _syncLock = new();
 
     public LruCache(int capacity)
@@ -136,69 +130,6 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, IC
         }
     }
 
-    public void Clear()
-    {
-        List<IDisposable> disposables;
-
-        lock (_syncLock)
-        {
-            disposables = _cacheMap.Values
-                .Select(node => node.Value)
-                .OfType<IDisposable>()
-                .ToList();
-
-            _cacheMap.Clear();
-            _lruList.Clear();
-        }
-
-        _ = Task.Run(() =>
-        {
-            foreach (var disposable in disposables)
-            {
-                try
-                {
-                    disposable.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error while disposing cache item in the background: {ex}");
-                }
-            }
-        });
-    }
-
-    public int Capacity => _capacity;
-
-    public int Count
-    {
-        get { lock (_syncLock) { return _cacheMap.Count; } }
-    }
-
-    public long Hits => Interlocked.Read(ref _hits);
-    public long Misses => Interlocked.Read(ref _misses);
-    public long Evictions => Interlocked.Read(ref _evictions);
-
-    public ImmutableList<TKey> GetKeysInOrder()
-    {
-        lock (_syncLock)
-        {
-            return _lruList.Select(node => node.Key)
-                .ToImmutableList();
-        }
-    }
-
-    public ImmutableList<KeyValuePair<TKey, TValue>> GetSnapshot()
-    {
-        lock (_syncLock)
-        {
-            return _lruList
-                .Select(node => new KeyValuePair<TKey, TValue>(node.Key, node.Value))
-                .ToImmutableList();
-        }
-    }
-
-    public void Dispose() => Clear();
-
     private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
     {
         _lruList.Remove(node);
@@ -218,11 +149,5 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, IC
         Interlocked.Increment(ref _evictions);
 
         DisposeItem(lruNode);
-    }
-
-    private static void DisposeItem(LinkedListNode<CacheItem<TKey, TValue>> node)
-    {
-        if (node.Value.Value is IDisposable disposable)
-            disposable.Dispose();
     }
 }
