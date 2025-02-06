@@ -590,34 +590,48 @@ public class LruCacheTests
     }
 
     [Fact]
-    public void Teste()
+    public void Should_TrackHitsMissesAndEvictions_WhenCacheCapacityIs15()
     {
-        int capacity = 2;
+        // arrange
+
+        int capacity = 15;
         var cache = new LruCache<int, string>(capacity);
 
-        cache.Put(1, "value1");
-        cache.Put(2, "value2");
+        for (int i = 1; i <= capacity; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
 
-        var hit = cache.Get(1); // + hit
+        // act & assert
 
-        bool found = cache.TryGet(3, out _); // + miss
+        for (int i = 1; i <= 10; i++)
+        {
+            string value = cache.Get(i);
+            Assert.Equal($"value{i}", value);
+        }
 
-        cache.Put(3, "value3"); // evict
+        for (int i = 16; i <= 20; i++)
+        {
+            bool found = cache.TryGet(i, out _);
+            Assert.False(found);
+        }
 
+        for (int i = 16; i <= 20; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
 
-        Assert.Equal("value1", hit);
-        Assert.False(found);
+        // assert
 
+        Assert.Equal(15, cache.Count);
 
-        Assert.Equal(1, cache.Hits);
-        Assert.Equal(1, cache.Misses);
-        Assert.Equal(1, cache.Evictions);
-
-        Assert.Equal(cache.Capacity, capacity);
+        Assert.Equal(10, cache.Hits);
+        Assert.Equal(5, cache.Misses);
+        Assert.Equal(5, cache.Evictions);
     }
 
     [Fact]
-    public void Should_ProduceOrderedSnapshot_WhenCacheContains15Items()
+    public void Should_ReturnOrderedSnapshot_WhenCacheContains15Items()
     {
         // arrange
 
