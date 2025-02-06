@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-
-namespace LruCache.Abstractions;
+﻿namespace LruCache.Abstractions;
 
 public interface ILruCache<TKey, TValue>
 {
@@ -11,5 +9,4 @@ public interface ILruCache<TKey, TValue>
     TValue AddOrUpdate(TKey key, TValue value);
     bool Remove(TKey key);
     void Clear();
-    ImmutableList<TKey> GetKeysInOrder();
 }

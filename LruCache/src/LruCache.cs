@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace LruCache;
 
-public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, IDisposable where TKey : notnull
+public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey>, IDisposable where TKey : notnull
 {
     private readonly int _capacity;
     private readonly Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>> _cacheMap;
