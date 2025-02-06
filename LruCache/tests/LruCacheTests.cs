@@ -615,4 +615,31 @@ public class LruCacheTests
 
         Assert.Equal(cache.Capacity, capacity);
     }
+
+    [Fact]
+    public void Should_ProduceOrderedSnapshot_WhenCacheContains15Items()
+    {
+        // arrange
+
+        int capacity = 15;
+        var cache = new LruCache<int, string>(capacity);
+
+        for (int i = 1; i <= capacity; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
+
+        // act
+
+        var snapshot = cache.GetSnapshot();
+
+        // assert
+
+        Assert.Equal(capacity, snapshot.Count);
+
+        Assert.Equal(15, snapshot[0].Key);
+        Assert.Equal("value15", snapshot[0].Value);
+        Assert.Equal(1, snapshot[capacity - 1].Key);
+        Assert.Equal("value1", snapshot[capacity - 1].Value);
+    }
 }
