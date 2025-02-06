@@ -10,9 +10,9 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ID
     private readonly Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>> _cacheMap;
     private readonly LinkedList<CacheItem<TKey, TValue>> _lruList;
 
-    private long _hitCount;
-    private long _missCount;
-    private long _evictionCount;
+    private long _hits;
+    private long _misses;
+    private long _evictions;
 
     private readonly object _syncLock = new();
 
@@ -31,13 +31,13 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ID
         {
             if (_cacheMap.TryGetValue(key, out var node))
             {
-                Interlocked.Increment(ref _hitCount);
+                Interlocked.Increment(ref _hits);
 
                 MoveToFront(node);
                 return node.Value.Value;
             }
 
-            Interlocked.Increment(ref _missCount);
+            Interlocked.Increment(ref _misses);
 
             throw new KeyNotFoundException($"The key '{key}' wasn't found in the cache");
         }
@@ -49,14 +49,14 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ID
         {
             if (_cacheMap.TryGetValue(key, out var node))
             {
-                Interlocked.Increment(ref _hitCount);
+                Interlocked.Increment(ref _hits);
 
                 MoveToFront(node);
                 value = node.Value.Value;
                 return true;
             }
 
-            Interlocked.Increment(ref _missCount);
+            Interlocked.Increment(ref _misses);
 
             value = default;
             return false;
@@ -92,13 +92,13 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ID
         {
             if (_cacheMap.TryGetValue(key, out var node))
             {
-                Interlocked.Increment(ref _hitCount);
+                Interlocked.Increment(ref _hits);
 
                 MoveToFront(node);
                 return node.Value.Value;
             }
 
-            Interlocked.Increment(ref _missCount);
+            Interlocked.Increment(ref _misses);
 
             if (_cacheMap.Count >= _capacity)
                 EvictLeastRecentlyUsed();
@@ -183,9 +183,9 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ID
         get { lock (_syncLock) { return _cacheMap.Count; } }
     }
 
-    public long HitCount => Interlocked.Read(ref _hitCount);
-    public long MissCount => Interlocked.Read(ref _missCount);
-    public long EvictionCount => Interlocked.Read(ref _evictionCount);
+    public long Hits => Interlocked.Read(ref _hits);
+    public long Misses => Interlocked.Read(ref _misses);
+    public long Evictions => Interlocked.Read(ref _evictions);
 
     public void Dispose() => Clear();
 
@@ -205,7 +205,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ID
         _cacheMap.Remove(lruNode.Value.Key);
         _lruList.RemoveLast();
 
-        Interlocked.Increment(ref _evictionCount);
+        Interlocked.Increment(ref _evictions);
 
         DisposeItem(lruNode);
     }
