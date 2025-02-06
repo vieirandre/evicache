@@ -187,7 +187,7 @@ public class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, IC
         }
     }
 
-    public ImmutableDictionary<TKey, TValue> GetSnapshot()
+    public ImmutableList<KeyValuePair<TKey, TValue>> GetSnapshot()
     {
         throw new NotImplementedException();
     }
