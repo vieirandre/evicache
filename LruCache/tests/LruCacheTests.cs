@@ -609,9 +609,9 @@ public class LruCacheTests
         Assert.False(found);
 
 
-        Assert.Equal(1, cache.HitCount);
-        Assert.Equal(1, cache.MissCount);
-        Assert.Equal(1, cache.EvictionCount);
+        Assert.Equal(1, cache.Hits);
+        Assert.Equal(1, cache.Misses);
+        Assert.Equal(1, cache.Evictions);
 
         Assert.Equal(cache.Capacity, capacity);
     }
