@@ -658,7 +658,7 @@ public class LruCacheTests
     }
 
     [Fact]
-    public void Should_UpdateExistingKeyAndReturnNewValue()
+    public void Should_UpdateExistingKey_AndReturnNewValue()
     {
         // arrange
 
@@ -682,7 +682,7 @@ public class LruCacheTests
     }
 
     [Fact]
-    public void Should_AddNewKeyAndReturnValue()
+    public void Should_AddNewKey_AndReturnValue()
     {
         // arrange
 
@@ -720,5 +720,25 @@ public class LruCacheTests
         Assert.Equal(3, cache.Count);
         Assert.False(cache.TryGet(1, out _));
         Assert.Equal(1, cache.Evictions);
+    }
+
+    [Fact]
+    public void Should_UpdateMetrics_OnAddOrUpdate_ForExistingAndNewKeys()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(5);
+
+        // act & assert:
+
+        cache.AddOrUpdate(1, "value1");
+        Assert.Equal(1, cache.Misses);
+        Assert.Equal(0, cache.Hits);
+
+        cache.AddOrUpdate(1, "value1Updated");
+        Assert.Equal(1, cache.Hits);
+
+        cache.AddOrUpdate(2, "value2");
+        Assert.Equal(2, cache.Misses);
     }
 }
