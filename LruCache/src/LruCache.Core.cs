@@ -71,11 +71,7 @@ public partial class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMet
                 if (_cacheMap.Count >= _capacity)
                     EvictLeastRecentlyUsed();
 
-                var newItem = new CacheItem<TKey, TValue>(key, value);
-                var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
-
-                _lruList.AddFirst(newNode);
-                _cacheMap[key] = newNode;
+                AddNewNode(key, value);
             }
         }
     }
@@ -97,11 +93,7 @@ public partial class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMet
             if (_cacheMap.Count >= _capacity)
                 EvictLeastRecentlyUsed();
 
-            var newItem = new CacheItem<TKey, TValue>(key, value);
-            var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
-
-            _lruList.AddFirst(newNode);
-            _cacheMap[key] = newNode;
+            AddNewNode(key, value);
 
             return value;
         }
@@ -126,11 +118,7 @@ public partial class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMet
             if (_cacheMap.Count >= _capacity)
                 EvictLeastRecentlyUsed();
 
-            var newItem = new CacheItem<TKey, TValue>(key, value);
-            var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
-
-            _lruList.AddFirst(newNode);
-            _cacheMap[key] = newNode;
+            AddNewNode(key, value);
 
             return value;
         }
@@ -173,5 +161,14 @@ public partial class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMet
         Interlocked.Increment(ref _evictions);
 
         DisposeItem(lruNode);
+    }
+
+    private void AddNewNode(TKey key, TValue value)
+    {
+        var newItem = new CacheItem<TKey, TValue>(key, value);
+        var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
+
+        _lruList.AddFirst(newNode);
+        _cacheMap[key] = newNode;
     }
 }
