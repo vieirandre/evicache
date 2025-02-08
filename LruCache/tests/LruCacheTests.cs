@@ -698,4 +698,27 @@ public class LruCacheTests
         Assert.Equal("value2", cache.Get(2));
         Assert.Equal(1, cache.Count);
     }
+
+    [Fact]
+    public void Should_EvictLeastRecentlyUsed_WhenAddingNewKeyExceedingCapacity()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        cache.Get(2);
+        var result = cache.AddOrUpdate(4, "value4");
+
+        // assert
+
+        Assert.Equal("value4", result);
+        Assert.Equal(3, cache.Count);
+        Assert.False(cache.TryGet(1, out _));
+        Assert.Equal(1, cache.Evictions);
+    }
 }
