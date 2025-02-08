@@ -109,7 +109,31 @@ public partial class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMet
 
     public TValue AddOrUpdate(TKey key, TValue value)
     {
-        throw new NotImplementedException();
+        lock (_syncLock)
+        {
+            if (_cacheMap.TryGetValue(key, out var node))
+            {
+                Interlocked.Increment(ref _hits);
+
+                node.Value.Value = value;
+                MoveToFront(node);
+
+                return value;
+            }
+
+            Interlocked.Increment(ref _misses);
+
+            if (_cacheMap.Count >= _capacity)
+                EvictLeastRecentlyUsed();
+
+            var newItem = new CacheItem<TKey, TValue>(key, value);
+            var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
+
+            _lruList.AddFirst(newNode);
+            _cacheMap[key] = newNode;
+
+            return value;
+        }
     }
 
     public bool Remove(TKey key)
