@@ -680,4 +680,22 @@ public class LruCacheTests
         var keys = cache.GetKeysInOrder();
         Assert.Equal(1, keys[0]);
     }
+
+    [Fact]
+    public void Should_AddNewKeyAndReturnValue()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(5);
+
+        // act
+
+        var result = cache.AddOrUpdate(2, "value2");
+
+        // assert
+
+        Assert.Equal("value2", result);
+        Assert.Equal("value2", cache.Get(2));
+        Assert.Equal(1, cache.Count);
+    }
 }
