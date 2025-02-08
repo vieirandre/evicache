@@ -656,4 +656,28 @@ public class LruCacheTests
         Assert.Equal(1, snapshot[capacity - 1].Key);
         Assert.Equal("value1", snapshot[capacity - 1].Value);
     }
+
+    [Fact]
+    public void Should_UpdateExistingKeyAndReturnNewValue()
+    {
+        // arrange
+
+        var cache = new LruCache<int, string>(5);
+        cache.Put(1, "oldValue");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        var result = cache.AddOrUpdate(1, "newValue");
+        cache.Get(3);
+
+        // assert
+
+        Assert.Equal("newValue", result);
+        Assert.Equal("newValue", cache.Get(1));
+
+        var keys = cache.GetKeysInOrder();
+        Assert.Equal(1, keys[0]);
+    }
 }
