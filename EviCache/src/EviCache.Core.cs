@@ -1,34 +1,35 @@
 ﻿using EviCache.Abstractions;
-using EviCache.Models;
+using EviCache.Enums;
+using EviCache.Factories;
 
 namespace EviCache;
 
 public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey, TValue>, IDisposable where TKey : notnull
 {
     private readonly int _capacity;
-    private readonly Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>> _cacheMap;
-    private readonly LinkedList<CacheItem<TKey, TValue>> _lruList;
+    private readonly Dictionary<TKey, TValue> _cacheMap;
+    private readonly IEvictionPolicy<TKey, TValue> _evictionPolicy;
     private readonly object _syncLock = new();
 
-    public EviCache(int capacity)
+    public EviCache(int capacity, EvictionPolicyType evictionPolicyType)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity);
 
         _capacity = capacity;
-        _cacheMap = new Dictionary<TKey, LinkedListNode<CacheItem<TKey, TValue>>>(capacity);
-        _lruList = new LinkedList<CacheItem<TKey, TValue>>();
+        _cacheMap = new Dictionary<TKey, TValue>(capacity);
+        _evictionPolicy = EvictionPolicyFactory.Create<TKey, TValue>(evictionPolicyType);
     }
 
     public TValue Get(TKey key)
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var node))
+            if (_cacheMap.TryGetValue(key, out var value))
             {
                 Interlocked.Increment(ref _hits);
 
-                MoveToFront(node);
-                return node.Value.Value;
+                _evictionPolicy.RecordAccess(key);
+                return value;
             }
 
             Interlocked.Increment(ref _misses);
@@ -41,18 +42,17 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var node))
+            if (_cacheMap.TryGetValue(key, out value))
             {
                 Interlocked.Increment(ref _hits);
 
-                MoveToFront(node);
-                value = node.Value.Value;
+                _evictionPolicy.RecordAccess(key);
                 return true;
             }
 
             Interlocked.Increment(ref _misses);
 
-            value = default;
+            value = default!;
             return false;
         }
     }
@@ -61,18 +61,19 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var existingNode))
+            if (_cacheMap.ContainsKey(key))
             {
-                existingNode.Value.Value = value;
-                MoveToFront(existingNode);
-            }
-            else
-            {
-                if (_cacheMap.Count >= _capacity)
-                    EvictLeastRecentlyUsed();
+                _cacheMap[key] = value;
+                _evictionPolicy.RecordUpdate(key);
 
-                AddNewNode(key, value);
+                return;
             }
+
+            if (_cacheMap.Count >= _capacity)
+                Evict();
+
+            _cacheMap[key] = value;
+            _evictionPolicy.RecordInsertion(key);
         }
     }
 
@@ -80,20 +81,21 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var node))
+            if (_cacheMap.TryGetValue(key, out var existing))
             {
                 Interlocked.Increment(ref _hits);
 
-                MoveToFront(node);
-                return node.Value.Value;
+                _evictionPolicy.RecordAccess(key);
+                return existing;
             }
 
             Interlocked.Increment(ref _misses);
 
             if (_cacheMap.Count >= _capacity)
-                EvictLeastRecentlyUsed();
+                Evict();
 
-            AddNewNode(key, value);
+            _cacheMap[key] = value;
+            _evictionPolicy.RecordInsertion(key);
 
             return value;
         }
@@ -103,12 +105,12 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var node))
+            if (_cacheMap.ContainsKey(key))
             {
                 Interlocked.Increment(ref _hits);
 
-                node.Value.Value = value;
-                MoveToFront(node);
+                _cacheMap[key] = value;
+                _evictionPolicy.RecordUpdate(key);
 
                 return value;
             }
@@ -116,9 +118,10 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
             Interlocked.Increment(ref _misses);
 
             if (_cacheMap.Count >= _capacity)
-                EvictLeastRecentlyUsed();
+                Evict();
 
-            AddNewNode(key, value);
+            _cacheMap[key] = value;
+            _evictionPolicy.RecordInsertion(key);
 
             return value;
         }
@@ -128,47 +131,31 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var node))
-            {
-                _cacheMap.Remove(key);
-                _lruList.Remove(node);
+            if (!_cacheMap.TryGetValue(key, out var value))
+                return false;
 
-                DisposeItem(node);
+            _cacheMap.Remove(key);
+            _evictionPolicy.RecordRemoval(key);
 
-                return true;
-            }
+            DisposeItem(value);
 
-            return false;
+            return true;
         }
     }
 
-    private void MoveToFront(LinkedListNode<CacheItem<TKey, TValue>> node)
+    private void Evict()
     {
-        _lruList.Remove(node);
-        _lruList.AddFirst(node);
-    }
-
-    private void EvictLeastRecentlyUsed()
-    {
-        var lruNode = _lruList.Last;
-
-        if (lruNode is null)
+        if (!_evictionPolicy.TrySelectEvictionCandidate(out var candidate))
             return;
 
-        _cacheMap.Remove(lruNode.Value.Key);
-        _lruList.RemoveLast();
+        if (!_cacheMap.TryGetValue(candidate, out var value))
+            return;
+
+        _cacheMap.Remove(candidate);
+        _evictionPolicy.RecordRemoval(candidate);
 
         Interlocked.Increment(ref _evictions);
 
-        DisposeItem(lruNode);
-    }
-
-    private void AddNewNode(TKey key, TValue value)
-    {
-        var newItem = new CacheItem<TKey, TValue>(key, value);
-        var newNode = new LinkedListNode<CacheItem<TKey, TValue>>(newItem);
-
-        _lruList.AddFirst(newNode);
-        _cacheMap[key] = newNode;
+        DisposeItem(value);
     }
 }
