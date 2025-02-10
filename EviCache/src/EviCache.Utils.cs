@@ -9,8 +9,7 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     {
         lock (_syncLock)
         {
-            return _lruList.Select(node => node.Key)
-                .ToImmutableList();
+            return _evictionPolicy.GetKeysInOrder();
         }
     }
 
@@ -18,8 +17,9 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     {
         lock (_syncLock)
         {
-            return _lruList
-                .Select(node => new KeyValuePair<TKey, TValue>(node.Key, node.Value))
+            return _evictionPolicy.GetKeysInOrder()
+                .Where(key => _cacheMap.TryGetValue(key, out var value))
+                .Select(key => new KeyValuePair<TKey, TValue>(key, _cacheMap[key]))
                 .ToImmutableList();
         }
     }
