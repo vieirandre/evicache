@@ -1,7 +1,7 @@
 ﻿using EviCache.Abstractions;
 using System.Collections.Immutable;
 
-namespace EviCache.Policies;
+namespace EviCache.EvictionPolicies;
 
 public class LruEvictionPolicy<TKey, TValue> : IEvictionPolicy<TKey, TValue> where TKey : notnull
 {

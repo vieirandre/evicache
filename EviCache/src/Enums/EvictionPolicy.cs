@@ -1,6 +1,6 @@
 ﻿namespace EviCache.Enums;
 
-public enum EvictionPolicyType
+public enum EvictionPolicy
 {
     LRU
 }

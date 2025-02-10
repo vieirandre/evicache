@@ -11,7 +11,7 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     private readonly IEvictionPolicy<TKey, TValue> _evictionPolicy;
     private readonly object _syncLock = new();
 
-    public EviCache(int capacity, EvictionPolicyType evictionPolicyType)
+    public EviCache(int capacity, EvictionPolicy evictionPolicyType)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity);
 

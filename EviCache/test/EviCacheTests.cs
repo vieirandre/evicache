@@ -10,7 +10,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
 
         // act
 
@@ -27,7 +27,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(2, EvictionPolicy.LRU);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -54,7 +54,7 @@ public class EviCacheTests
     {
         // act & assert
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => new EviCache<int, string>(invalidCapacity, EvictionPolicyType.LRU));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new EviCache<int, string>(invalidCapacity, EvictionPolicy.LRU));
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<string, int>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<string, int>(2, EvictionPolicy.LRU);
 
         // act
 
@@ -80,7 +80,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(2, EvictionPolicy.LRU);
         cache.Put(1, "oldValue");
         cache.Put(2, "value2");
 
@@ -106,7 +106,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicy.LRU);
         var disposableItem = new DisposableDummy();
         cache.Put(1, disposableItem);
 
@@ -127,7 +127,7 @@ public class EviCacheTests
         // arrange
 
         int capacity = 2;
-        var cache = new EviCache<int, string>(capacity, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(capacity, EvictionPolicy.LRU);
 
         // act
 
@@ -146,7 +146,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicy.LRU);
         var disposableItem = new DisposableDummy();
 
         cache.Put(1, disposableItem);
@@ -169,7 +169,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicy.LRU);
         var disposableItem = new DisposableDummy();
 
         cache.Put(1, disposableItem);
@@ -189,7 +189,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, DisposableDummy>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, DisposableDummy>(3, EvictionPolicy.LRU);
         var item1 = new DisposableDummy();
         var item2 = new DisposableDummy();
         var item3 = new DisposableDummy();
@@ -220,7 +220,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -243,7 +243,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(2, EvictionPolicy.LRU);
 
         // act
 
@@ -261,7 +261,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(2, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -281,7 +281,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(2, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -304,7 +304,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -329,7 +329,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicy.LRU);
 
         // act
 
@@ -348,7 +348,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicy.LRU);
         var disposable1 = new DisposableDummy();
         var disposable2 = new DisposableDummy();
 
@@ -374,7 +374,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -393,7 +393,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -413,7 +413,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(2, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -433,7 +433,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -454,7 +454,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -475,7 +475,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -496,7 +496,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, DisposableDummy>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, DisposableDummy>(3, EvictionPolicy.LRU);
         var disposable1 = new DisposableDummy();
         var disposable2 = new DisposableDummy();
         var disposable3 = new DisposableDummy();
@@ -521,7 +521,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -540,7 +540,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(2, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -555,7 +555,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -576,7 +576,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, DisposableDummy>(2, EvictionPolicy.LRU);
         var disposableItem = new DisposableDummy();
         cache.Put(1, disposableItem);
 
@@ -596,7 +596,7 @@ public class EviCacheTests
         // arrange
 
         int capacity = 15;
-        var cache = new EviCache<int, string>(capacity, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(capacity, EvictionPolicy.LRU);
 
         for (int i = 1; i <= capacity; i++)
         {
@@ -637,7 +637,7 @@ public class EviCacheTests
         // arrange
 
         int capacity = 15;
-        var cache = new EviCache<int, string>(capacity, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(capacity, EvictionPolicy.LRU);
 
         for (int i = 1; i <= capacity; i++)
         {
@@ -663,7 +663,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(5, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(5, EvictionPolicy.LRU);
         cache.Put(1, "oldValue");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -687,7 +687,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(5, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(5, EvictionPolicy.LRU);
 
         // act
 
@@ -705,7 +705,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(3, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(3, EvictionPolicy.LRU);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -728,7 +728,7 @@ public class EviCacheTests
     {
         // arrange
 
-        var cache = new EviCache<int, string>(5, EvictionPolicyType.LRU);
+        var cache = new EviCache<int, string>(5, EvictionPolicy.LRU);
 
         // act & assert:
 

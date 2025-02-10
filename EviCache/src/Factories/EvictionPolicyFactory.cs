@@ -1,16 +1,16 @@
 ﻿using EviCache.Abstractions;
 using EviCache.Enums;
-using EviCache.Policies;
+using EviCache.EvictionPolicies;
 
 namespace EviCache.Factories;
 
 public static class EvictionPolicyFactory
 {
-    public static IEvictionPolicy<TKey, TValue> Create<TKey, TValue>(EvictionPolicyType policyType) where TKey : notnull
+    public static IEvictionPolicy<TKey, TValue> Create<TKey, TValue>(EvictionPolicy policyType) where TKey : notnull
     {
         return policyType switch
         {
-            EvictionPolicyType.LRU => new LruEvictionPolicy<TKey, TValue>(),
+            EvictionPolicy.LRU => new LruEvictionPolicy<TKey, TValue>(),
             _ => throw new NotSupportedException($"The eviction policy '{policyType}' is not supported")
         };
     }
