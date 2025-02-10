@@ -56,8 +56,7 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
             if (_cacheMap.Count >= _capacity)
                 Evict();
 
-            _cacheMap[key] = value;
-            _evictionPolicy.RecordInsertion(key);
+            AddNewItem(key, value);
         }
     }
 
@@ -78,9 +77,7 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
             if (_cacheMap.Count >= _capacity)
                 Evict();
 
-            _cacheMap[key] = value;
-            _evictionPolicy.RecordInsertion(key);
-
+            AddNewItem(key, value);
             return value;
         }
     }
@@ -104,9 +101,7 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
             if (_cacheMap.Count >= _capacity)
                 Evict();
 
-            _cacheMap[key] = value;
-            _evictionPolicy.RecordInsertion(key);
-
+            AddNewItem(key, value);
             return value;
         }
     }
@@ -125,6 +120,12 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
 
             return true;
         }
+    }
+
+    private void AddNewItem(TKey key, TValue value)
+    {
+        _cacheMap[key] = value;
+        _evictionPolicy.RecordInsertion(key);
     }
 
     private void Evict()
