@@ -1,5 +1,4 @@
 ﻿using EviCache.Abstractions;
-using EviCache.Models;
 
 namespace EviCache;
 
@@ -12,12 +11,11 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
         lock (_syncLock)
         {
             disposables = _cacheMap.Values
-                .Select(node => node.Value)
                 .OfType<IDisposable>()
                 .ToList();
 
             _cacheMap.Clear();
-            _lruList.Clear();
+            _evictionPolicy.Clear();
         }
 
         _ = Task.Run(() =>
@@ -38,9 +36,9 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
 
     public void Dispose() => Clear();
 
-    private static void DisposeItem(LinkedListNode<CacheItem<TKey, TValue>> node)
+    private static void DisposeItem(TValue? value)
     {
-        if (node.Value.Value is IDisposable disposable)
+        if (value is IDisposable disposable)
             disposable.Dispose();
     }
 }
