@@ -1,15 +1,15 @@
-using LruCache.Tests.Utils;
+using EviCache.Tests.Utils;
 
-namespace LruCache.Tests;
+namespace EviCache.Tests;
 
-public class LruCacheTests
+public class EviCacheTests
 {
     [Fact]
     public void Should_ReturnValue_WhenKeyIsInsertedAndRetrieved()
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
 
         // act
 
@@ -26,7 +26,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(2);
+        var cache = new EviCache<int, string>(2);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -53,7 +53,7 @@ public class LruCacheTests
     {
         // act & assert
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => new LruCache<int, string>(invalidCapacity));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new EviCache<int, string>(invalidCapacity));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<string, int>(2);
+        var cache = new EviCache<string, int>(2);
 
         // act
 
@@ -79,7 +79,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(2);
+        var cache = new EviCache<int, string>(2);
         cache.Put(1, "oldValue");
         cache.Put(2, "value2");
 
@@ -105,7 +105,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, DisposableDummy>(2);
+        var cache = new EviCache<int, DisposableDummy>(2);
         var disposableItem = new DisposableDummy();
         cache.Put(1, disposableItem);
 
@@ -126,7 +126,7 @@ public class LruCacheTests
         // arrange
 
         int capacity = 2;
-        var cache = new LruCache<int, string>(capacity);
+        var cache = new EviCache<int, string>(capacity);
 
         // act
 
@@ -145,7 +145,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, DisposableDummy>(2);
+        var cache = new EviCache<int, DisposableDummy>(2);
         var disposableItem = new DisposableDummy();
 
         cache.Put(1, disposableItem);
@@ -168,7 +168,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, DisposableDummy>(2);
+        var cache = new EviCache<int, DisposableDummy>(2);
         var disposableItem = new DisposableDummy();
 
         cache.Put(1, disposableItem);
@@ -188,7 +188,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, DisposableDummy>(3);
+        var cache = new EviCache<int, DisposableDummy>(3);
         var item1 = new DisposableDummy();
         var item2 = new DisposableDummy();
         var item3 = new DisposableDummy();
@@ -219,7 +219,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -242,7 +242,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(2);
+        var cache = new EviCache<int, string>(2);
 
         // act
 
@@ -260,7 +260,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(2);
+        var cache = new EviCache<int, string>(2);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -280,7 +280,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(2);
+        var cache = new EviCache<int, string>(2);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -303,7 +303,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -328,7 +328,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, DisposableDummy>(2);
+        var cache = new EviCache<int, DisposableDummy>(2);
 
         // act
 
@@ -347,7 +347,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, DisposableDummy>(2);
+        var cache = new EviCache<int, DisposableDummy>(2);
         var disposable1 = new DisposableDummy();
         var disposable2 = new DisposableDummy();
 
@@ -373,7 +373,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -392,7 +392,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -412,7 +412,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(2);
+        var cache = new EviCache<int, string>(2);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -432,7 +432,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -453,7 +453,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -474,7 +474,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -495,7 +495,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, DisposableDummy>(3);
+        var cache = new EviCache<int, DisposableDummy>(3);
         var disposable1 = new DisposableDummy();
         var disposable2 = new DisposableDummy();
         var disposable3 = new DisposableDummy();
@@ -520,7 +520,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -539,7 +539,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(2);
+        var cache = new EviCache<int, string>(2);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -554,7 +554,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -575,7 +575,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, DisposableDummy>(2);
+        var cache = new EviCache<int, DisposableDummy>(2);
         var disposableItem = new DisposableDummy();
         cache.Put(1, disposableItem);
 
@@ -595,7 +595,7 @@ public class LruCacheTests
         // arrange
 
         int capacity = 15;
-        var cache = new LruCache<int, string>(capacity);
+        var cache = new EviCache<int, string>(capacity);
 
         for (int i = 1; i <= capacity; i++)
         {
@@ -636,7 +636,7 @@ public class LruCacheTests
         // arrange
 
         int capacity = 15;
-        var cache = new LruCache<int, string>(capacity);
+        var cache = new EviCache<int, string>(capacity);
 
         for (int i = 1; i <= capacity; i++)
         {
@@ -662,7 +662,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(5);
+        var cache = new EviCache<int, string>(5);
         cache.Put(1, "oldValue");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -686,7 +686,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(5);
+        var cache = new EviCache<int, string>(5);
 
         // act
 
@@ -704,7 +704,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(3);
+        var cache = new EviCache<int, string>(3);
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -727,7 +727,7 @@ public class LruCacheTests
     {
         // arrange
 
-        var cache = new LruCache<int, string>(5);
+        var cache = new EviCache<int, string>(5);
 
         // act & assert:
 

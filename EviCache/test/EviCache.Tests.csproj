@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\LruCache.csproj" />
+    <ProjectReference Include="..\src\EviCache.csproj" />
   </ItemGroup>
 
   <ItemGroup>

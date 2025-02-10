@@ -1,4 +1,4 @@
-﻿namespace LruCache.Tests.Utils;
+﻿namespace EviCache.Tests.Utils;
 
 public class DisposableDummy : IDisposable
 {

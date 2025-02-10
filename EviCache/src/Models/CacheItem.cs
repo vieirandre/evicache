@@ -1,4 +1,4 @@
-﻿namespace LruCache.Models;
+﻿namespace EviCache.Models;
 
 public class CacheItem<TKey, TValue>(TKey key, TValue value)
 {

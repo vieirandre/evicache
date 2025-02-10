@@ -1,9 +1,9 @@
-﻿using LruCache.Abstractions;
-using LruCache.Models;
+﻿using EviCache.Abstractions;
+using EviCache.Models;
 
-namespace LruCache;
+namespace EviCache;
 
-public partial class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey, TValue>, IDisposable where TKey : notnull
+public partial class EviCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey, TValue>, IDisposable where TKey : notnull
 {
     public void Clear()
     {

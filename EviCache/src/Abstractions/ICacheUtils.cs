@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace LruCache.Abstractions;
+namespace EviCache.Abstractions;
 
 public interface ICacheUtils<TKey, TValue> where TKey : notnull
 {

@@ -1,4 +1,4 @@
-﻿namespace LruCache.Abstractions;
+﻿namespace EviCache.Abstractions;
 
 public interface ICacheMetrics
 {

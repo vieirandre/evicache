@@ -1,9 +1,9 @@
-﻿using LruCache.Abstractions;
+﻿using EviCache.Abstractions;
 using System.Collections.Immutable;
 
-namespace LruCache;
+namespace EviCache;
 
-public partial class LruCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey, TValue>, IDisposable where TKey : notnull
+public partial class EviCache<TKey, TValue> : ILruCache<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey, TValue>, IDisposable where TKey : notnull
 {
     public ImmutableList<TKey> GetKeysInOrder()
     {
