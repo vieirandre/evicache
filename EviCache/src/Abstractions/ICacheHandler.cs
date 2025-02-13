@@ -1,7 +1,10 @@
-﻿namespace EviCache.Abstractions;
+﻿using System.Collections.Immutable;
 
-public interface ICacheHandler<TKey, TValue> : ICacheHandlerInspection<TKey> where TKey : notnull
+namespace EviCache.Abstractions;
+
+public interface ICacheHandler<TKey, TValue> where TKey : notnull
 {
+    ImmutableList<TKey> InternalCollection { get; }
     void RecordAccess(TKey key);
     void RecordInsertion(TKey key);
     void RecordUpdate(TKey key);
