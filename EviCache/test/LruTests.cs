@@ -3,7 +3,7 @@ using EviCache.Tests.Utils;
 
 namespace EviCache.Tests;
 
-public class EviCacheTests
+public class LruTests
 {
     [Fact]
     public void Should_ReturnValue_WhenKeyIsInsertedAndRetrieved()
