@@ -8,15 +8,15 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
 {
     private readonly int _capacity;
     private readonly Dictionary<TKey, TValue> _cacheMap;
-    private readonly IEvictionPolicy<TKey, TValue> _evictionPolicy;
+    private readonly ICacheHandler<TKey, TValue> _cacheHandler;
     private readonly object _syncLock = new();
 
-    public EviCache(int capacity, EvictionPolicy evictionPolicyType)
+    public EviCache(int capacity, EvictionPolicy evictionPolicy)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity);
 
         _capacity = capacity;
         _cacheMap = new Dictionary<TKey, TValue>(capacity);
-        _evictionPolicy = EvictionPolicyFactory.Create<TKey, TValue>(evictionPolicyType);
+        _cacheHandler = CacheHandlerFactory.Create<TKey, TValue>(evictionPolicy);
     }
 }

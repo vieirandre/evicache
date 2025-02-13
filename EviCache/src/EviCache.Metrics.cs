@@ -12,7 +12,13 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
 
     public int Count
     {
-        get { lock (_syncLock) { return _cacheMap.Count; } }
+        get
+        {
+            lock (_syncLock)
+            {
+                return _cacheMap.Count;
+            }
+        }
     }
 
     public long Hits => Interlocked.Read(ref _hits);

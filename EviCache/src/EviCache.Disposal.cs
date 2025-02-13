@@ -15,7 +15,7 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
                 .ToList();
 
             _cacheMap.Clear();
-            _evictionPolicy.Clear();
+            _cacheHandler.Clear();
         }
 
         _ = Task.Run(() =>

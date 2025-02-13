@@ -1,9 +1,9 @@
 ﻿using EviCache.Abstractions;
 using System.Collections.Immutable;
 
-namespace EviCache.EvictionPolicies;
+namespace EviCache.Handlers;
 
-public class LruEvictionPolicy<TKey, TValue> : IEvictionPolicy<TKey, TValue> where TKey : notnull
+public class LruCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where TKey : notnull
 {
     private readonly LinkedList<TKey> _cacheList = new();
 

@@ -9,7 +9,7 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     {
         lock (_syncLock)
         {
-            return _evictionPolicy.InternalCollection;
+            return _cacheHandler.InternalCollection;
         }
     }
 
@@ -17,7 +17,7 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
     {
         lock (_syncLock)
         {
-            return _evictionPolicy.InternalCollection
+            return _cacheHandler.InternalCollection
                 .Where(key => _cacheMap.TryGetValue(key, out var value))
                 .Select(key => new KeyValuePair<TKey, TValue>(key, _cacheMap[key]))
                 .ToImmutableList();
