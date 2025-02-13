@@ -130,17 +130,15 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
 
     private void Evict()
     {
-        if (!_cacheHandler.TrySelectEvictionCandidate(out var candidate))
-            return;
+        if (_cacheHandler.TrySelectEvictionCandidate(out var candidate)
+            && _cacheMap.TryGetValue(candidate, out var value))
+        {
+            _cacheMap.Remove(candidate);
+            _cacheHandler.RecordRemoval(candidate);
 
-        if (!_cacheMap.TryGetValue(candidate, out var value))
-            return;
+            Interlocked.Increment(ref _evictions);
 
-        _cacheMap.Remove(candidate);
-        _cacheHandler.RecordRemoval(candidate);
-
-        Interlocked.Increment(ref _evictions);
-
-        DisposeItem(value);
+            DisposeItem(value);
+        }
     }
 }
