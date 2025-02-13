@@ -2,5 +2,6 @@
 
 public enum EvictionPolicy
 {
-    LRU
+    LRU, // least recently used
+    LFU // least frequently used
 }
