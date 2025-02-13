@@ -2,7 +2,7 @@
 
 namespace EviCache.Abstractions;
 
-public interface ICacheUtils<TKey, TValue> where TKey : notnull
+public interface ICacheInspection<TKey, TValue> where TKey : notnull
 {
     ImmutableList<TKey> GetKeys();
     ImmutableList<KeyValuePair<TKey, TValue>> GetSnapshot();
