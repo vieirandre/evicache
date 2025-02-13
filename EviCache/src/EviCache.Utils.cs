@@ -5,7 +5,7 @@ namespace EviCache;
 
 public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICacheMetrics, ICacheUtils<TKey, TValue>, IDisposable where TKey : notnull
 {
-    public ImmutableList<TKey> GetKeysInOrder()
+    public ImmutableList<TKey> GetKeys()
     {
         lock (_syncLock)
         {

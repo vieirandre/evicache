@@ -272,7 +272,7 @@ public class EviCacheTests
         // assert
 
         Assert.Equal("value1", result);
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
         Assert.Equal([1, 2], keys);
     }
 
@@ -381,7 +381,7 @@ public class EviCacheTests
 
         // act
 
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
 
         // assert
 
@@ -401,7 +401,7 @@ public class EviCacheTests
         // act
 
         cache.TryGet(1, out var _);
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
 
         // assert
 
@@ -420,7 +420,7 @@ public class EviCacheTests
         // act
 
         cache.Put(3, "value3");
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
 
         // assert
 
@@ -441,7 +441,7 @@ public class EviCacheTests
         // act
 
         cache.Remove(2);
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
 
         // assert
 
@@ -462,7 +462,7 @@ public class EviCacheTests
         // act
 
         cache.Clear();
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
 
         // assert
 
@@ -483,7 +483,7 @@ public class EviCacheTests
         // act
 
         cache.Put(2, "newValue2");
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
 
         // assert
 
@@ -508,7 +508,7 @@ public class EviCacheTests
         // act
 
         cache.TryGet(1, out var _);
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
 
         // assert
 
@@ -567,7 +567,7 @@ public class EviCacheTests
         // assert
 
         Assert.Equal("value1", result);
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
         Assert.Equal([1, 3, 2], keys);
     }
 
@@ -678,7 +678,7 @@ public class EviCacheTests
         Assert.Equal("newValue", result);
         Assert.Equal("newValue", cache.Get(1));
 
-        var keys = cache.GetKeysInOrder();
+        var keys = cache.GetKeys();
         Assert.Equal(1, keys[0]);
     }
 
