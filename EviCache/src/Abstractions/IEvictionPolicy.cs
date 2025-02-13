@@ -1,6 +1,6 @@
 ﻿namespace EviCache.Abstractions;
 
-public interface IEvictionPolicy<TKey, TValue> : ICacheInspection<TKey> where TKey : notnull
+public interface IEvictionPolicy<TKey, TValue> : IEvictionPolicyInspection<TKey> where TKey : notnull
 {
     void RecordAccess(TKey key);
     void RecordInsertion(TKey key);

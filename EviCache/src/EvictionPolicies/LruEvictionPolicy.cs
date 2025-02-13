@@ -7,6 +7,8 @@ public class LruEvictionPolicy<TKey, TValue> : IEvictionPolicy<TKey, TValue> whe
 {
     private readonly LinkedList<TKey> _cacheList = new();
 
+    public ImmutableList<TKey> InternalCollection => _cacheList.ToImmutableList();
+
     public void RecordAccess(TKey key)
     {
         _cacheList.Remove(key);
@@ -44,7 +46,4 @@ public class LruEvictionPolicy<TKey, TValue> : IEvictionPolicy<TKey, TValue> whe
         candidate = _cacheList.Last.Value;
         return true;
     }
-
-    public ImmutableList<TKey> GetKeysInOrder()
-        => _cacheList.ToImmutableList();
 }
