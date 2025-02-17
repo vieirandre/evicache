@@ -1,17 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 
-	<PackageId>LRU.Cache</PackageId>
-	<Version>1.0.0</Version>
-	<Authors>André Vieira</Authors>
-	<Description>A lightweight, thread-safe, in-memory LRU cache.</Description>
+		<PackageId>EviCache</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>André Vieira</Authors>
+		<Description>A lightweight, thread-safe, in-memory cache.</Description>
 
-	<RepositoryUrl>https://github.com/vieirandre/lru-cache</RepositoryUrl>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-  </PropertyGroup>
+		<Title>EviCache</Title>
+		<PackageTags>cache; caching; thread-safe; in-memory; eviction; lru</PackageTags>
+		<ProjectUrl>https://github.com/vieirandre/evicache</ProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/vieirandre/evicache</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+	</PropertyGroup>
 
 </Project>
