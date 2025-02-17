@@ -13,7 +13,7 @@ public partial class EviCache<TKey, TValue> : ICacheOperations<TKey, TValue>, IC
 
     public EviCache(int capacity, EvictionPolicy evictionPolicy)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity);
+        if (capacity <= 0) throw new ArgumentOutOfRangeException(nameof(capacity));
 
         _capacity = capacity;
         _cacheMap = new Dictionary<TKey, TValue>(capacity);
