@@ -53,7 +53,7 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 
     public void RegisterUpdate(TKey key)
     {
-        throw new NotImplementedException();
+        RegisterAccess(key);
     }
 
     public void RegisterRemoval(TKey key)
