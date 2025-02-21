@@ -184,4 +184,69 @@ public class LfuTests
         Assert.False(removed);
         Assert.False(disposableItem.IsDisposed);
     }
+
+    [Fact]
+    public void Should_ClearAllDisposableItems()
+    {
+        // arrange
+
+        var options = new CacheOptions(3, _evictionPolicy);
+        var cache = new Cache<int, string>(options);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        cache.Clear();
+
+        // assert
+
+        Assert.Equal(0, cache.Count);
+        Assert.False(cache.TryGet(1, out _));
+        Assert.False(cache.TryGet(2, out _));
+        Assert.False(cache.TryGet(3, out _));
+    }
+
+    [Fact]
+    public void Should_TrackHitsMissesAndEvictions_WhenCacheCapacityIs15()
+    {
+        // arrange
+
+        int capacity = 15;
+        var options = new CacheOptions(capacity, _evictionPolicy);
+        var cache = new Cache<int, string>(options);
+
+        for (int i = 1; i <= capacity; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
+
+        // act & assert
+
+        for (int i = 1; i <= 10; i++)
+        {
+            string value = cache.Get(i);
+            Assert.Equal($"value{i}", value);
+        }
+
+        for (int i = 16; i <= 20; i++)
+        {
+            bool found = cache.TryGet(i, out _);
+            Assert.False(found);
+        }
+
+        for (int i = 16; i <= 20; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
+
+        // assert
+
+        Assert.Equal(capacity, cache.Count);
+        Assert.Equal(10, cache.Hits);
+        Assert.Equal(5, cache.Misses);
+        Assert.Equal(5, cache.Evictions);
+    }
 }
