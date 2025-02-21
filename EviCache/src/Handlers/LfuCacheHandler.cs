@@ -5,19 +5,53 @@ namespace EviCache.Handlers;
 
 public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where TKey : notnull
 {
-    public ImmutableList<TKey> InternalCollection => throw new NotImplementedException();
+    private readonly Dictionary<TKey, int> _keyFrequencies = new();
+    private readonly SortedDictionary<int, LinkedList<TKey>> _frequencyBuckets = new();
 
-    public void Clear()
-    {
-        throw new NotImplementedException();
-    }
+    public ImmutableList<TKey> InternalCollection => throw new NotImplementedException();
 
     public void RecordAccess(TKey key)
     {
-        throw new NotImplementedException();
+        if (!_keyFrequencies.TryGetValue(key, out int oldFreq))
+        {
+            RecordInsertion(key);
+            return;
+        }
+
+        if (_frequencyBuckets.TryGetValue(oldFreq, out var bucket))
+        {
+            bucket.Remove(key);
+
+            if (bucket.Count == 0)
+                _frequencyBuckets.Remove(oldFreq);
+        }
+
+        int newFreq = oldFreq + 1;
+        _keyFrequencies[key] = newFreq;
+
+        if (!_frequencyBuckets.TryGetValue(newFreq, out var newBucket))
+        {
+            newBucket = new LinkedList<TKey>();
+            _frequencyBuckets[newFreq] = newBucket;
+        }
+
+        newBucket.AddLast(key);
     }
 
     public void RecordInsertion(TKey key)
+    {
+        _keyFrequencies[key] = 1;
+
+        if (!_frequencyBuckets.TryGetValue(1, out var bucket))
+        {
+            bucket = new LinkedList<TKey>();
+            _frequencyBuckets[1] = bucket;
+        }
+
+        bucket.AddLast(key);
+    }
+
+    public void RecordUpdate(TKey key)
     {
         throw new NotImplementedException();
     }
@@ -27,7 +61,7 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
         throw new NotImplementedException();
     }
 
-    public void RecordUpdate(TKey key)
+    public void Clear()
     {
         throw new NotImplementedException();
     }
