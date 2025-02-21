@@ -9,23 +9,23 @@ public class LruCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 
     public ImmutableList<TKey> InternalCollection => _cacheList.ToImmutableList();
 
-    public void RecordAccess(TKey key)
+    public void RegisterAccess(TKey key)
     {
         _cacheList.Remove(key);
         _cacheList.AddFirst(key);
     }
 
-    public void RecordInsertion(TKey key)
+    public void RegisterInsertion(TKey key)
     {
         _cacheList.AddFirst(key);
     }
 
-    public void RecordUpdate(TKey key)
+    public void RegisterUpdate(TKey key)
     {
-        RecordAccess(key);
+        RegisterAccess(key);
     }
 
-    public void RecordRemoval(TKey key)
+    public void RegisterRemoval(TKey key)
     {
         _cacheList.Remove(key);
     }

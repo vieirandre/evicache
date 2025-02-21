@@ -12,7 +12,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
             {
                 Interlocked.Increment(ref _hits);
 
-                _cacheHandler.RecordAccess(key);
+                _cacheHandler.RegisterAccess(key);
                 return value;
             }
 
@@ -30,7 +30,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
             {
                 Interlocked.Increment(ref _hits);
 
-                _cacheHandler.RecordAccess(key);
+                _cacheHandler.RegisterAccess(key);
                 return true;
             }
 
@@ -48,7 +48,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
             if (_cacheMap.ContainsKey(key))
             {
                 _cacheMap[key] = value;
-                _cacheHandler.RecordUpdate(key);
+                _cacheHandler.RegisterUpdate(key);
 
                 return;
             }
@@ -68,7 +68,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
             {
                 Interlocked.Increment(ref _hits);
 
-                _cacheHandler.RecordAccess(key);
+                _cacheHandler.RegisterAccess(key);
                 return existing;
             }
 
@@ -91,7 +91,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
                 Interlocked.Increment(ref _hits);
 
                 _cacheMap[key] = value;
-                _cacheHandler.RecordUpdate(key);
+                _cacheHandler.RegisterUpdate(key);
 
                 return value;
             }
@@ -114,7 +114,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
                 return false;
 
             _cacheMap.Remove(key);
-            _cacheHandler.RecordRemoval(key);
+            _cacheHandler.RegisterRemoval(key);
 
             DisposeItem(value);
 
@@ -125,7 +125,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
     private void AddNewItem(TKey key, TValue value)
     {
         _cacheMap[key] = value;
-        _cacheHandler.RecordInsertion(key);
+        _cacheHandler.RegisterInsertion(key);
     }
 
     private void Evict()
@@ -134,7 +134,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
             && _cacheMap.TryGetValue(candidate, out var value))
         {
             _cacheMap.Remove(candidate);
-            _cacheHandler.RecordRemoval(candidate);
+            _cacheHandler.RegisterRemoval(candidate);
 
             Interlocked.Increment(ref _evictions);
 

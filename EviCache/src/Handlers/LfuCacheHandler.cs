@@ -10,11 +10,11 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 
     public ImmutableList<TKey> InternalCollection => throw new NotImplementedException();
 
-    public void RecordAccess(TKey key)
+    public void RegisterAccess(TKey key)
     {
         if (!_keyFrequencies.TryGetValue(key, out int oldFreq))
         {
-            RecordInsertion(key);
+            RegisterInsertion(key);
             return;
         }
 
@@ -38,7 +38,7 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
         newBucket.AddLast(key);
     }
 
-    public void RecordInsertion(TKey key)
+    public void RegisterInsertion(TKey key)
     {
         _keyFrequencies[key] = 1;
 
@@ -51,12 +51,12 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
         bucket.AddLast(key);
     }
 
-    public void RecordUpdate(TKey key)
+    public void RegisterUpdate(TKey key)
     {
         throw new NotImplementedException();
     }
 
-    public void RecordRemoval(TKey key)
+    public void RegisterRemoval(TKey key)
     {
         throw new NotImplementedException();
     }
