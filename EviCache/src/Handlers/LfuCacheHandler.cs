@@ -63,7 +63,8 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 
     public void Clear()
     {
-        throw new NotImplementedException();
+        _keyFrequencies.Clear();
+        _frequencyBuckets.Clear();
     }
 
     public bool TrySelectEvictionCandidate(out TKey candidate)
