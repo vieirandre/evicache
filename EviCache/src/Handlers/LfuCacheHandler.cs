@@ -80,6 +80,20 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 
     public bool TrySelectEvictionCandidate(out TKey candidate)
     {
-        throw new NotImplementedException();
+        if (_frequencyBuckets.Count == 0)
+        {
+            candidate = default!;
+            return false;
+        }
+
+        var firstBucket = _frequencyBuckets.First();
+        if (firstBucket.Value.Count == 0)
+        {
+            candidate = default!;
+            return false;
+        }
+
+        candidate = firstBucket.Value.First.Value;
+        return true;
     }
 }
