@@ -6,12 +6,14 @@ namespace EviCache.Tests;
 
 public class LruTests
 {
+    private const EvictionPolicy _evictionPolicy = EvictionPolicy.LRU;
+
     [Fact]
     public void Should_ReturnValue_WhenKeyIsInsertedAndRetrieved()
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         // act
@@ -29,7 +31,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -57,7 +59,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(invalidCapacity, EvictionPolicy.LRU);
+        var options = new CacheOptions(invalidCapacity, _evictionPolicy);
 
         // act & assert
 
@@ -69,7 +71,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<string, int>(options);
 
         // act
@@ -88,7 +90,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "oldValue");
@@ -116,7 +118,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, DisposableDummy>(options);
 
         var disposableItem = new DisposableDummy();
@@ -139,7 +141,7 @@ public class LruTests
         // arrange
 
         int capacity = 2;
-        var options = new CacheOptions(capacity, EvictionPolicy.LRU);
+        var options = new CacheOptions(capacity, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         // act
@@ -159,7 +161,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, DisposableDummy>(options);
 
         var disposableItem = new DisposableDummy();
@@ -183,7 +185,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, DisposableDummy>(options);
 
         var disposableItem = new DisposableDummy();
@@ -204,7 +206,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, DisposableDummy>(options);
 
         var item1 = new DisposableDummy();
@@ -237,7 +239,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -261,7 +263,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         // act
@@ -280,7 +282,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -302,7 +304,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -327,7 +329,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -354,7 +356,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, DisposableDummy>(options);
 
         // act
@@ -374,7 +376,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, DisposableDummy>(options);
 
         var disposable1 = new DisposableDummy();
@@ -402,7 +404,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -423,7 +425,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -445,7 +447,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -467,7 +469,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -490,7 +492,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -513,7 +515,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -536,7 +538,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, DisposableDummy>(options);
 
         var disposable1 = new DisposableDummy();
@@ -563,7 +565,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -584,7 +586,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -601,7 +603,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -624,7 +626,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(2, EvictionPolicy.LRU);
+        var options = new CacheOptions(2, _evictionPolicy);
         var cache = new Cache<int, DisposableDummy>(options);
 
         var disposableItem = new DisposableDummy();
@@ -646,7 +648,7 @@ public class LruTests
         // arrange
 
         int capacity = 15;
-        var options = new CacheOptions(capacity, EvictionPolicy.LRU);
+        var options = new CacheOptions(capacity, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         for (int i = 1; i <= capacity; i++)
@@ -688,7 +690,7 @@ public class LruTests
         // arrange
 
         int capacity = 15;
-        var options = new CacheOptions(capacity, EvictionPolicy.LRU);
+        var options = new CacheOptions(capacity, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         for (int i = 1; i <= capacity; i++)
@@ -715,7 +717,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(5, EvictionPolicy.LRU);
+        var options = new CacheOptions(5, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "oldValue");
@@ -741,7 +743,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(5, EvictionPolicy.LRU);
+        var options = new CacheOptions(5, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         // act
@@ -760,7 +762,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(3, EvictionPolicy.LRU);
+        var options = new CacheOptions(3, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         cache.Put(1, "value1");
@@ -785,7 +787,7 @@ public class LruTests
     {
         // arrange
 
-        var options = new CacheOptions(5, EvictionPolicy.LRU);
+        var options = new CacheOptions(5, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
         // act & assert:
