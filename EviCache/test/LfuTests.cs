@@ -1,5 +1,6 @@
 ﻿using EviCache.Enums;
 using EviCache.Options;
+using EviCache.Tests.Utils;
 
 namespace EviCache.Tests;
 
@@ -94,5 +95,93 @@ public class LfuTests
         Assert.False(cache.TryGet(2, out _));
         Assert.Equal("newValue", cache.Get(1));
         Assert.Equal("value3", cache.Get(3));
+    }
+
+    [Fact]
+    public void Should_NotDisposeItem_WhenTryGetIsCalled()
+    {
+        // arrange
+
+        var options = new CacheOptions(2, _evictionPolicy);
+        var cache = new Cache<int, DisposableDummy>(options);
+
+        var disposableItem = new DisposableDummy();
+        cache.Put(1, disposableItem);
+
+        // act
+
+        bool found = cache.TryGet(1, out var result);
+
+        // assert
+
+        Assert.True(found);
+        Assert.False(disposableItem.IsDisposed);
+        Assert.Equal(disposableItem, result);
+    }
+
+    [Fact]
+    public void Should_NotExceedCapacity_WhenCacheIsFull()
+    {
+        // arrange
+
+        int capacity = 2;
+        var options = new CacheOptions(capacity, _evictionPolicy);
+        var cache = new Cache<int, string>(options);
+
+        // act
+
+        for (int i = 0; i < capacity * 2; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
+
+        // assert
+
+        Assert.True(cache.Count <= capacity);
+    }
+
+    [Fact]
+    public void Should_RemoveKeyAndDisposeItem_WhenKeyExists()
+    {
+        // arrange
+
+        var options = new CacheOptions(2, _evictionPolicy);
+        var cache = new Cache<int, DisposableDummy>(options);
+
+        var disposableItem = new DisposableDummy();
+        cache.Put(1, disposableItem);
+        cache.Put(2, new DisposableDummy());
+
+        // act
+
+        bool removed = cache.Remove(1);
+
+        // assert
+
+        Assert.True(removed);
+        Assert.Equal(1, cache.Count);
+        Assert.True(disposableItem.IsDisposed);
+        Assert.False(cache.TryGet(1, out _));
+    }
+
+    [Fact]
+    public void Should_ReturnFalseAndNotDispose_WhenKeyDoesNotExist()
+    {
+        // arrange
+
+        var options = new CacheOptions(2, _evictionPolicy);
+        var cache = new Cache<int, DisposableDummy>(options);
+
+        var disposableItem = new DisposableDummy();
+        cache.Put(1, disposableItem);
+
+        // act
+
+        bool removed = cache.Remove(9);
+
+        // assert
+
+        Assert.False(removed);
+        Assert.False(disposableItem.IsDisposed);
     }
 }
