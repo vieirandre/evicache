@@ -58,7 +58,18 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 
     public void RegisterRemoval(TKey key)
     {
-        throw new NotImplementedException();
+        if (!_keyFrequencies.TryGetValue(key, out int freq))
+            return;
+
+        _keyFrequencies.Remove(key);
+
+        if (!_frequencyBuckets.TryGetValue(freq, out var bucket))
+            return;
+
+        bucket.Remove(key);
+
+        if (bucket.Count == 0)
+            _frequencyBuckets.Remove(freq);
     }
 
     public void Clear()
