@@ -1,4 +1,5 @@
 ﻿using EviCache.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace EviCache;
 
@@ -28,7 +29,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error while disposing cache item in the background: {ex}");
+                    _logger.LogError(ex, "Error while disposing cache item in the background");
                 }
             }
         });
