@@ -58,4 +58,26 @@ public class LfuTests : CacheTestsBase
         Assert.Equal("newValue", cache.Get(1));
         Assert.Equal("value3", cache.Get(3));
     }
+
+    [Fact]
+    public void Should_EvictFirstInsertedKey_WhenFrequenciesAreEqual()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        cache.Put(3, "value3");
+
+        // assert
+
+        Assert.False(cache.TryGet(1, out _));
+        Assert.True(cache.TryGet(2, out var value2));
+        Assert.Equal("value2", value2);
+        Assert.True(cache.TryGet(3, out var value3));
+        Assert.Equal("value3", value3);
+    }
 }
