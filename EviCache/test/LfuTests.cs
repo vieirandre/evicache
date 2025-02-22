@@ -80,4 +80,35 @@ public class LfuTests : CacheTestsBase
         Assert.True(cache.TryGet(3, out var value3));
         Assert.Equal("value3", value3);
     }
+
+    [Fact]
+    public void Should_EvictCorrectly_AfterMultipleAccesses()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3"); // freq = 1
+
+        // act
+
+        cache.Get(1); // freq = 2
+        cache.Get(1); // freq = 3
+        cache.Get(1);
+        cache.Get(2); // freq = 2
+        cache.Get(2);
+
+        cache.Put(4, "value4"); // evict
+
+        // assert
+
+        Assert.False(cache.TryGet(3, out _));
+        Assert.True(cache.TryGet(1, out string value1));
+        Assert.Equal("value1", value1);
+        Assert.True(cache.TryGet(2, out string value2));
+        Assert.Equal("value2", value2);
+        Assert.True(cache.TryGet(4, out string value4));
+        Assert.Equal("value4", value4);
+    }
 }
