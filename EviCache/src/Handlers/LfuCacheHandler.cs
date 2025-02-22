@@ -1,5 +1,4 @@
 ﻿using EviCache.Abstractions;
-using System.Collections.Immutable;
 
 namespace EviCache.Handlers;
 
@@ -7,8 +6,6 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 {
     private readonly Dictionary<TKey, int> _keyFrequencies = new();
     private readonly SortedDictionary<int, LinkedList<TKey>> _frequencyBuckets = new();
-
-    public ImmutableList<TKey> InternalCollection => throw new NotImplementedException();
 
     public void RegisterAccess(TKey key)
     {

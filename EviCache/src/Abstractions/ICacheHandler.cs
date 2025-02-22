@@ -4,7 +4,6 @@ namespace EviCache.Abstractions;
 
 public interface ICacheHandler<TKey, TValue> where TKey : notnull
 {
-    ImmutableList<TKey> InternalCollection { get; }
     void RegisterAccess(TKey key);
     void RegisterInsertion(TKey key);
     void RegisterUpdate(TKey key);
