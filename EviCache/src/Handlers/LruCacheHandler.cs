@@ -1,4 +1,5 @@
 ﻿using EviCache.Abstractions;
+using System.Collections.Immutable;
 
 namespace EviCache.Handlers;
 
@@ -42,5 +43,10 @@ public class LruCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 
         candidate = _lruList.Last.Value;
         return true;
+    }
+
+    public ImmutableList<TKey> GetKeys()
+    {
+        return _lruList.ToImmutableList();
     }
 }

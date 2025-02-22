@@ -1,4 +1,5 @@
 ﻿using EviCache.Abstractions;
+using System.Collections.Immutable;
 
 namespace EviCache.Handlers;
 
@@ -85,5 +86,10 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 
         candidate = _frequencyBuckets.First().Value.First.Value;
         return true;
+    }
+
+    public ImmutableList<TKey> GetKeys()
+    {
+        throw new NotImplementedException();
     }
 }

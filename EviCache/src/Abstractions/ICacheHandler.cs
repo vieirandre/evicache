@@ -2,7 +2,7 @@
 
 namespace EviCache.Abstractions;
 
-public interface ICacheHandler<TKey, TValue> where TKey : notnull
+public interface ICacheHandler<TKey, TValue> : ICacheKeyProvider<TKey> where TKey : notnull
 {
     void RegisterAccess(TKey key);
     void RegisterInsertion(TKey key);

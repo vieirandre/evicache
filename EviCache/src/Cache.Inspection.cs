@@ -9,7 +9,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
     {
         lock (_syncLock)
         {
-            return _cacheHandler.InternalCollection;
+            return _cacheHandler.GetKeys();
         }
     }
 
@@ -17,7 +17,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
     {
         lock (_syncLock)
         {
-            return _cacheHandler.InternalCollection
+            return _cacheHandler.GetKeys()
                 .Where(key => _cacheMap.TryGetValue(key, out var value))
                 .Select(key => new KeyValuePair<TKey, TValue>(key, _cacheMap[key]))
                 .ToImmutableList();
