@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace EviCache.Handlers;
 
-public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where TKey : notnull
+internal class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where TKey : notnull
 {
     private readonly Dictionary<TKey, int> _keyFrequencies = new();
     private readonly SortedDictionary<int, LinkedList<TKey>> _frequencyBuckets = new();

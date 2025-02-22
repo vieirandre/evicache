@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace EviCache.Handlers;
 
-public class LruCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where TKey : notnull
+internal class LruCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where TKey : notnull
 {
     private readonly LinkedList<TKey> _lruList = new();
 

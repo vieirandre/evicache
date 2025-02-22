@@ -4,9 +4,9 @@ using EviCache.Handlers;
 
 namespace EviCache.Factories;
 
-public static class CacheHandlerFactory
+internal static class CacheHandlerFactory
 {
-    public static ICacheHandler<TKey, TValue> Create<TKey, TValue>(EvictionPolicy policyType) where TKey : notnull
+    internal static ICacheHandler<TKey, TValue> Create<TKey, TValue>(EvictionPolicy policyType) where TKey : notnull
     {
         return policyType switch
         {
