@@ -417,7 +417,10 @@ public class LruTests
 
         // assert
 
-        Assert.Equal([3, 2, 1], keys);
+        Assert.Collection(keys,
+            key => Assert.Equal(3, key),
+            key => Assert.Equal(2, key),
+            key => Assert.Equal(1, key));
     }
 
     [Fact]
@@ -439,7 +442,10 @@ public class LruTests
 
         // assert
 
-        Assert.Equal([1, 3, 2], keys);
+        Assert.Collection(keys,
+            key => Assert.Equal(1, key),
+            key => Assert.Equal(3, key),
+            key => Assert.Equal(2, key));
     }
 
     [Fact]
@@ -460,7 +466,10 @@ public class LruTests
 
         // assert
 
-        Assert.Equal([3, 2], keys);
+        Assert.Collection(keys,
+            key => Assert.Equal(3, key),
+            key => Assert.Equal(2, key));
+
         Assert.False(cache.TryGet(1, out _));
     }
 
@@ -483,7 +492,10 @@ public class LruTests
 
         // assert
 
-        Assert.Equal([3, 1], keys);
+        Assert.Collection(keys,
+            key => Assert.Equal(3, key),
+            key => Assert.Equal(1, key));
+
         Assert.False(cache.TryGet(2, out _));
     }
 
@@ -529,7 +541,11 @@ public class LruTests
 
         // assert
 
-        Assert.Equal([2, 3, 1], keys);
+        Assert.Collection(keys,
+            key => Assert.Equal(2, key),
+            key => Assert.Equal(3, key),
+            key => Assert.Equal(1, key));
+
         Assert.Equal("newValue2", cache.TryGet(2, out var value2) ? value2 : null);
     }
 
@@ -556,7 +572,11 @@ public class LruTests
 
         // assert
 
-        Assert.Equal([1, 3, 2], keys);
+        Assert.Collection(keys,
+            key => Assert.Equal(1, key),
+            key => Assert.Equal(3, key),
+            key => Assert.Equal(2, key));
+
         Assert.False(disposable1.IsDisposed);
     }
 
@@ -690,6 +710,8 @@ public class LruTests
         // arrange
 
         int capacity = 15;
+        var expectedOrder = Enumerable.Range(1, capacity).Reverse().ToArray();
+
         var options = new CacheOptions(capacity, _evictionPolicy);
         var cache = new Cache<int, string>(options);
 
@@ -706,10 +728,13 @@ public class LruTests
 
         Assert.Equal(capacity, snapshot.Count);
 
-        Assert.Equal(15, snapshot[0].Key);
-        Assert.Equal("value15", snapshot[0].Value);
-        Assert.Equal(1, snapshot[capacity - 1].Key);
-        Assert.Equal("value1", snapshot[capacity - 1].Value);
+        var assertions = expectedOrder.Select(expected => (Action<KeyValuePair<int, string>>)(item =>
+        {
+            Assert.Equal(expected, item.Key);
+            Assert.Equal($"value{expected}", item.Value);
+        })).ToArray();
+
+        Assert.Collection(snapshot, assertions);
     }
 
     [Fact]
