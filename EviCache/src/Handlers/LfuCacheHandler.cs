@@ -90,6 +90,6 @@ public class LfuCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where T
 
     public ImmutableList<TKey> GetKeys()
     {
-        throw new NotImplementedException();
+        return _keyFrequencies.Keys.ToImmutableList();
     }
 }
