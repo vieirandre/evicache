@@ -41,14 +41,7 @@ public abstract class CacheTestsBase
 
         // assert
 
-        loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => string.Equals(v.ToString(), $"Cache initialized with capacity {capacity} and eviction policy {EvictionPolicy}")),
-                null,
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        loggerMock.VerifyLog(LogLevel.Information, $"Cache initialized with capacity {capacity} and eviction policy {EvictionPolicy}", Times.Once());
     }
 
     [Fact]
@@ -70,14 +63,7 @@ public abstract class CacheTestsBase
 
         // assert
 
-        loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => string.Equals(v.ToString(), $"Cache cleared. Removed {capacity} items")),
-                null,
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed {capacity} items", Times.Once());
     }
 
     [Fact]
