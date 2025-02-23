@@ -35,21 +35,6 @@ public class LruTests : CacheTestsBase
         Assert.Equal("value3", value3);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(-10)]
-    public void Should_ThrowArgumentOutOfRangeException_WhenCapacityIsZeroOrNegative(int invalidCapacity)
-    {
-        // arrange
-
-        var options = new CacheOptions(invalidCapacity, _evictionPolicy);
-
-        // act & assert
-
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Cache<int, string>(options));
-    }
-
     [Fact]
     public void Should_UpdateExistingKeyAndEvictLeastRecentlyUsed_WhenReinsertingKeyOverCapacity()
     {

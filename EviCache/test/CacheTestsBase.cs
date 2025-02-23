@@ -14,6 +14,17 @@ public abstract class CacheTestsBase
         return new Cache<TKey, TValue>(options);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-10)]
+    public void Should_ThrowArgumentOutOfRangeException_WhenCapacityIsZeroOrNegative(int invalidCapacity)
+    {
+        // act & assert
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => CreateCache<int, string>(invalidCapacity));
+    }
+
     [Fact]
     public void Should_ReturnValue_WhenKeyIsInsertedAndRetrieved()
     {
