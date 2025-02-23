@@ -1,4 +1,5 @@
 ﻿using EviCache.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace EviCache;
 
@@ -137,6 +138,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
             _cacheHandler.RegisterRemoval(candidate);
 
             Interlocked.Increment(ref _evictions);
+            _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
 
             DisposeItem(value);
         }

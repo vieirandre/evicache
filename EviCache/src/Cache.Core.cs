@@ -24,5 +24,6 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
         _cacheHandler = CacheHandlerFactory.Create<TKey, TValue>(options.EvictionPolicy);
 
         _logger = logger ?? NullLogger<Cache<TKey, TValue>>.Instance;
+        _logger.LogInformation("Cache initialized with capacity {Capacity} and eviction policy {EvictionPolicy}", options.Capacity, options.EvictionPolicy);
     }
 }
