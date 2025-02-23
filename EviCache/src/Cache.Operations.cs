@@ -131,6 +131,41 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         }
     }
 
+    public void Clear()
+    {
+        int removedCount;
+        List<IDisposable> disposables;
+
+        lock (_syncLock)
+        {
+            removedCount = _cacheMap.Count;
+
+            disposables = _cacheMap.Values
+                .OfType<IDisposable>()
+                .ToList();
+
+            _cacheMap.Clear();
+            _cacheHandler.Clear();
+        }
+
+        _ = Task.Run(() =>
+        {
+            foreach (var disposable in disposables)
+            {
+                try
+                {
+                    disposable.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error while disposing cache item in the background");
+                }
+            }
+        });
+
+        _logger.LogInformation("Cache cleared. Removed {Count} items", removedCount);
+    }
+
     private void AddNewItem(TKey key, TValue value)
     {
         _cacheMap[key] = value;
