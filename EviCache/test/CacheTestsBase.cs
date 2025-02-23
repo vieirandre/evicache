@@ -1,6 +1,8 @@
 ﻿using EviCache.Enums;
 using EviCache.Options;
 using EviCache.Tests.Utils;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace EviCache.Tests;
 
@@ -8,10 +10,10 @@ public abstract class CacheTestsBase
 {
     protected abstract EvictionPolicy EvictionPolicy { get; }
 
-    protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity) where TKey : notnull
+    protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity, ILogger? logger = null) where TKey : notnull
     {
         var options = new CacheOptions(capacity, EvictionPolicy);
-        return new Cache<TKey, TValue>(options);
+        return new Cache<TKey, TValue>(options, logger);
     }
 
     [Theory]
@@ -23,6 +25,59 @@ public abstract class CacheTestsBase
         // act & assert
 
         Assert.Throws<ArgumentOutOfRangeException>(() => CreateCache<int, string>(invalidCapacity));
+    }
+
+    [Fact]
+    public void Should_LogInitializationInformation()
+    {
+        // arrange
+
+        var loggerMock = new Mock<ILogger<Cache<int, string>>>();
+        int capacity = 3;
+
+        // act
+
+        _ = CreateCache<int, string>(capacity, loggerMock.Object);
+
+        // assert
+
+        loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => string.Equals(v.ToString(), $"Cache initialized with capacity {capacity} and eviction policy {EvictionPolicy}")),
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public void Should_LogCacheClearInformation()
+    {
+        // arrange
+
+        var loggerMock = new Mock<ILogger<Cache<int, string>>>();
+
+        int capacity = 3;
+        var cache = CreateCache<int, string>(capacity, loggerMock.Object);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        cache.Clear();
+
+        // assert
+
+        loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => string.Equals(v.ToString(), $"Cache cleared. Removed {capacity} items")),
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
     }
 
     [Fact]
