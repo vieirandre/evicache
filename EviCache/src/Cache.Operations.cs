@@ -42,6 +42,14 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
         }
     }
 
+    public bool ContainsKey(TKey key)
+    {
+        lock (_syncLock)
+        {
+            return _cacheMap.ContainsKey(key);
+        }
+    }
+
     public void Put(TKey key, TValue value)
     {
         lock (_syncLock)
