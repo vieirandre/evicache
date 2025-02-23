@@ -5,7 +5,7 @@ namespace EviCache.Tests.Utils;
 
 public static class LoggerMockExtensions
 {
-    public static void VerifyLog<T>(this Mock<ILogger<T>> loggerMock, LogLevel logLevel, string expectedMessage, Times times)
+    public static void VerifyLog(this Mock<ILogger> loggerMock, LogLevel logLevel, string expectedMessage, Times times)
     {
         loggerMock.Verify(
             x => x.Log(

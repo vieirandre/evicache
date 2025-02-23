@@ -32,7 +32,7 @@ public abstract class CacheTestsBase
     {
         // arrange
 
-        var loggerMock = new Mock<ILogger<Cache<int, string>>>();
+        var loggerMock = new Mock<ILogger>();
         int capacity = 3;
 
         // act
@@ -49,7 +49,7 @@ public abstract class CacheTestsBase
     {
         // arrange
 
-        var loggerMock = new Mock<ILogger<Cache<int, string>>>();
+        var loggerMock = new Mock<ILogger>();
 
         int capacity = 2;
         var cache = CreateCache<int, string>(capacity, loggerMock.Object);
