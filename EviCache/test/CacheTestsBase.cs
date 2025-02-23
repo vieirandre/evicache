@@ -455,4 +455,78 @@ public abstract class CacheTestsBase
         cache.AddOrUpdate(2, "value2");
         Assert.Equal(2, cache.Misses);
     }
+
+    [Fact]
+    public void ContainsKey_ReturnsTrue_WhenKeyExists()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+        cache.Put(1, "value1");
+
+        // act
+
+        bool contains = cache.ContainsKey(1);
+
+        // assert
+
+        Assert.True(contains);
+    }
+
+    [Fact]
+    public void ContainsKey_ReturnsFalse_WhenKeyDoesNotExist()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+        cache.Put(1, "value1");
+
+        // act
+
+        bool contains = cache.ContainsKey(2);
+
+        // assert
+
+        Assert.False(contains);
+    }
+
+    [Fact]
+    public void ContainsKey_ReturnsFalse_AfterKeyIsRemoved()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+        cache.Put(1, "value1");
+
+        // act
+
+        bool removed = cache.Remove(1);
+        bool contains = cache.ContainsKey(1);
+
+        // assert
+
+        Assert.True(removed);
+        Assert.False(contains);
+    }
+
+    [Fact]
+    public void ContainsKey_ReturnsFalse_WhenCacheIsCleared()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        cache.Clear();
+        bool containsKey1 = cache.ContainsKey(1);
+        bool containsKey2 = cache.ContainsKey(2);
+
+        // assert
+
+        Assert.False(containsKey1);
+        Assert.False(containsKey2);
+    }
 }
