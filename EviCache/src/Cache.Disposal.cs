@@ -7,10 +7,13 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
 {
     public void Clear()
     {
+        int removedCount;
         List<IDisposable> disposables;
 
         lock (_syncLock)
         {
+            removedCount = _cacheMap.Count;
+
             disposables = _cacheMap.Values
                 .OfType<IDisposable>()
                 .ToList();
@@ -33,6 +36,8 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICach
                 }
             }
         });
+
+        _logger.LogInformation("Cache cleared. Removed {Count} items", removedCount);
     }
 
     public void Dispose() => Clear();
