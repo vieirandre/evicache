@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace EviCache;
 
-public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICacheMetrics, ICacheInspection<TKey, TValue>, IDisposable where TKey : notnull
+public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>, ICacheOperationsAsync<TKey, TValue>, ICacheMetrics, ICacheInspection<TKey, TValue>, IDisposable where TKey : notnull
 {
     public ImmutableList<TKey> GetKeys()
     {
