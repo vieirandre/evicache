@@ -1,6 +1,7 @@
 using EviCache.Enums;
-using EviCache.Options;
 using EviCache.Tests.Utils;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace EviCache.Tests;
 
@@ -15,8 +16,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var options = new CacheOptions(2, _evictionPolicy);
-        var cache = new Cache<int, string>(options);
+        var cache = CreateCache<int, string>(2, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -33,6 +33,8 @@ public class LruTests : CacheTestsBase
         Assert.Null(value2);
         Assert.Equal("value1", value1);
         Assert.Equal("value3", value3);
+
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 2 | Total evictions: 1", Times.Once());
     }
 
     [Fact]
@@ -40,8 +42,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var options = new CacheOptions(2, _evictionPolicy);
-        var cache = new Cache<int, string>(options);
+        var cache = CreateCache<int, string>(2, _loggerMock.Object);
 
         cache.Put(1, "oldValue");
         cache.Put(2, "value2");
@@ -61,6 +62,8 @@ public class LruTests : CacheTestsBase
 
         cache.TryGet(3, out var value3);
         Assert.Equal("value3", value3);
+
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 2 | Total evictions: 1", Times.Once());
     }
 
     [Fact]
@@ -68,8 +71,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var options = new CacheOptions(3, _evictionPolicy);
-        var cache = new Cache<int, string>(options);
+        var cache = CreateCache<int, string>(3);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -92,8 +94,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var options = new CacheOptions(2, _evictionPolicy);
-        var cache = new Cache<int, string>(options);
+        var cache = CreateCache<int, string>(2);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -114,8 +115,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var options = new CacheOptions(2, _evictionPolicy);
-        var cache = new Cache<int, string>(options);
+        var cache = CreateCache<int, string>(2, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -132,6 +132,8 @@ public class LruTests : CacheTestsBase
         Assert.Equal("value2", value2);
         Assert.True(cache.TryGet(3, out var value3));
         Assert.Equal("value3", value3);
+
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
     }
 
     [Fact]
@@ -139,8 +141,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var options = new CacheOptions(2, _evictionPolicy);
-        var cache = new Cache<int, DisposableDummy>(options);
+        var cache = CreateCache<int, DisposableDummy>(2, _loggerMock.Object);
 
         var disposable1 = new DisposableDummy();
         var disposable2 = new DisposableDummy();
@@ -160,6 +161,8 @@ public class LruTests : CacheTestsBase
         Assert.Equal(disposable2, retrieved2);
         Assert.True(cache.TryGet(3, out var retrieved3));
         Assert.Equal(disposable3, retrieved3);
+
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
     }
 
     [Fact]
@@ -167,8 +170,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var options = new CacheOptions(3, _evictionPolicy);
-        var cache = new Cache<int, string>(options);
+        var cache = CreateCache<int, string>(3);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -190,8 +192,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var options = new CacheOptions(3, _evictionPolicy);
-        var cache = new Cache<int, string>(options);
+        var cache = CreateCache<int, string>(3, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -208,6 +209,8 @@ public class LruTests : CacheTestsBase
         Assert.Equal(3, cache.Count);
         Assert.False(cache.TryGet(1, out _));
         Assert.Equal(1, cache.Evictions);
+
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
     }
 
     [Fact]
@@ -237,6 +240,7 @@ public class LruTests : CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(3);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -258,7 +262,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, string>(2);
+        var cache = CreateCache<int, string>(2, _loggerMock.Object);
 
         // act
 
@@ -273,6 +277,8 @@ public class LruTests : CacheTestsBase
             key => Assert.Equal(2, key));
 
         Assert.False(cache.TryGet(1, out _));
+
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
     }
 
     [Fact]
@@ -281,6 +287,7 @@ public class LruTests : CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(3);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -304,6 +311,7 @@ public class LruTests : CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(3);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -356,6 +364,7 @@ public class LruTests : CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(3);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
