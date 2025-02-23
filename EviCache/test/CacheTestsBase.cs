@@ -58,7 +58,7 @@ public abstract class CacheTestsBase
 
         var loggerMock = new Mock<ILogger<Cache<int, string>>>();
 
-        int capacity = 3;
+        int capacity = 2;
         var cache = CreateCache<int, string>(capacity, loggerMock.Object);
 
         cache.Put(1, "value1");
