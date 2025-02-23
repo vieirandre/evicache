@@ -8,12 +8,19 @@ namespace EviCache.Tests;
 
 public abstract class CacheTestsBase
 {
+    protected readonly Mock<ILogger> _loggerMock;
+
     protected abstract EvictionPolicy EvictionPolicy { get; }
 
     protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity, ILogger? logger = null) where TKey : notnull
     {
         var options = new CacheOptions(capacity, EvictionPolicy);
         return new Cache<TKey, TValue>(options, logger);
+    }
+
+    public CacheTestsBase()
+    {
+        _loggerMock = new Mock<ILogger>();
     }
 
     [Theory]
@@ -32,16 +39,15 @@ public abstract class CacheTestsBase
     {
         // arrange
 
-        var loggerMock = new Mock<ILogger>();
         int capacity = 3;
 
         // act
 
-        _ = CreateCache<int, string>(capacity, loggerMock.Object);
+        _ = CreateCache<int, string>(capacity, _loggerMock.Object);
 
         // assert
 
-        loggerMock.VerifyLog(LogLevel.Information, $"Cache initialized with capacity {capacity} and eviction policy {EvictionPolicy}", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Information, $"Cache initialized with capacity {capacity} and eviction policy {EvictionPolicy}", Times.Once());
     }
 
     [Fact]
@@ -49,10 +55,8 @@ public abstract class CacheTestsBase
     {
         // arrange
 
-        var loggerMock = new Mock<ILogger>();
-
         int capacity = 2;
-        var cache = CreateCache<int, string>(capacity, loggerMock.Object);
+        var cache = CreateCache<int, string>(capacity, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -63,7 +67,7 @@ public abstract class CacheTestsBase
 
         // assert
 
-        loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed {capacity} items", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed {capacity} items", Times.Once());
     }
 
     [Fact]
