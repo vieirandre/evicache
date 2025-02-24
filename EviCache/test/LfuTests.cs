@@ -125,4 +125,47 @@ public class LfuTests : CacheTestsBase
         _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 3 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
+
+    [Fact]
+    public void Should_EvictLeastFrequentlyUsed_MultipleTimes()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3, _loggerMock.Object);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        cache.Get(1);
+        cache.Get(1);
+        cache.Get(2);
+
+        // act
+
+        cache.Put(4, "value4");
+
+        // assert
+
+        Assert.False(cache.TryGet(3, out _));
+        Assert.True(cache.TryGet(1, out _));
+        Assert.True(cache.TryGet(2, out _));
+        Assert.True(cache.TryGet(4, out _));
+        Assert.Equal(1, cache.Evictions);
+
+        // act
+
+        cache.Put(5, "value5");
+        cache.Put(6, "value6");
+
+        // assert
+
+        Assert.Equal(3, cache.Count);
+        Assert.Equal(3, cache.Evictions);
+
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 3 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 4 | Total evictions: 2", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 5 | Total evictions: 3", Times.Once());
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
+    }
 }

@@ -69,6 +69,52 @@ public class LruTests : CacheTestsBase
     }
 
     [Fact]
+    public void Should_EvictLeastRecentlyUsed_MultipleTimes()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3, _loggerMock.Object);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        cache.Get(2);
+
+        // act
+
+        cache.Put(4, "value4");
+
+        // assert
+
+        Assert.False(cache.TryGet(1, out _));
+        Assert.True(cache.TryGet(2, out _));
+        Assert.True(cache.TryGet(3, out _));
+        Assert.True(cache.TryGet(4, out _));
+        Assert.Equal(1, cache.Evictions);
+
+        // act
+
+        for (int i = 5; i <= 10; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
+
+        // assert
+
+        Assert.Equal(3, cache.Count);
+        Assert.Equal(7, cache.Evictions);
+
+        var keys = cache.GetKeys();
+        Assert.Equal(10, keys[0]);
+
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 7 | Total evictions: 7", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: .* | Total evictions: .*", Times.Exactly(7));
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
+    }
+
+    [Fact]
     public void Should_ClearAllItems_WhenClearIsCalled()
     {
         // arrange
