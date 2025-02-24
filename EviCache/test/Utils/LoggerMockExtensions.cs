@@ -18,4 +18,11 @@ public static class LoggerMockExtensions
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             times);
     }
+
+    public static void VerifyNoFailureLogsWereCalledInEviction(this Mock<ILogger> loggerMock)
+    {
+        loggerMock.VerifyLog(LogLevel.Error, "Eviction attempted on an empty cache. No candidate available", Times.Never());
+        loggerMock.VerifyLog(LogLevel.Warning, $"Eviction handler didn't return a candidate. Falling back to evicting key: .*", Times.Never());
+        loggerMock.VerifyLog(LogLevel.Error, "Eviction candidate (.*) wasn't found in the cache", Times.Never());
+    }
 }
