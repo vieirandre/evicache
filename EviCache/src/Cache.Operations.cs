@@ -174,16 +174,31 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
     private void Evict()
     {
-        if (_cacheHandler.TrySelectEvictionCandidate(out var candidate)
-            && _cacheMap.TryGetValue(candidate, out var value))
+        if (!_cacheHandler.TrySelectEvictionCandidate(out var candidate))
         {
-            _cacheMap.Remove(candidate);
-            _cacheHandler.RegisterRemoval(candidate);
+            candidate = _cacheMap.Keys.FirstOrDefault();
+            if (candidate is null)
+            {
+                _logger.LogError("Eviction attempted on an empty cache. No candidate available");
+                return;
+            }
 
-            Interlocked.Increment(ref _evictions);
-            _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
-
-            DisposeItem(value);
+            _logger.LogWarning("Eviction handler didn't return a candidate. Falling back to evicting key: {Candidate}", candidate);
         }
+
+
+        if (!_cacheMap.TryGetValue(candidate, out var value))
+        {
+            _logger.LogError("Eviction candidate ({Candidate}) wasn't found in the cache", candidate);
+            return;
+        }
+
+        _cacheMap.Remove(candidate);
+        _cacheHandler.RegisterRemoval(candidate);
+
+        Interlocked.Increment(ref _evictions);
+        _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
+
+        DisposeItem(value);
     }
 }
