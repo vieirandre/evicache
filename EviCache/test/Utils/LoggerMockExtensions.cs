@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
+using System.Text.RegularExpressions;
 
 namespace EviCache.Tests.Utils;
 
@@ -12,7 +13,7 @@ public static class LoggerMockExtensions
                 logLevel,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) =>
-                    string.Equals(v.ToString(), expectedMessage, StringComparison.InvariantCulture)),
+                    Regex.IsMatch(v.ToString(), expectedMessage, RegexOptions.None)),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             times);
