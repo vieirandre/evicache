@@ -37,6 +37,7 @@ public class LfuTests : CacheTestsBase
         Assert.Equal("value3", value3);
 
         _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 2 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
     [Fact]
@@ -61,6 +62,7 @@ public class LfuTests : CacheTestsBase
         Assert.Equal("value3", cache.Get(3));
 
         _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 2 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
     [Fact]
@@ -86,6 +88,7 @@ public class LfuTests : CacheTestsBase
         Assert.Equal("value3", value3);
 
         _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
     [Fact]
@@ -120,5 +123,6 @@ public class LfuTests : CacheTestsBase
         Assert.Equal("value4", value4);
 
         _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 3 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 }
