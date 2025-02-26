@@ -6,6 +6,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace EviCache;
 
+/// <summary>
+/// Represents an in-memory, thread-safe cache with support for multiple eviction policies.
+/// </summary>
+/// <typeparam name="TKey">The type of keys stored in the cache.</typeparam>
+/// <typeparam name="TValue">The type of values stored in the cache.</typeparam>
 public partial class Cache<TKey, TValue> where TKey : notnull
 {
     private readonly int _capacity;
@@ -14,6 +19,13 @@ public partial class Cache<TKey, TValue> where TKey : notnull
     private readonly object _syncLock = new();
     private readonly ILogger _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Cache{TKey, TValue}"/> class with the specified options.
+    /// </summary>
+    /// <param name="options">The configuration options, including capacity and eviction policy.</param>
+    /// <param name="logger">An optional logger for logging cache events.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="options"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the capacity is zero or negative.</exception>
     public Cache(CacheOptions options, ILogger? logger = null)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
