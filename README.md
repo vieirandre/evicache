@@ -51,7 +51,7 @@ bool retrieved = cache.TryGet(1, out string value);
 string value = cache.GetOrAdd(2, "two");
 
 // Update the value if the key exists; otherwise, add it
-int updatedValue = cache.AddOrUpdate(1, "newOne");
+string updatedValue = cache.AddOrUpdate(1, "newOne");
 ```
 
 **Checking, removing, and clearing entries**
