@@ -1,10 +1,10 @@
-# EviCache
+## About
 
-EviCache is a lightweight, thread-safe, in-memory caching library for .NET.
+`EviCache` is a lightweight, thread-safe, in-memory caching library for .NET.
 
-It supports multiple eviction policies and offers both synchronous and asynchronous APIs for interacting with the cache. Moreover, it provides metrics and inspection capabilites.
+It supports multiple eviction policies and offers extended cache operations. Moreover, it provides metrics and inspection capabilites.
 
-## Key features
+## Key Features
 
 - **Thread-safe operations**: All cache operations are synchronized, ensuring thread safety for concurrent access.
 - **Multiple eviction policies** (work in progress for others):
@@ -13,9 +13,9 @@ It supports multiple eviction policies and offers both synchronous and asynchron
 - **Built-in metrics**: Tracks cache capacity, current count, hits, misses, and evictions.
 - **Cache inspection**: Retrieves snapshots and list of keys currently in the cache.
 
-## Usage
+## How to Use
 
-### Initializing the cache
+**Initializing the cache**
 
 ```csharp
 using EviCache;
@@ -31,7 +31,7 @@ var cacheOptions = new CacheOptions(5, EvictionPolicy.LRU);
 var cache = new Cache<int, string>(cacheOptions);
 ```
 
-### Inserting and retrieving values
+**Inserting and retrieving values**
 
 ```csharp
 // Insert a new value into the cache
@@ -44,7 +44,7 @@ int valueOne = cache.Get(1);
 bool retrieved = cache.TryGet(1, out string value);
 ```
 
-### Conditional retrieval and updates
+**Conditional retrieval and updates**
 
 ```csharp
 // Return the existing value for a key or add a new key/value pair if not found
@@ -54,7 +54,7 @@ string value = cache.GetOrAdd(2, "two");
 int updatedValue = cache.AddOrUpdate(1, "newOne");
 ```
 
-### Checking, removal, and clearing entries
+**Checking, removing, and clearing entries**
 
 ```csharp
 // Check if a key exists in the cache
@@ -67,7 +67,7 @@ bool removed = cache.Remove(1);
 cache.Clear();
 ```
 
-### Inspecting cache contents
+**Inspecting cache contents**
 
 ```csharp
 // Retrieve a snapshot of the cache
@@ -77,7 +77,7 @@ ImmutableList<KeyValuePair<TKey, TValue>> snapshot = cache.GetSnapshot();
 ImmutableList<TKey> keys = cache.GetKeys();
 ```
 
-### Accessing cache metrics
+**Accessing cache metrics**
 
 ```csharp
 // Access cache metrics
