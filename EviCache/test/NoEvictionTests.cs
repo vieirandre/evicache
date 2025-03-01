@@ -1,4 +1,5 @@
 ﻿using EviCache.Enums;
+using EviCache.Tests.Helpers;
 
 namespace EviCache.Tests;
 
@@ -8,55 +9,67 @@ public class NoEvictionTests : CacheTestsBase
     protected override bool SupportsEviction => false;
 
     [Fact]
-    public void Should_ThrowException_WhenAddingNewItem_OverCapacity_WithPut()
+    public void Should_FailSilently_WhenAddingNewItem_OverCapacity_WithPut()
     {
         // arrange
 
-        var cache = CreateCache<int, string>(2);
+        var cache = CreateCache<int, string>(2, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
-        // act & assert
+        // act
 
-        var ex = Assert.Throws<InvalidOperationException>(() => cache.Put(3, "value3"));
-        Assert.Equal("NoEviction policy is in effect; cannot evict items", ex.Message);
+        cache.Put(3, "value3");
+
+        // assert
+
+        Assert.False(cache.TryGet(3, out _));
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
     [Fact]
-    public void Should_ThrowException_WhenAddingNewItem_OverCapacity_WithGetOrAdd()
+    public void Should_FailSilently_WhenAddingNewItem_OverCapacity_WithGetOrAdd()
     {
         // arrange
 
-        var cache = CreateCache<int, string>(2);
+        var cache = CreateCache<int, string>(2, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
-        // act & assert
+        // act
 
-        var ex = Assert.Throws<InvalidOperationException>(() => cache.GetOrAdd(3, "value3"));
-        Assert.Equal("NoEviction policy is in effect; cannot evict items", ex.Message);
+        _ = cache.GetOrAdd(3, "value3");
+
+        // assert
+
+        Assert.False(cache.TryGet(3, out _));
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
     [Fact]
-    public void Should_ThrowException_WhenAddingNewItem_OverCapacity_WithAddOrUpdate()
+    public void Should_FailSilently_WhenAddingNewItem_OverCapacity_WithAddOrUpdate()
     {
         // arrange
 
-        var cache = CreateCache<int, string>(2);
+        var cache = CreateCache<int, string>(2, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
-        // act & assert
+        // act
 
-        var ex = Assert.Throws<InvalidOperationException>(() => cache.AddOrUpdate(3, "value3"));
-        Assert.Equal("NoEviction policy is in effect; cannot evict items", ex.Message);
+        _ = cache.AddOrUpdate(3, "value3");
+
+        // assert
+
+        Assert.False(cache.TryGet(3, out _));
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
     [Fact]
-    public void Should_UpdateExistingKey_WithoutThrowing_WhenCacheIsFull()
+    public void Should_UpdateExistingKey_WhenCacheIsFull_WithPut()
     {
         // arrange
 
@@ -71,6 +84,46 @@ public class NoEvictionTests : CacheTestsBase
 
         // assert
 
+        Assert.Equal("updatedValue1", cache.Get(1));
+    }
+
+    [Fact]
+    public void Should_ReturnOriginalValue_WhenCacheIsFull_WithGetOrAdd()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        string originalValue = cache.GetOrAdd(1, "updatedValue1");
+
+        // assert
+
+        Assert.Equal("value1", originalValue);
+        Assert.Equal("value1", cache.Get(1));
+    }
+
+    [Fact]
+    public void Should_UpdateExistingKey_WhenCacheIsFull_WithAddOrUpdate()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        string updatedValue = cache.AddOrUpdate(1, "updatedValue1");
+
+        // assert
+
+        Assert.Equal("updatedValue1", updatedValue);
         Assert.Equal("updatedValue1", cache.Get(1));
     }
 

@@ -7,5 +7,4 @@ internal interface ICacheHandler<TKey> : ICacheKeyProvider<TKey> where TKey : no
     void RegisterUpdate(TKey key);
     void RegisterRemoval(TKey key);
     void Clear();
-    bool TrySelectEvictionCandidate(out TKey candidate);
 }

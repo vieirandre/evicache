@@ -168,7 +168,10 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
     private bool EnsureCapacityForKey(TKey key)
     {
-        if (_cacheMap.Count >= _capacity && !TryEvictItem())
+        if (_cacheMap.Count < _capacity) return true;
+        if (_evictionCandidateSelector is null) return false;
+
+        if (!TryEvictItem())
         {
             _logger.LogWarning("Eviction failed. Item not added. Key: {Key}", key);
             return false;
@@ -179,9 +182,9 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
     private bool TryEvictItem()
     {
-        if (!_cacheHandler.TrySelectEvictionCandidate(out var candidate))
+        if (_evictionCandidateSelector?.TrySelectEvictionCandidate(out var candidate) != true)
         {
-            _logger.LogError("Eviction handler didn't return a candidate");
+            _logger.LogError("Eviction selector didn't return a candidate");
             return false;
         }
 

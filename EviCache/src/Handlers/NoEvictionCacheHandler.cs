@@ -17,7 +17,5 @@ internal class NoEvictionCacheHandler<TKey> : ICacheHandler<TKey> where TKey : n
 
     public void Clear() => _keys.Clear();
 
-    public bool TrySelectEvictionCandidate(out TKey candidate) => throw new InvalidOperationException("NoEviction policy is in effect; cannot evict items");
-
     public ImmutableList<TKey> GetKeys() => _keys.ToImmutableList();
 }
