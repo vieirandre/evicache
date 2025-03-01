@@ -36,14 +36,13 @@ public partial class Cache<TKey, TValue> : ICacheOperationsAsync<TKey, TValue> w
         return Task.FromResult(AddOrUpdate(key, value));
     }
 
-    public Task<bool> RemoveAsync(TKey key)
+    public async Task<bool> RemoveAsync(TKey key)
     {
-        return Task.FromResult(Remove(key));
+        return await Task.Run(() => Remove(key));
     }
 
-    public Task ClearAsync()
+    public async Task ClearAsync()
     {
-        Clear();
-        return Task.CompletedTask;
+        await Task.Run(Clear);
     }
 }
