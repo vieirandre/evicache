@@ -8,9 +8,9 @@ namespace EviCache.Tests;
 
 public abstract class CacheTestsBase
 {
-    protected readonly Mock<ILogger> _loggerMock;
-
     protected abstract EvictionPolicy EvictionPolicy { get; }
+    protected virtual bool SupportsEviction => true;
+    protected readonly Mock<ILogger> _loggerMock;
 
     protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity, ILogger? logger = null) where TKey : notnull
     {
@@ -107,9 +107,11 @@ public abstract class CacheTestsBase
         Assert.Equal(20, thatValue);
     }
 
-    [Fact]
+    [SkippableFact]
     public void Should_UpdateExistingKeyAndEvict_WhenReinsertingKeyOverCapacity()
     {
+        Skip.IfNot(SupportsEviction);
+
         // arrange
 
         var cache = CreateCache<int, string>(2);
@@ -149,9 +151,11 @@ public abstract class CacheTestsBase
         Assert.Equal(disposableItem, result);
     }
 
-    [Fact]
+    [SkippableFact]
     public void Should_NotExceedCapacity_WhenCacheIsFull()
     {
+        Skip.IfNot(SupportsEviction);
+
         // arrange
 
         int capacity = 2;
@@ -234,9 +238,11 @@ public abstract class CacheTestsBase
         Assert.False(cache.TryGet(3, out _));
     }
 
-    [Fact]
+    [SkippableFact]
     public void Should_TrackHitsMissesAndEvictions_WhenCacheCapacityIs15()
     {
+        Skip.IfNot(SupportsEviction);
+
         // arrange
 
         int capacity = 15;
@@ -308,9 +314,11 @@ public abstract class CacheTestsBase
         Assert.Equal("value1", result);
     }
 
-    [Fact]
+    [SkippableFact]
     public void Should_Evict_WhenAddingNewItemExceedsCapacityInGetOrAdd()
     {
+        Skip.IfNot(SupportsEviction);
+
         // arrange
 
         var cache = CreateCache<int, string>(2);
@@ -469,9 +477,11 @@ public abstract class CacheTestsBase
         Assert.Equal(1, cache.Count);
     }
 
-    [Fact]
+    [SkippableFact]
     public void Should_Evict_WhenAddingNewKeyExceedingCapacity()
     {
+        Skip.IfNot(SupportsEviction);
+
         // arrange
 
         var cache = CreateCache<int, string>(3);

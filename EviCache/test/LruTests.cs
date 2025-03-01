@@ -7,9 +7,7 @@ namespace EviCache.Tests;
 
 public class LruTests : CacheTestsBase
 {
-    private const EvictionPolicy _evictionPolicy = EvictionPolicy.LRU;
-
-    protected override EvictionPolicy EvictionPolicy => _evictionPolicy;
+    protected override EvictionPolicy EvictionPolicy => EvictionPolicy.LRU;
 
     [Fact]
     public void Should_EvictLeastRecentlyUsed_WhenCapacityIsExceeded()
