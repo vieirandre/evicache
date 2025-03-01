@@ -1,4 +1,4 @@
-﻿namespace EviCache.Tests.Utils;
+﻿namespace EviCache.Tests.Helpers;
 
 public class DisposableDummy : IDisposable
 {

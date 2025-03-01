@@ -2,7 +2,7 @@
 using Moq;
 using System.Text.RegularExpressions;
 
-namespace EviCache.Tests.Utils;
+namespace EviCache.Tests.Helpers;
 
 public static class LoggerMockExtensions
 {

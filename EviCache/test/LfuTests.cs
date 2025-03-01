@@ -1,5 +1,5 @@
 ﻿using EviCache.Enums;
-using EviCache.Tests.Utils;
+using EviCache.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
 
