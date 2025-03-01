@@ -28,6 +28,9 @@ public interface ICacheOperations<TKey, TValue> where TKey : notnull
     /// </summary>
     /// <param name="key">The key to check for existence.</param>
     /// <returns><c>true</c> if the key exists in the cache; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// [Note] Unlike other retrieval methods, this one does not trigger cache hit or miss counters.
+    /// </remarks>
     bool ContainsKey(TKey key);
 
     /// <summary>
@@ -35,6 +38,9 @@ public interface ICacheOperations<TKey, TValue> where TKey : notnull
     /// </summary>
     /// <param name="key">The key of the item to add or update.</param>
     /// <param name="value">The value to associate with the key.</param>
+    /// <remarks>
+    /// [Note] Unlike other insertion methods, this one does not trigger cache hit or miss counters.
+    /// </remarks>
     void Put(TKey key, TValue value);
 
     /// <summary>
