@@ -176,16 +176,9 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         if (!_cacheHandler.TrySelectEvictionCandidate(out var candidate))
         {
-            candidate = _cacheMap.Keys.FirstOrDefault();
-            if (candidate is null)
-            {
-                _logger.LogError("Eviction attempted on an empty cache. No candidate available");
-                return;
-            }
-
-            _logger.LogWarning("Eviction handler didn't return a candidate. Falling back to evicting key: {Candidate}", candidate);
+            _logger.LogError("Eviction handler didn't return a candidate");
+            return;
         }
-
 
         if (!_cacheMap.TryGetValue(candidate, out var value))
         {
