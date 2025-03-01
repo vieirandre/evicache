@@ -26,6 +26,9 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// </summary>
     /// <param name="key">The key to check for existence.</param>
     /// <returns>A task representing the asynchronous operation, containing a boolean that indicates whether the key exists.</returns>
+    /// <remarks>
+    /// [Note] Unlike other retrieval methods, this one does not trigger cache hit or miss counters.
+    /// </remarks>
     Task<bool> ContainsKeyAsync(TKey key);
 
     /// <summary>
@@ -34,6 +37,9 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <param name="key">The key of the item to add or update.</param>
     /// <param name="value">The value to associate with the key.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// [Note] Unlike other insertion methods, this one does not trigger cache hit or miss counters.
+    /// </remarks>
     Task PutAsync(TKey key, TValue value);
 
     /// <summary>
