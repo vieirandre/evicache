@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace EviCache.Handlers;
 
-internal class NoEvictionCacheHandler<TKey, TValue> : ICacheHandler<TKey, TValue> where TKey : notnull
+internal class NoEvictionCacheHandler<TKey> : ICacheHandler<TKey> where TKey : notnull
 {
     private readonly List<TKey> _keys = new();
 

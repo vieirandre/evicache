@@ -6,13 +6,13 @@ namespace EviCache.Factories;
 
 internal static class CacheHandlerFactory
 {
-    internal static ICacheHandler<TKey, TValue> Create<TKey, TValue>(EvictionPolicy policyType) where TKey : notnull
+    internal static ICacheHandler<TKey> Create<TKey>(EvictionPolicy policyType) where TKey : notnull
     {
         return policyType switch
         {
-            EvictionPolicy.LRU => new LruCacheHandler<TKey, TValue>(),
-            EvictionPolicy.LFU => new LfuCacheHandler<TKey, TValue>(),
-            EvictionPolicy.NoEviction => new NoEvictionCacheHandler<TKey, TValue>(),
+            EvictionPolicy.LRU => new LruCacheHandler<TKey>(),
+            EvictionPolicy.LFU => new LfuCacheHandler<TKey>(),
+            EvictionPolicy.NoEviction => new NoEvictionCacheHandler<TKey>(),
             _ => throw new NotSupportedException($"The eviction policy '{policyType}' is not supported")
         };
     }
