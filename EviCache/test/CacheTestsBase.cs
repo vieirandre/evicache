@@ -1,7 +1,6 @@
 ﻿using EviCache.Enums;
 using EviCache.Options;
 using EviCache.Tests.Helpers;
-using EviCache.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -111,7 +110,7 @@ public abstract class CacheTestsBase
     [SkippableFact]
     public void Should_UpdateExistingKeyAndEvict_WhenReinsertingKeyOverCapacity()
     {
-        Skip.IfNot(SupportsEviction);
+        Skip.IfNot(SupportsEviction, TestMessages.EvictionNotSupported);
 
         // arrange
 
@@ -155,7 +154,7 @@ public abstract class CacheTestsBase
     [SkippableFact]
     public void Should_NotExceedCapacity_WhenCacheIsFull()
     {
-        Skip.IfNot(SupportsEviction);
+        Skip.IfNot(SupportsEviction, TestMessages.EvictionNotSupported);
 
         // arrange
 
@@ -223,6 +222,7 @@ public abstract class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(3);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -242,7 +242,7 @@ public abstract class CacheTestsBase
     [SkippableFact]
     public void Should_TrackHitsMissesAndEvictions_WhenCacheCapacityIs15()
     {
-        Skip.IfNot(SupportsEviction);
+        Skip.IfNot(SupportsEviction, TestMessages.EvictionNotSupported);
 
         // arrange
 
@@ -303,6 +303,7 @@ public abstract class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(2);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -318,11 +319,12 @@ public abstract class CacheTestsBase
     [SkippableFact]
     public void Should_Evict_WhenAddingNewItemExceedsCapacityInGetOrAdd()
     {
-        Skip.IfNot(SupportsEviction);
+        Skip.IfNot(SupportsEviction, TestMessages.EvictionNotSupported);
 
         // arrange
 
         var cache = CreateCache<int, string>(2);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -331,6 +333,7 @@ public abstract class CacheTestsBase
         var result = cache.GetOrAdd(3, "value3");
 
         // assert
+
         Assert.Equal("value3", result);
         Assert.False(cache.TryGet(1, out _));
         Assert.True(cache.TryGet(2, out var value2));
@@ -345,6 +348,7 @@ public abstract class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(3);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -389,6 +393,7 @@ public abstract class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(3);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -408,6 +413,7 @@ public abstract class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(2);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
@@ -426,6 +432,7 @@ public abstract class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, DisposableDummy>(2);
+
         var disposableItem = new DisposableDummy();
         cache.Put(1, disposableItem);
 
@@ -445,6 +452,7 @@ public abstract class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(5);
+
         cache.Put(1, "oldValue");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -481,11 +489,12 @@ public abstract class CacheTestsBase
     [SkippableFact]
     public void Should_Evict_WhenAddingNewKeyExceedingCapacity()
     {
-        Skip.IfNot(SupportsEviction);
+        Skip.IfNot(SupportsEviction, TestMessages.EvictionNotSupported);
 
         // arrange
 
         var cache = CreateCache<int, string>(3);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
         cache.Put(3, "value3");
@@ -582,6 +591,7 @@ public abstract class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(3);
+
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
