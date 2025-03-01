@@ -62,8 +62,8 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
                 return;
             }
 
-            if (_cacheMap.Count >= _capacity)
-                Evict();
+            if (!EnsureCapacityForKey(key))
+                return;
 
             AddNewItem(key, value);
         }
@@ -83,8 +83,8 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
             Interlocked.Increment(ref _misses);
 
-            if (_cacheMap.Count >= _capacity)
-                Evict();
+            if (!EnsureCapacityForKey(key))
+                return default!;
 
             AddNewItem(key, value);
             return value;
@@ -107,8 +107,8 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
             Interlocked.Increment(ref _misses);
 
-            if (_cacheMap.Count >= _capacity)
-                Evict();
+            if (!EnsureCapacityForKey(key))
+                return default!;
 
             AddNewItem(key, value);
             return value;
@@ -166,24 +166,29 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         _logger.LogInformation("Cache cleared. Removed {Count} items", removedCount);
     }
 
-    private void AddNewItem(TKey key, TValue value)
+    private bool EnsureCapacityForKey(TKey key)
     {
-        _cacheMap[key] = value;
-        _cacheHandler.RegisterInsertion(key);
+        if (_cacheMap.Count >= _capacity && !TryEvictItem())
+        {
+            _logger.LogWarning("Eviction failed. Item not added. Key: {Key}", key);
+            return false;
+        }
+
+        return true;
     }
 
-    private void Evict()
+    private bool TryEvictItem()
     {
         if (!_cacheHandler.TrySelectEvictionCandidate(out var candidate))
         {
             _logger.LogError("Eviction handler didn't return a candidate");
-            return;
+            return false;
         }
 
         if (!_cacheMap.TryGetValue(candidate, out var value))
         {
             _logger.LogError("Eviction candidate ({Candidate}) wasn't found in the cache", candidate);
-            return;
+            return false;
         }
 
         _cacheMap.Remove(candidate);
@@ -193,5 +198,13 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
 
         DisposeItem(value);
+
+        return true;
+    }
+
+    private void AddNewItem(TKey key, TValue value)
+    {
+        _cacheMap[key] = value;
+        _cacheHandler.RegisterInsertion(key);
     }
 }

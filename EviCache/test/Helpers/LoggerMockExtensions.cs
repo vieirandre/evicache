@@ -23,5 +23,6 @@ public static class LoggerMockExtensions
     {
         loggerMock.VerifyLog(LogLevel.Error, "Eviction handler didn't return a candidate", Times.Never());
         loggerMock.VerifyLog(LogLevel.Error, "Eviction candidate (.*) wasn't found in the cache", Times.Never());
+        loggerMock.VerifyLog(LogLevel.Warning, "Eviction failed. Item not added. Key: .*", Times.Never());
     }
 }
