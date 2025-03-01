@@ -12,5 +12,9 @@ public enum EvictionPolicy
     /// <summary>
     /// Least Frequently Used (LFU): Evicts the item with the lowest access frequency.
     /// </summary>
-    LFU
+    LFU,
+    /// <summary>
+    /// No Eviction: New items are not accepted when the cache is full.
+    /// </summary>
+    NoEviction
 }

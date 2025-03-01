@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-
-namespace EviCache.Abstractions;
+﻿namespace EviCache.Abstractions;
 
 internal interface ICacheHandler<TKey, TValue> : ICacheKeyProvider<TKey> where TKey : notnull
 {
