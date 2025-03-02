@@ -39,7 +39,7 @@ var cache = new Cache<int, string>(cacheOptions);
 cache.Put(1, "one");
 
 // Retrieve the value (throws KeyNotFoundException if key doesn't exist)
-int valueOne = cache.Get(1);
+string value = cache.Get(1);
 
 // Retrieve the value without throwing an exception if the key is missing
 bool retrieved = cache.TryGet(1, out string value);
