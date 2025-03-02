@@ -25,6 +25,7 @@ public class NoEvictionTests : CacheTestsBase
         // assert
 
         Assert.False(cache.TryGet(3, out _));
+        Assert.False(cache.Count > cache.Capacity);
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -45,6 +46,7 @@ public class NoEvictionTests : CacheTestsBase
         // assert
 
         Assert.False(cache.TryGet(3, out _));
+        Assert.False(cache.Count > cache.Capacity);
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -65,6 +67,7 @@ public class NoEvictionTests : CacheTestsBase
         // assert
 
         Assert.False(cache.TryGet(3, out _));
+        Assert.False(cache.Count > cache.Capacity);
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
