@@ -608,6 +608,63 @@ public abstract class CacheTestsBase
     }
 
     [Fact]
+    public void Should_HandleCapacityOfOne()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(1, _loggerMock.Object);
+
+        // act
+
+        cache.Put(1, "value1");
+
+        // assert
+
+        Assert.True(cache.TryGet(1, out var value1));
+        Assert.Equal("value1", value1);
+
+        // act
+
+        cache.Put(2, "value2");
+
+        if (SupportsEviction)
+        {
+            // assert
+
+            Assert.False(cache.TryGet(1, out _));
+            Assert.True(cache.TryGet(2, out var value2));
+            Assert.Equal("value2", value2);
+
+            // act
+
+            cache.Put(2, "newValue2");
+
+            // assert
+
+            Assert.True(cache.TryGet(2, out var updatedValue));
+            Assert.Equal("newValue2", updatedValue);
+        }
+        else
+        {
+            // assert
+
+            Assert.True(cache.TryGet(1, out _));
+            Assert.False(cache.TryGet(2, out _));
+
+            // act
+
+            cache.Put(1, "newValue1");
+
+            // assert
+
+            Assert.True(cache.TryGet(1, out var updatedValue));
+            Assert.Equal("newValue1", updatedValue);
+        }
+
+        Assert.Equal(1, cache.Count);
+    }
+
+    [Fact]
     public async Task Should_HandleConcurrentAccess()
     {
         // arrange
