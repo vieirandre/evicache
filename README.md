@@ -82,9 +82,8 @@ ImmutableList<TKey> keys = cache.GetKeys();
 
 ```csharp
 // Access cache metrics
-Console.WriteLine($"Cache Capacity: {cache.Capacity}");
-Console.WriteLine($"Current Count: {cache.Count}");
+Console.WriteLine($"Cache Count: {cache.Count}");
 Console.WriteLine($"Cache Hits: {cache.Hits}");
 Console.WriteLine($"Cache Misses: {cache.Misses}");
-Console.WriteLine($"Total Evictions: {cache.Evictions}");
+Console.WriteLine($"Cache Evictions: {cache.Evictions}");
 ```
