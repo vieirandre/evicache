@@ -166,4 +166,36 @@ public class LfuTests : CacheTestsBase
         _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 5 | Total evictions: 3", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
+
+    [Fact]
+    public void Should_ReturnSnapshotInOrderOfIncreasingFrequency()
+    {
+        // arrange
+
+        int capacity = 20;
+        var expectedOrder = Enumerable.Range(1, capacity);
+
+        var cache = CreateCache<int, string>(capacity);
+
+        for (int i = 1; i <= capacity; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
+
+        // act
+
+        for (int i = 1; i <= capacity; i++)
+        {
+            for (int j = 1; j < i; j++)
+            {
+                cache.Get(i);
+            }
+        }
+
+        // assert
+
+        var actualOrder = cache.GetSnapshot().Select(kvp => kvp.Key);
+
+        Assert.Equal(expectedOrder, actualOrder);
+    }
 }
