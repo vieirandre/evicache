@@ -771,4 +771,39 @@ public abstract class CacheTestsBase
         Assert.Single(cache.GetKeys());
         Assert.Equal(taskCount * iterations + 1, cache.Hits); // '+1' due to tryGet used in assert
     }
+
+    [Fact]
+    public async Task Should_HandleRepeatedInsertionsAndRemovalsOnSameKey()
+    {
+        // arrange
+
+        var cache = CreateCache<int, int>(10);
+
+        int key = 1;
+        int iterations = 10000;
+        int taskCount = 10;
+
+        var tasks = new List<Task>();
+
+        // act
+
+        for (int t = 0; t < taskCount; t++)
+        {
+            tasks.Add(Task.Run(() =>
+            {
+                for (int i = 0; i < iterations; i++)
+                {
+                    cache.Put(key, i);
+                    cache.Remove(key);
+                }
+            }));
+        }
+
+        await Task.WhenAll(tasks);
+
+        // assert
+
+        Assert.True(cache.Count <= 1);
+        Assert.True(cache.GetKeys().Count <= 1);
+    }
 }
