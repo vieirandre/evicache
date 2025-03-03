@@ -11,7 +11,7 @@
 		<Description>A lightweight, thread-safe, in-memory cache.</Description>
 
 		<Title>EviCache</Title>
-		<PackageTags>cache; caching; lightweight; thread-safe; in-memory; eviction; lru; lfu</PackageTags>
+		<PackageTags>cache; caching; lightweight; thread-safe; in-memory; eviction; replacement; lru; lfu</PackageTags>
 		<ProjectUrl>https://github.com/vieirandre/evicache</ProjectUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/vieirandre/evicache</RepositoryUrl>
