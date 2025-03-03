@@ -11,7 +11,7 @@ It supports multiple eviction policies and offers extended cache operations. Mor
     - Least Recently Used (LRU): Evicts the item that has not been accessed for the longest period.
     - Least Frequently Used (LFU): Evicts the item with the lowest access frequency.
     - No Eviction: New items are not accepted when the cache is full.
-- **Built-in metrics**: Tracks cache capacity, current count, hits, misses, and evictions.
+- **Built-in metrics**: Tracks cache count, hits, misses, and evictions.
 - **Cache inspection**: Retrieves snapshots and list of keys currently in the cache.
 
 ## How to Use
