@@ -606,4 +606,71 @@ public abstract class CacheTestsBase
         Assert.False(containsKey1);
         Assert.False(containsKey2);
     }
+
+    [Fact]
+    public async Task Should_HandleConcurrentAccess()
+    {
+        // arrange
+
+        const int capacity = 50;
+        const int taskCount = 50;
+        const int operationsPerTask = 1000;
+
+        var cache = CreateCache<int, int>(capacity, _loggerMock.Object);
+
+        var tasks = new List<Task>();
+
+        // act
+
+        for (int t = 0; t < taskCount; t++)
+        {
+            tasks.Add(Task.Run(() =>
+            {
+                var localRandom = new Random(Guid.NewGuid().GetHashCode());
+
+                for (int i = 0; i < operationsPerTask; i++)
+                {
+                    int key = localRandom.Next(1, 200);
+                    int value = localRandom.Next();
+
+                    int op = localRandom.Next(0, 5);
+                    switch (op)
+                    {
+                        case 0:
+                            cache.Put(key, value);
+                            break;
+                        case 1:
+                            cache.TryGet(key, out _);
+                            break;
+                        case 2:
+                            cache.Remove(key);
+                            break;
+                        case 3:
+                            cache.AddOrUpdate(key, value);
+                            break;
+                        case 4:
+                            cache.GetOrAdd(key, value);
+                            break;
+                    }
+                }
+            }));
+        }
+
+        await Task.WhenAll(tasks);
+
+        // assert
+
+        Assert.True(cache.Count <= capacity);
+
+        var keys = cache.GetKeys();
+
+        foreach (var key in keys)
+        {
+            Assert.True(cache.TryGet(key, out _));
+        }
+
+        Assert.Equal(keys.Count, keys.Distinct().Count()); // no duplicates
+
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
+    }
 }
