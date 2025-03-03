@@ -662,6 +662,7 @@ public abstract class CacheTestsBase
         }
 
         Assert.Equal(1, cache.Count);
+        _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
     [Fact]
@@ -729,5 +730,45 @@ public abstract class CacheTestsBase
         Assert.Equal(keys.Count, keys.Distinct().Count()); // no duplicates
 
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
+    }
+
+    [Fact]
+    public async Task Should_HandleConcurrentUpdatesOnSameKey()
+    {
+        // arrange
+
+        var cache = CreateCache<int, int>(10);
+
+        int key = 25;
+        cache.Put(key, 0);
+
+        int taskCount = 50;
+        int iterations = 1000;
+
+        var tasks = new List<Task>();
+
+        // act
+
+        for (int t = 0; t < taskCount; t++)
+        {
+            tasks.Add(Task.Run(() =>
+            {
+                for (int i = 0; i < iterations; i++)
+                {
+                    cache.AddOrUpdate(key, i);
+                }
+            }));
+        }
+
+        await Task.WhenAll(tasks);
+
+        // assert
+
+        Assert.Equal(1, cache.Count);
+        Assert.Equal(0, cache.Evictions);
+        Assert.True(cache.TryGet(key, out int finalValue));
+        Assert.InRange(finalValue, 0, iterations - 1);
+        Assert.Single(cache.GetKeys());
+        Assert.Equal(taskCount * iterations + 1, cache.Hits); // '+1' due to tryGet used in assert
     }
 }
