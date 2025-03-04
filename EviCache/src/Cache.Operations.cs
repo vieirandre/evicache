@@ -56,16 +56,14 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         {
             if (_cacheMap.ContainsKey(key))
             {
-                _cacheMap[key] = value;
-                _cacheHandler.RegisterUpdate(key);
-
+                AddOrUpdateItem(key, value, isUpdate: true);
                 return;
             }
 
             if (!EnsureCapacityForKey(key))
                 return;
 
-            AddNewItem(key, value);
+            AddOrUpdateItem(key, value, isUpdate: false);
         }
     }
 
@@ -86,7 +84,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
             if (!EnsureCapacityForKey(key))
                 return default!;
 
-            AddNewItem(key, value);
+            AddOrUpdateItem(key, value, isUpdate: false);
             return value;
         }
     }
@@ -99,9 +97,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
             {
                 Interlocked.Increment(ref _hits);
 
-                _cacheMap[key] = value;
-                _cacheHandler.RegisterUpdate(key);
-
+                AddOrUpdateItem(key, value, isUpdate: true);
                 return value;
             }
 
@@ -110,7 +106,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
             if (!EnsureCapacityForKey(key))
                 return default!;
 
-            AddNewItem(key, value);
+            AddOrUpdateItem(key, value, isUpdate: false);
             return value;
         }
     }
@@ -166,6 +162,20 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         _logger.LogInformation("Cache cleared. Removed {Count} items", removedCount);
     }
 
+    private void AddOrUpdateItem(TKey key, TValue value, bool isUpdate)
+    {
+        if (isUpdate)
+        {
+            _cacheMap[key] = value;
+            _cacheHandler.RegisterUpdate(key);
+        }
+        else
+        {
+            _cacheMap.Add(key, value);
+            _cacheHandler.RegisterInsertion(key);
+        }
+    }
+
     private bool EnsureCapacityForKey(TKey key)
     {
         if (_cacheMap.Count < _capacity) return true;
@@ -203,11 +213,5 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         DisposeItem(value);
 
         return true;
-    }
-
-    private void AddNewItem(TKey key, TValue value)
-    {
-        _cacheMap[key] = value;
-        _cacheHandler.RegisterInsertion(key);
     }
 }
