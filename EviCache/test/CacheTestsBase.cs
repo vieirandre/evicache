@@ -888,4 +888,25 @@ public abstract class CacheTestsBase
         Assert.Equal(3, cache.Hits);
         Assert.Equal(3, cache.Misses);
     }
+
+    [Fact]
+    public void Should_NotImpactMetrics_WhenContainsKeyIsCalled()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+        cache.Put(1, "value1");
+
+        // act
+
+        bool containsExisting = cache.ContainsKey(1);
+        bool containsMissing = cache.ContainsKey(99);
+
+        // assert
+
+        Assert.True(containsExisting);
+        Assert.False(containsMissing);
+        Assert.Equal(0, cache.Hits);
+        Assert.Equal(0, cache.Misses);
+    }
 }
