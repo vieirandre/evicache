@@ -111,6 +111,7 @@ public abstract class CacheTestsBase
     public void Should_UpdateExistingKeyAndEvict_WhenReinsertingKeyOverCapacity()
     {
         Skip.IfNot(SupportsEviction, TestMessages.EvictionNotSupported);
+        Skip.If(EvictionPolicy.Equals(EvictionPolicy.FIFO), "FIFO doesn't reinsert on updates");
 
         // arrange
 
