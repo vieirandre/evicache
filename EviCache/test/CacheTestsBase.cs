@@ -807,4 +807,30 @@ public abstract class CacheTestsBase
         Assert.True(cache.Count <= 1);
         Assert.True(cache.GetKeys().Count <= 1);
     }
+
+    [Fact]
+    public void Should_ReturnConsistentKeysAndSnapshot()
+    {
+        // arrange
+
+        int capacity = 15;
+        var cache = CreateCache<int, string>(capacity);
+
+        var numbers = Enumerable.Range(1, capacity);
+        numbers.Shuffle();
+
+        foreach (int n in numbers)
+        {
+            cache.Put(n, $"value{n}");
+        }
+
+        // act
+
+        var keys = cache.GetKeys();
+        var snapshotKeys = cache.GetSnapshot().Select(kvp => kvp.Key);
+
+        // assert
+
+        Assert.True(keys.SequenceEqual(snapshotKeys));
+    }
 }
