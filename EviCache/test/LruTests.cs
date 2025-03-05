@@ -32,7 +32,7 @@ public class LruTests : CacheTestsBase
         Assert.Equal("value1", value1);
         Assert.Equal("value3", value3);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 2 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 2 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -62,7 +62,7 @@ public class LruTests : CacheTestsBase
         cache.TryGet(3, out var value3);
         Assert.Equal("value3", value3);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 2 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 2 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -179,7 +179,7 @@ public class LruTests : CacheTestsBase
         Assert.True(cache.TryGet(3, out var value3));
         Assert.Equal("value3", value3);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 1 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -209,7 +209,7 @@ public class LruTests : CacheTestsBase
         Assert.True(cache.TryGet(3, out var retrieved3));
         Assert.Equal(disposable3, retrieved3);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 1 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -258,7 +258,7 @@ public class LruTests : CacheTestsBase
         Assert.False(cache.TryGet(1, out _));
         Assert.Equal(1, cache.Evictions);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 1 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -327,7 +327,7 @@ public class LruTests : CacheTestsBase
 
         Assert.False(cache.TryGet(1, out _));
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 1 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 

@@ -34,7 +34,7 @@ public class LfuTests : CacheTestsBase
         Assert.True(cache.TryGet(3, out var value3));
         Assert.Equal("value3", value3);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 2 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 2 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -59,7 +59,7 @@ public class LfuTests : CacheTestsBase
         Assert.Equal("newValue", cache.Get(1));
         Assert.Equal("value3", cache.Get(3));
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 2 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 2 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -85,7 +85,7 @@ public class LfuTests : CacheTestsBase
         Assert.True(cache.TryGet(3, out var value3));
         Assert.Equal("value3", value3);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 1 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -120,7 +120,7 @@ public class LfuTests : CacheTestsBase
         Assert.True(cache.TryGet(4, out string value4));
         Assert.Equal("value4", value4);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 3 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 3 | Total evictions: 1", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -161,9 +161,9 @@ public class LfuTests : CacheTestsBase
         Assert.Equal(3, cache.Count);
         Assert.Equal(3, cache.Evictions);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 3 | Total evictions: 1", Times.Once());
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 4 | Total evictions: 2", Times.Once());
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 5 | Total evictions: 3", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 3 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 4 | Total evictions: 2", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 5 | Total evictions: 3", Times.Once());
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
