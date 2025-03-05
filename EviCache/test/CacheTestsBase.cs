@@ -833,4 +833,25 @@ public abstract class CacheTestsBase
 
         Assert.True(keys.SequenceEqual(snapshotKeys));
     }
+
+    [Fact]
+    public void Should_BeIdempotent_WhenClearingCacheMultipleTimes()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        cache.Clear();
+        cache.Clear();
+
+        // assert
+
+        Assert.Equal(0, cache.Count);
+        Assert.Empty(cache.GetKeys());
+    }
 }
