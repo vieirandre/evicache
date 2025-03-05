@@ -854,4 +854,38 @@ public abstract class CacheTestsBase
         Assert.Equal(0, cache.Count);
         Assert.Empty(cache.GetKeys());
     }
+
+    [Fact]
+    public void Should_UpdateMetricsAccurately_AfterMixedOperations()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(5);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // act
+
+        cache.Get(1);
+        cache.Get(2);
+
+        // act & assert
+
+        Assert.Throws<KeyNotFoundException>(() => cache.Get(4));
+
+        // act
+
+        cache.TryGet(4, out _);
+        cache.AddOrUpdate(1, "newValue1");
+        cache.Remove(2);
+        cache.GetOrAdd(5, "value5");
+
+        // assert
+
+        Assert.Equal(3, cache.Count);
+        Assert.Equal(3, cache.Hits);
+        Assert.Equal(3, cache.Misses);
+    }
 }
