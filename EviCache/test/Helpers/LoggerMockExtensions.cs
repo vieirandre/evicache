@@ -13,7 +13,7 @@ public static class LoggerMockExtensions
                 logLevel,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) =>
-                    Regex.IsMatch(v.ToString(), expectedMessage, RegexOptions.None)),
+                    Regex.IsMatch(v.ToString(), expectedMessage.Replace("|", "\\|"), RegexOptions.None)),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             times);

@@ -106,9 +106,9 @@ public class LruTests : CacheTestsBase
         var keys = cache.GetKeys();
         Assert.Equal(10, keys[0]);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1 | Total evictions: 1", Times.Once());
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 7 | Total evictions: 7", Times.Once());
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: .* | Total evictions: .*", Times.Exactly(7));
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 1 | Total evictions: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 7 | Total evictions: 7", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: .* | Total evictions: .*", Times.Exactly(7));
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 

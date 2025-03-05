@@ -31,7 +31,7 @@ public class FifoTests : CacheTestsBase
         Assert.True(cache.TryGet(3, out var value3));
         Assert.Equal("value3", value3);
 
-        _loggerMock.VerifyLog(LogLevel.Debug, $"Evicted key from cache: 1", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Debug, "Evicted key from cache: 1 | Total evictions: 1", Times.Once());
     }
 
     [Fact]
