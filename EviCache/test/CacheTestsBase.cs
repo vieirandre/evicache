@@ -111,7 +111,7 @@ public abstract class CacheTestsBase
     public void Should_UpdateExistingKeyAndEvict_WhenReinsertingKeyOverCapacity()
     {
         Skip.IfNot(SupportsEviction, TestMessages.EvictionNotSupported);
-        Skip.If(EvictionPolicy.Equals(EvictionPolicy.FIFO), "FIFO doesn't reinsert on updates");
+        Skip.If(EvictionPolicy.Equals(EvictionPolicy.FIFO), "FIFO doesn't reorder on updates");
 
         // arrange
 
@@ -831,7 +831,7 @@ public abstract class CacheTestsBase
 
         // assert
 
-        Assert.True(keys.SequenceEqual(snapshotKeys));
+        Assert.Equal(keys, snapshotKeys);
     }
 
     [Fact]
@@ -908,5 +908,34 @@ public abstract class CacheTestsBase
         Assert.False(containsMissing);
         Assert.Equal(0, cache.Hits);
         Assert.Equal(0, cache.Misses);
+    }
+
+    [Fact]
+    public async Task Should_YieldSameResults_ForSyncAndAsyncOperations() // TODO: expand
+    {
+        // arrange
+
+        var syncCache = CreateCache<int, string>(5);
+        var asyncCache = CreateCache<int, string>(5);
+
+        // act (sync)
+
+        syncCache.Put(1, "value1");
+        syncCache.Put(2, "value2");
+        string syncValue = syncCache.Get(1);
+
+        // act (async)
+
+        await asyncCache.PutAsync(1, "value1");
+        await asyncCache.PutAsync(2, "value2");
+        string asyncValue = await asyncCache.GetAsync(1);
+
+        // assert
+
+        Assert.Equal(syncCache.Count, asyncCache.Count);
+        Assert.Equal(syncCache.GetKeys(), asyncCache.GetKeys());
+        Assert.Equal(syncValue, asyncValue);
+        Assert.Equal(syncCache.Hits, asyncCache.Hits);
+        Assert.Equal(syncCache.Misses, asyncCache.Misses);
     }
 }
