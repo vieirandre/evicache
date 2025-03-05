@@ -12,6 +12,7 @@ internal static class CacheHandlerFactory
         {
             EvictionPolicy.LRU => new LruCacheHandler<TKey>(),
             EvictionPolicy.LFU => new LfuCacheHandler<TKey>(),
+            EvictionPolicy.FIFO => new FifoCacheHandler<TKey>(),
             EvictionPolicy.NoEviction => new NoEvictionCacheHandler<TKey>(),
             _ => throw new NotSupportedException($"The eviction policy '{policyType}' is not supported")
         };

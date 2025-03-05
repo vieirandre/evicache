@@ -14,6 +14,10 @@ public enum EvictionPolicy
     /// </summary>
     LFU,
     /// <summary>
+    /// First-In, First-Out (FIFO): Evicts the item that was inserted first.
+    /// </summary>
+    FIFO,
+    /// <summary>
     /// No Eviction: New items are not accepted when the cache is full.
     /// </summary>
     NoEviction
