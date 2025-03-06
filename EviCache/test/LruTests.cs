@@ -117,7 +117,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, string>(3);
+        var cache = CreateCache<int, string>(3, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -133,6 +133,8 @@ public class LruTests : CacheTestsBase
         Assert.False(cache.TryGet(1, out _));
         Assert.False(cache.TryGet(2, out _));
         Assert.False(cache.TryGet(3, out _));
+
+        _loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed 3 items", Times.Once());
     }
 
     [Fact]
@@ -218,7 +220,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, string>(3);
+        var cache = CreateCache<int, string>(3, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -233,6 +235,8 @@ public class LruTests : CacheTestsBase
 
         Assert.Empty(keys);
         Assert.Equal(0, cache.Count);
+
+        _loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed 3 items", Times.Once());
     }
 
     [Fact]

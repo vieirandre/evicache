@@ -222,7 +222,7 @@ public abstract class CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, string>(3);
+        var cache = CreateCache<int, string>(3, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -238,6 +238,8 @@ public abstract class CacheTestsBase
         Assert.False(cache.TryGet(1, out _));
         Assert.False(cache.TryGet(2, out _));
         Assert.False(cache.TryGet(3, out _));
+
+        _loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed 3 items", Times.Once());
     }
 
     [SkippableFact]
@@ -591,7 +593,7 @@ public abstract class CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, string>(3);
+        var cache = CreateCache<int, string>(3, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -606,6 +608,8 @@ public abstract class CacheTestsBase
 
         Assert.False(containsKey1);
         Assert.False(containsKey2);
+
+        _loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed 2 items", Times.Once());
     }
 
     [Fact]
@@ -839,7 +843,7 @@ public abstract class CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, string>(3);
+        var cache = CreateCache<int, string>(3, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -853,6 +857,10 @@ public abstract class CacheTestsBase
 
         Assert.Equal(0, cache.Count);
         Assert.Empty(cache.GetKeys());
+
+        _loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed 2 items", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed 0 items", Times.Once());
+        _loggerMock.VerifyLog(LogLevel.Information, $"Cache cleared. Removed .* items", Times.Exactly(2));
     }
 
     [Fact]

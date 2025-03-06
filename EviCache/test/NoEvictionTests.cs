@@ -1,5 +1,7 @@
 ﻿using EviCache.Enums;
 using EviCache.Tests.Helpers;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace EviCache.Tests;
 
@@ -158,7 +160,7 @@ public class NoEvictionTests : CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, string>(2);
+        var cache = CreateCache<int, string>(2, _loggerMock.Object);
 
         cache.Put(1, "value1");
         cache.Put(2, "value2");
@@ -172,5 +174,7 @@ public class NoEvictionTests : CacheTestsBase
 
         Assert.True(cache.TryGet(3, out var value3));
         Assert.Equal("value3", value3);
+
+        _loggerMock.VerifyLog(LogLevel.Information, "Cache cleared. Removed 2 items", Times.Once());
     }
 }
