@@ -938,4 +938,34 @@ public abstract class CacheTestsBase
         Assert.Equal(syncCache.Hits, asyncCache.Hits);
         Assert.Equal(syncCache.Misses, asyncCache.Misses);
     }
+
+    [SkippableFact]
+    public void Should_PreserveStateAndOrdering_AfterRepeatedUpdates_WhenNotAtCapacity()
+    {
+        Skip.If(EvictionPolicy.Equals(EvictionPolicy.LRU), "LRU update moves the item to the front");
+
+        // arrange
+
+        var cache = CreateCache<int, string>(4);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        var keysBeforeUpdates = cache.GetKeys();
+
+        // act
+
+        cache.AddOrUpdate(2, "updatedValue2");
+        cache.AddOrUpdate(2, "updatedValue2_v2");
+
+        // assert
+
+        var keysAfterUpdates = cache.GetKeys();
+
+        Assert.Equal("updatedValue2_v2", cache.Get(2));
+        Assert.Contains(2, keysBeforeUpdates);
+        Assert.Contains(2, keysAfterUpdates);
+        Assert.Equal(keysBeforeUpdates, keysAfterUpdates);
+    }
 }
