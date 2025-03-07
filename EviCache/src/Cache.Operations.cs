@@ -1,4 +1,5 @@
 ﻿using EviCache.Abstractions;
+using EviCache.Exceptions;
 using Microsoft.Extensions.Logging;
 
 namespace EviCache;
@@ -60,9 +61,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
                 return;
             }
 
-            if (!EnsureCapacityForKey(key))
-                return;
-
+            EnsureCapacityForKey(key);
             AddOrUpdateItem(key, value, isUpdate: false);
         }
     }
@@ -81,10 +80,9 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
             Interlocked.Increment(ref _misses);
 
-            if (!EnsureCapacityForKey(key))
-                return default!;
-
+            EnsureCapacityForKey(key);
             AddOrUpdateItem(key, value, isUpdate: false);
+
             return value;
         }
     }
@@ -103,10 +101,9 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
             Interlocked.Increment(ref _misses);
 
-            if (!EnsureCapacityForKey(key))
-                return default!;
-
+            EnsureCapacityForKey(key);
             AddOrUpdateItem(key, value, isUpdate: false);
+
             return value;
         }
     }
@@ -176,18 +173,16 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         }
     }
 
-    private bool EnsureCapacityForKey(TKey key)
+    private void EnsureCapacityForKey(TKey key)
     {
-        if (_cacheMap.Count < _capacity) return true;
-        if (_evictionCandidateSelector is null) return false;
+        if (_cacheMap.Count < _capacity)
+            return;
+
+        if (_evictionCandidateSelector is null)
+            throw new CacheFullException($"Cache is full (capacity: {_capacity}) and uses NoEviction policy", _capacity);
 
         if (!TryEvictItem())
-        {
-            _logger.LogWarning("Eviction failed. Item not added. Key: {Key}", key);
-            return false;
-        }
-
-        return true;
+            throw new CacheFullException($"Cache is full (capacity: {_capacity}) and eviction failed for key: {key}", _capacity);
     }
 
     private bool TryEvictItem()

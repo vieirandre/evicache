@@ -1,4 +1,5 @@
 ﻿using EviCache.Enums;
+using EviCache.Exceptions;
 using EviCache.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -11,7 +12,7 @@ public class NoEvictionTests : CacheTestsBase
     protected override bool SupportsEviction => false;
 
     [Fact]
-    public void Should_FailSilently_WhenAddingNewItem_OverCapacity_WithPut()
+    public void Should_ThrowException_WhenAddingNewItem_OverCapacity_WithPut()
     {
         // arrange
 
@@ -20,19 +21,20 @@ public class NoEvictionTests : CacheTestsBase
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
-        // act
+        // act & assert
 
-        cache.Put(3, "value3");
+        var exception = Assert.Throws<CacheFullException>(() => cache.Put(3, "value3"));
 
         // assert
 
         Assert.False(cache.TryGet(3, out _));
         Assert.False(cache.Count > cache.Capacity);
+        Assert.Equal("Cache is full (capacity: 2) and uses NoEviction policy", exception.Message);
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
     [Fact]
-    public void Should_FailSilently_WhenAddingNewItem_OverCapacity_WithGetOrAdd()
+    public void Should_ThrowException_WhenAddingNewItem_OverCapacity_WithGetOrAdd()
     {
         // arrange
 
@@ -41,19 +43,20 @@ public class NoEvictionTests : CacheTestsBase
         cache.Put(1, "value1");
         cache.Put(2, "value2");
 
-        // act
+        // act & assert
 
-        _ = cache.GetOrAdd(3, "value3");
+        var exception = Assert.Throws<CacheFullException>(() => cache.GetOrAdd(3, "value3"));
 
         // assert
 
         Assert.False(cache.TryGet(3, out _));
         Assert.False(cache.Count > cache.Capacity);
+        Assert.Equal("Cache is full (capacity: 2) and uses NoEviction policy", exception.Message);
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
     [Fact]
-    public void Should_FailSilently_WhenAddingNewItem_OverCapacity_WithAddOrUpdate()
+    public void Should_ThrowException_WhenAddingNewItem_OverCapacity_WithAddOrUpdate()
     {
         // arrange
 
@@ -64,12 +67,13 @@ public class NoEvictionTests : CacheTestsBase
 
         // act
 
-        _ = cache.AddOrUpdate(3, "value3");
+        var exception = Assert.Throws<CacheFullException>(() => cache.AddOrUpdate(3, "value3"));
 
         // assert
 
         Assert.False(cache.TryGet(3, out _));
         Assert.False(cache.Count > cache.Capacity);
+        Assert.Equal("Cache is full (capacity: 2) and uses NoEviction policy", exception.Message);
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 

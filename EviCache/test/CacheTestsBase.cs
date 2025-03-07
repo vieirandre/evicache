@@ -1,4 +1,5 @@
 ﻿using EviCache.Enums;
+using EviCache.Exceptions;
 using EviCache.Options;
 using EviCache.Tests.Helpers;
 using Microsoft.Extensions.Logging;
@@ -628,12 +629,12 @@ public abstract class CacheTestsBase
         Assert.True(cache.TryGet(1, out var value1));
         Assert.Equal("value1", value1);
 
-        // act
-
-        cache.Put(2, "value2");
-
         if (SupportsEviction)
         {
+            // act
+
+            cache.Put(2, "value2");
+
             // assert
 
             Assert.False(cache.TryGet(1, out _));
@@ -651,6 +652,10 @@ public abstract class CacheTestsBase
         }
         else
         {
+            // act
+
+            var exception = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
+
             // assert
 
             Assert.True(cache.TryGet(1, out _));
@@ -664,6 +669,7 @@ public abstract class CacheTestsBase
 
             Assert.True(cache.TryGet(1, out var updatedValue));
             Assert.Equal("newValue1", updatedValue);
+            Assert.Equal("Cache is full (capacity: 1) and uses NoEviction policy", exception.Message);
         }
 
         Assert.Equal(1, cache.Count);
@@ -678,6 +684,10 @@ public abstract class CacheTestsBase
         const int capacity = 50;
         const int taskCount = 50;
         const int operationsPerTask = 1000;
+
+        CacheFullException putException = default!;
+        CacheFullException addOrUpdateException = default!;
+        CacheFullException getOrAddException = default!;
 
         var cache = CreateCache<int, int>(capacity, _loggerMock.Object);
 
@@ -700,7 +710,8 @@ public abstract class CacheTestsBase
                     switch (op)
                     {
                         case 0:
-                            cache.Put(key, value);
+                            try { cache.Put(key, value); }
+                            catch (CacheFullException ex) { putException ??= ex; }
                             break;
                         case 1:
                             cache.TryGet(key, out _);
@@ -709,10 +720,12 @@ public abstract class CacheTestsBase
                             cache.Remove(key);
                             break;
                         case 3:
-                            cache.AddOrUpdate(key, value);
+                            try { cache.AddOrUpdate(key, value); }
+                            catch (CacheFullException ex) { addOrUpdateException ??= ex; }
                             break;
                         case 4:
-                            cache.GetOrAdd(key, value);
+                            try { cache.GetOrAdd(key, value); }
+                            catch (CacheFullException ex) { getOrAddException ??= ex; }
                             break;
                     }
                 }
@@ -733,6 +746,13 @@ public abstract class CacheTestsBase
         }
 
         Assert.Equal(keys.Count, keys.Distinct().Count()); // no duplicates
+
+        if (!SupportsEviction)
+        {
+            Assert.Equal($"Cache is full (capacity: {capacity}) and uses NoEviction policy", putException?.Message);
+            Assert.Equal($"Cache is full (capacity: {capacity}) and uses NoEviction policy", addOrUpdateException?.Message);
+            Assert.Equal($"Cache is full (capacity: {capacity}) and uses NoEviction policy", getOrAddException?.Message);
+        }
 
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
