@@ -4,6 +4,7 @@ using EviCache.Options;
 using EviCache.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Collections.Immutable;
 
 namespace EviCache.Tests;
 
@@ -995,5 +996,64 @@ public abstract class CacheTestsBase
         Assert.Contains(2, keysBeforeUpdates);
         Assert.Contains(2, keysAfterUpdates);
         Assert.Equal(keysBeforeUpdates, keysAfterUpdates);
+    }
+
+    [Fact]
+    public void Should_StoreDistinctKeysCorrectly_WhenHashCodeCollisionsHappen()
+    {
+        // arrange
+
+        var cache = CreateCache<CollisionKey, string>(3);
+
+        var key1 = new CollisionKey(1);
+        var key2 = new CollisionKey(2);
+        var key3 = new CollisionKey(3);
+
+        // act
+
+        cache.Put(key1, "value1");
+        cache.Put(key2, "value2");
+        cache.Put(key3, "value3");
+
+        // assert
+
+        Assert.Equal(3, cache.Count);
+
+        Assert.True(cache.TryGet(key1, out string key1Value));
+        Assert.True(cache.TryGet(key2, out string key2Value));
+        Assert.True(cache.TryGet(key3, out string key3Value));
+
+        Assert.Equal("value1", key1Value);
+        Assert.Equal("value2", key2Value);
+        Assert.Equal("value3", key3Value);
+    }
+
+    [Fact]
+    public void Should_IterateOverAllKeys_WhenHashCodeCollisionsHappen()
+    {
+        // arrange
+
+        var cache = CreateCache<CollisionKey, string>(3);
+
+        var key1 = new CollisionKey(1);
+        var key2 = new CollisionKey(2);
+
+        cache.Put(key1, "value1");
+        cache.Put(key2, "value2");
+
+        // act
+
+        var cacheKeys = cache.GetKeys();
+        var cacheValues = cache.GetSnapshot().Select(kvp => kvp.Value).ToImmutableList();
+
+        // assert
+
+        Assert.Equal(2, cacheKeys.Count);
+        Assert.Contains(key1, cacheKeys);
+        Assert.Contains(key2, cacheKeys);
+
+        Assert.Equal(2, cacheValues.Count);
+        Assert.Contains("value1", cacheValues);
+        Assert.Contains("value2", cacheValues);
     }
 }
