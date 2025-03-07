@@ -427,7 +427,7 @@ public abstract class CacheTestsBase
 
         // assert
 
-        Assert.Equal("The key '3' wasn't found in the cache", exception.Message);
+        Assert.Equal("The key '3' was not found in the cache", exception.Message);
     }
 
     [Fact]

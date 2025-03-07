@@ -20,7 +20,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
             Interlocked.Increment(ref _misses);
 
-            throw new KeyNotFoundException($"The key '{key}' wasn't found in the cache");
+            throw new KeyNotFoundException($"The key '{key}' was not found in the cache");
         }
     }
 
@@ -193,13 +193,13 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         if (_evictionCandidateSelector?.TrySelectEvictionCandidate(out var candidate) != true)
         {
-            _logger.LogError("Eviction selector didn't return a candidate");
+            _logger.LogError("Eviction selector did not return a candidate");
             return false;
         }
 
         if (!_cacheMap.TryGetValue(candidate, out var value))
         {
-            _logger.LogError("Eviction candidate ({Candidate}) wasn't found in the cache", candidate);
+            _logger.LogError("Eviction candidate ({Candidate}) was not found in the cache", candidate);
             return false;
         }
 

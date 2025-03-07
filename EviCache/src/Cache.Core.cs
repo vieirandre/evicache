@@ -45,6 +45,6 @@ public partial class Cache<TKey, TValue> where TKey : notnull
         _evictionCandidateSelector = _cacheHandler as IEvictionCandidateSelector<TKey>;
 
         _logger = logger ?? NullLogger<Cache<TKey, TValue>>.Instance;
-        _logger.LogInformation("Cache initialized with capacity {Capacity} and eviction policy {EvictionPolicy}", options.Capacity, options.EvictionPolicy);
+        _logger.LogInformation("Cache initialized with capacity {Capacity} and eviction policy {EvictionPolicy}", _capacity, _evictionPolicy);
     }
 }
