@@ -468,4 +468,40 @@ public class LruTests : CacheTestsBase
 
         Assert.Collection(snapshot, assertions);
     }
+
+    [Fact]
+    public void Should_MaintainCorrectOrder_WithRepeatedAccesses()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+        cache.Put(3, "value3");
+
+        // assert
+
+        Assert.Equal(new[] { 3, 2, 1 }, cache.GetKeys());
+
+        // act & assert
+
+        cache.Get(2);
+        Assert.Equal(new[] { 2, 3, 1 }, cache.GetKeys());
+
+        cache.Get(2);
+        Assert.Equal(new[] { 2, 3, 1 }, cache.GetKeys());
+
+        cache.Get(1);
+        Assert.Equal(new[] { 1, 2, 3 }, cache.GetKeys());
+
+        cache.Get(3);
+        Assert.Equal(new[] { 3, 1, 2 }, cache.GetKeys());
+
+        cache.Get(3);
+        Assert.Equal(new[] { 3, 1, 2 }, cache.GetKeys());
+
+        cache.Get(2);
+        Assert.Equal(new[] { 2, 3, 1 }, cache.GetKeys());
+    }
 }
