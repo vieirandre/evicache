@@ -39,7 +39,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// </summary>
     /// <param name="key">The key of the item to add or update.</param>
     /// <param name="value">The value to associate with the key.</param>
-    /// <exception cref="CacheFullException">Thrown if the cache is full and cannot add the new item.</exception>
+    /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     /// <returns>A task representing the asynchronous operation.</returns>
     /// <remarks>
     /// [Note] Unlike other insertion methods, this one does not trigger cache hit or miss counters.
@@ -52,7 +52,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <param name="key">The key to look up or add.</param>
     /// <param name="value">The value to add if the key is not found.</param>
     /// <returns>A task representing the asynchronous operation, containing the existing or newly added value.</returns>
-    /// <exception cref="CacheFullException">Thrown if the cache is full and cannot add the new item.</exception>
+    /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     Task<TValue> GetOrAddAsync(TKey key, TValue value);
 
     /// <summary>
@@ -60,7 +60,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// </summary>
     /// <param name="key">The key to add or update.</param>
     /// <param name="value">The new value to associate with the key.</param>
-    /// <exception cref="CacheFullException">Thrown if the cache is full and cannot add the new item.</exception>
+    /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     /// <returns>A task representing the asynchronous operation, containing the new value.</returns>
     Task<TValue> AddOrUpdateAsync(TKey key, TValue value);
 

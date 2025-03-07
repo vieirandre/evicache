@@ -40,7 +40,7 @@ public interface ICacheOperations<TKey, TValue> where TKey : notnull
     /// </summary>
     /// <param name="key">The key of the item to add or update.</param>
     /// <param name="value">The value to associate with the key.</param>
-    /// <exception cref="CacheFullException">Thrown if the cache is full and cannot add the new item.</exception>
+    /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     /// <remarks>
     /// [Note] Unlike other insertion methods, this one does not trigger cache hit or miss counters.
     /// </remarks>
@@ -52,7 +52,7 @@ public interface ICacheOperations<TKey, TValue> where TKey : notnull
     /// <param name="key">The key to look up or add.</param>
     /// <param name="value">The value to add if the key is not found.</param>
     /// <returns>The existing or newly added value.</returns>
-    /// <exception cref="CacheFullException">Thrown if the cache is full and cannot add the new item.</exception>
+    /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     TValue GetOrAdd(TKey key, TValue value);
 
     /// <summary>
@@ -61,7 +61,7 @@ public interface ICacheOperations<TKey, TValue> where TKey : notnull
     /// <param name="key">The key to add or update.</param>
     /// <param name="value">The new value to associate with the key.</param>
     /// <returns>The new value associated with the key.</returns>
-    /// <exception cref="CacheFullException">Thrown if the cache is full and cannot add the new item.</exception>
+    /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     TValue AddOrUpdate(TKey key, TValue value);
 
     /// <summary>
