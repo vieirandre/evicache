@@ -198,4 +198,31 @@ public class LfuTests : CacheTestsBase
 
         Assert.Equal(expectedOrder, actualOrder);
     }
+
+    [Fact]
+    public void Should_EvictLeastRecentlyInsertedKey_WhenMultipleKeysHaveSameLowestFrequency()
+    {
+        // arrange
+
+        int capacity = 10;
+        var cache = CreateCache<int, string>(capacity);
+
+        for (int i = 1; i <= capacity; i++)
+        {
+            cache.Put(i, $"value{i}");
+        }
+
+        cache.Get(2);
+
+        // act
+
+        cache.Put(11, "value11");
+
+        // assert
+
+        Assert.Equal(capacity, cache.Count);
+        Assert.False(cache.TryGet(1, out _));
+        Assert.True(cache.TryGet(11, out var value11));
+        Assert.Equal("value11", value11);
+    }
 }
