@@ -1,4 +1,5 @@
 ﻿using EviCache.Abstractions;
+using EviCache.Enums;
 using EviCache.Factories;
 using EviCache.Options;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,8 @@ namespace EviCache;
 public partial class Cache<TKey, TValue> where TKey : notnull
 {
     private readonly int _capacity;
+    private readonly EvictionPolicy _evictionPolicy;
+
     private readonly object _syncLock = new();
     private readonly ILogger _logger;
 
@@ -35,6 +38,8 @@ public partial class Cache<TKey, TValue> where TKey : notnull
         if (options.Capacity <= 0) throw new ArgumentOutOfRangeException(nameof(options.Capacity));
 
         _capacity = options.Capacity;
+        _evictionPolicy = options.EvictionPolicy;
+
         _cacheMap = new Dictionary<TKey, TValue>(_capacity);
         _cacheHandler = CacheHandlerFactory.Create<TKey>(options.EvictionPolicy);
         _evictionCandidateSelector = _cacheHandler as IEvictionCandidateSelector<TKey>;

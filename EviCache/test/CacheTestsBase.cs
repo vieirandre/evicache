@@ -669,7 +669,7 @@ public abstract class CacheTestsBase
 
             Assert.True(cache.TryGet(1, out var updatedValue));
             Assert.Equal("newValue1", updatedValue);
-            Assert.Equal("Cache is full (capacity: 1) and uses NoEviction policy", exception.Message);
+            Assert.Equal($"Cache is full (capacity: 1) and uses {EvictionPolicy} policy", exception.Message);
         }
 
         Assert.Equal(1, cache.Count);
@@ -749,9 +749,9 @@ public abstract class CacheTestsBase
 
         if (!SupportsEviction)
         {
-            Assert.Equal($"Cache is full (capacity: {capacity}) and uses NoEviction policy", putException?.Message);
-            Assert.Equal($"Cache is full (capacity: {capacity}) and uses NoEviction policy", addOrUpdateException?.Message);
-            Assert.Equal($"Cache is full (capacity: {capacity}) and uses NoEviction policy", getOrAddException?.Message);
+            Assert.Equal($"Cache is full (capacity: {capacity}) and uses {EvictionPolicy} policy", putException?.Message);
+            Assert.Equal($"Cache is full (capacity: {capacity}) and uses {EvictionPolicy} policy", addOrUpdateException?.Message);
+            Assert.Equal($"Cache is full (capacity: {capacity}) and uses {EvictionPolicy} policy", getOrAddException?.Message);
         }
 
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();

@@ -29,7 +29,7 @@ public class NoEvictionTests : CacheTestsBase
 
         Assert.False(cache.TryGet(3, out _));
         Assert.False(cache.Count > cache.Capacity);
-        Assert.Equal("Cache is full (capacity: 2) and uses NoEviction policy", exception.Message);
+        Assert.Equal($"Cache is full (capacity: 2) and uses {EvictionPolicy} policy", exception.Message);
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -51,7 +51,7 @@ public class NoEvictionTests : CacheTestsBase
 
         Assert.False(cache.TryGet(3, out _));
         Assert.False(cache.Count > cache.Capacity);
-        Assert.Equal("Cache is full (capacity: 2) and uses NoEviction policy", exception.Message);
+        Assert.Equal($"Cache is full (capacity: 2) and uses {EvictionPolicy} policy", exception.Message);
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
@@ -73,7 +73,7 @@ public class NoEvictionTests : CacheTestsBase
 
         Assert.False(cache.TryGet(3, out _));
         Assert.False(cache.Count > cache.Capacity);
-        Assert.Equal("Cache is full (capacity: 2) and uses NoEviction policy", exception.Message);
+        Assert.Equal($"Cache is full (capacity: 2) and uses {EvictionPolicy} policy", exception.Message);
         _loggerMock.VerifyNoFailureLogsWereCalledInEviction();
     }
 
