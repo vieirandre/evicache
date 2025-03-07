@@ -115,9 +115,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
             if (!_cacheMap.TryGetValue(key, out var value))
                 return false;
 
-            _cacheMap.Remove(key);
-            _cacheHandler.RegisterRemoval(key);
-
+            RemoveItem(key);
             DisposeItem(value);
 
             return true;
@@ -173,6 +171,12 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         }
     }
 
+    private void RemoveItem(TKey key)
+    {
+        _cacheMap.Remove(key);
+        _cacheHandler.RegisterRemoval(key);
+    }
+
     private void EnsureCapacityForKey(TKey key)
     {
         if (_cacheMap.Count < _capacity)
@@ -199,8 +203,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
             return false;
         }
 
-        _cacheMap.Remove(candidate);
-        _cacheHandler.RegisterRemoval(candidate);
+        RemoveItem(candidate);
 
         Interlocked.Increment(ref _evictions);
         _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
