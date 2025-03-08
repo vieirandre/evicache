@@ -4,16 +4,21 @@ using System.Text.RegularExpressions;
 
 namespace EviCache.Tests.Helpers;
 
-public static class LoggerMockExtensions
+public static partial class LoggerMockExtensions
 {
+    [GeneratedRegex(@"[\|\(\)]")]
+    private static partial Regex Pattern();
+
     public static void VerifyLog(this Mock<ILogger> loggerMock, LogLevel logLevel, string expectedMessage, Times times)
     {
+        string escapedMessage = Pattern().Replace(expectedMessage, m => "\\" + m.Value);
+
         loggerMock.Verify(
             x => x.Log(
                 logLevel,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) =>
-                    Regex.IsMatch(v.ToString(), expectedMessage.Replace("|", "\\|"), RegexOptions.None)),
+                    Regex.IsMatch(v.ToString(), escapedMessage, RegexOptions.None)),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             times);

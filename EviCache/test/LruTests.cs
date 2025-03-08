@@ -512,7 +512,7 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, string>(1);
+        var cache = CreateCache<int, string>(1, _loggerMock.Object);
         cache.Put(1, "value1");
 
         OverrideLruCandidateList(cache, new LinkedList<int>());
@@ -521,6 +521,7 @@ public class LruTests : CacheTestsBase
 
         var ex = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
         Assert.Equal("Cache is full (capacity: 1) and eviction failed for key: 2", ex.Message);
+        _loggerMock.VerifyLog(LogLevel.Error, "Eviction selector did not return a candidate", Times.Once());
     }
 
     [Fact]
@@ -528,17 +529,20 @@ public class LruTests : CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, string>(1);
+        var cache = CreateCache<int, string>(1, _loggerMock.Object);
         cache.Put(1, "value1");
 
-        var candidateList = new LinkedList<int>();
-        candidateList.AddLast(999);
-        OverrideLruCandidateList(cache, candidateList);
+        int fakeCandidate = 999;
+        var fakeCandidateList = new LinkedList<int>();
+        fakeCandidateList.AddLast(fakeCandidate);
+
+        OverrideLruCandidateList(cache, fakeCandidateList);
 
         // act & assert
 
         var ex = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
         Assert.Equal("Cache is full (capacity: 1) and eviction failed for key: 2", ex.Message);
+        _loggerMock.VerifyLog(LogLevel.Error, $"Eviction candidate ({fakeCandidate}) was not found in the cache", Times.Once());
     }
 
     private static void OverrideLruCandidateList(Cache<int, string> cache, LinkedList<int> newList)
