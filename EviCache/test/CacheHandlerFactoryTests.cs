@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace EviCache.Tests;
 
-public class HandlerFactoryTests
+public class CacheHandlerFactoryTests
 {
     [Theory]
     [InlineData(EvictionPolicy.LRU, "LruCacheHandler`1")]
