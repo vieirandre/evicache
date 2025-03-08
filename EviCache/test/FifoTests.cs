@@ -88,7 +88,7 @@ public class FifoTests : CacheTestsBase
         var cache = CreateCache<int, string>(1, _loggerMock.Object);
         cache.Put(1, "value1");
 
-        cache.OverrideEvictionCandidateCollection("_fifoList", new LinkedList<int>());
+        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), new LinkedList<int>());
 
         // act & assert
 
@@ -110,7 +110,7 @@ public class FifoTests : CacheTestsBase
         var fakeCandidateList = new LinkedList<int>();
         fakeCandidateList.AddLast(fakeCandidate);
 
-        cache.OverrideEvictionCandidateCollection("_fifoList", fakeCandidateList);
+        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), fakeCandidateList);
 
         // act & assert
 

@@ -235,7 +235,7 @@ public class LfuTests : CacheTestsBase
         var cache = CreateCache<int, string>(1, _loggerMock.Object);
         cache.Put(1, "value1");
 
-        cache.OverrideEvictionCandidateCollection("_frequencyBuckets", new SortedDictionary<int, LinkedList<int>>());
+        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), new SortedDictionary<int, LinkedList<int>>());
 
         // act & assert
 
@@ -259,7 +259,7 @@ public class LfuTests : CacheTestsBase
         fakeCandidateList.AddLast(fakeCandidate);
         fakeFrequencyBuckets.Add(1, fakeCandidateList);
 
-        cache.OverrideEvictionCandidateCollection("_frequencyBuckets", fakeFrequencyBuckets);
+        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), fakeFrequencyBuckets);
 
         // act & assert
 
