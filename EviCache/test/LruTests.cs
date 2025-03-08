@@ -3,7 +3,6 @@ using EviCache.Exceptions;
 using EviCache.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Reflection;
 
 namespace EviCache.Tests;
 
@@ -515,11 +514,12 @@ public class LruTests : CacheTestsBase
         var cache = CreateCache<int, string>(1, _loggerMock.Object);
         cache.Put(1, "value1");
 
-        OverrideLruCandidateList(cache, new LinkedList<int>());
+        cache.OverrideEvictionCandidateCollection("_lruList", new LinkedList<int>());
 
         // act & assert
 
         var ex = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
+
         Assert.Equal("Cache is full (capacity: 1) and eviction failed for key: 2", ex.Message);
         _loggerMock.VerifyLog(LogLevel.Error, "Eviction selector did not return a candidate", Times.Once());
     }
@@ -536,26 +536,13 @@ public class LruTests : CacheTestsBase
         var fakeCandidateList = new LinkedList<int>();
         fakeCandidateList.AddLast(fakeCandidate);
 
-        OverrideLruCandidateList(cache, fakeCandidateList);
+        cache.OverrideEvictionCandidateCollection("_lruList", fakeCandidateList);
 
         // act & assert
 
         var ex = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
+
         Assert.Equal("Cache is full (capacity: 1) and eviction failed for key: 2", ex.Message);
         _loggerMock.VerifyLog(LogLevel.Error, $"Eviction candidate ({fakeCandidate}) was not found in the cache", Times.Once());
-    }
-
-    private static void OverrideLruCandidateList(Cache<int, string> cache, LinkedList<int> newList)
-    {
-        var selectorField = typeof(Cache<int, string>).GetField("_evictionCandidateSelector", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(selectorField);
-
-        var evictionHandler = selectorField.GetValue(cache);
-        Assert.NotNull(evictionHandler);
-
-        var lruListField = evictionHandler.GetType().GetField("_lruList", BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.NotNull(lruListField);
-
-        lruListField.SetValue(evictionHandler, newList);
     }
 }
