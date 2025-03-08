@@ -113,7 +113,7 @@ public abstract class CacheTestsBase
     public void Should_UpdateExistingKeyAndEvict_WhenReinsertingKeyOverCapacity()
     {
         Skip.IfNot(SupportsEviction, TestMessages.EvictionNotSupported);
-        Skip.If(EvictionPolicy.Equals(EvictionPolicy.FIFO), "FIFO doesn't reorder on updates");
+        Skip.If(EvictionPolicy.Equals(EvictionPolicy.FIFO), "FIFO does not reorder on updates");
 
         // arrange
 
