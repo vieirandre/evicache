@@ -14,6 +14,9 @@ public class CacheFullException : Exception
     /// Initializes a new instance of the <see cref="CacheFullException"/> class with a specified error message.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
+    /// <remarks>
+    /// [Note] A capacity value of -1 indicates that the cache capacity was not specified or is unavailable.
+    /// </remarks>
     public CacheFullException(string message) : base(message)
     {
         Capacity = -1;
