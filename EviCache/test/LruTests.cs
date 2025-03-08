@@ -1,7 +1,9 @@
 using EviCache.Enums;
+using EviCache.Exceptions;
 using EviCache.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Reflection;
 
 namespace EviCache.Tests;
 
@@ -503,5 +505,53 @@ public class LruTests : CacheTestsBase
 
         cache.Get(2);
         Assert.Equal(new[] { 2, 3, 1 }, cache.GetKeys());
+    }
+
+    [Fact]
+    public void Should_ThrowException_WhenEvictionFails_DueToNoCandidate()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(1);
+        cache.Put(1, "value1");
+
+        OverrideLruCandidateList(cache, new LinkedList<int>());
+
+        // act & assert
+
+        var ex = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
+        Assert.Equal("Cache is full (capacity: 1) and eviction failed for key: 2", ex.Message);
+    }
+
+    [Fact]
+    public void Should_ThrowException_WhenEvictionFails_DueToCandidateNotInCache()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(1);
+        cache.Put(1, "value1");
+
+        var candidateList = new LinkedList<int>();
+        candidateList.AddLast(999);
+        OverrideLruCandidateList(cache, candidateList);
+
+        // act & assert
+
+        var ex = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
+        Assert.Equal("Cache is full (capacity: 1) and eviction failed for key: 2", ex.Message);
+    }
+
+    private static void OverrideLruCandidateList(Cache<int, string> cache, LinkedList<int> newList)
+    {
+        var selectorField = typeof(Cache<int, string>).GetField("_evictionCandidateSelector", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(selectorField);
+
+        var evictionHandler = selectorField.GetValue(cache);
+        Assert.NotNull(evictionHandler);
+
+        var lruListField = evictionHandler.GetType().GetField("_lruList", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(lruListField);
+
+        lruListField.SetValue(evictionHandler, newList);
     }
 }
