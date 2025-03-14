@@ -241,7 +241,7 @@ public class LfuTests : CacheTestsBase
 
         var ex = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
 
-        Assert.Equal("Cache is full (capacity: 1) and eviction failed for key: 2", ex.Message);
+        Assert.Equal("Cache is full (capacity: 1). Failed to evict any item while adding key: 2", ex.Message);
         _loggerMock.VerifyLog(LogLevel.Error, "Eviction selector did not return a candidate", Times.Once());
     }
 
@@ -265,7 +265,7 @@ public class LfuTests : CacheTestsBase
 
         var ex = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
 
-        Assert.Equal("Cache is full (capacity: 1) and eviction failed for key: 2", ex.Message);
+        Assert.Equal("Cache is full (capacity: 1). Failed to evict any item while adding key: 2", ex.Message);
         _loggerMock.VerifyLog(LogLevel.Error, $"Eviction candidate ({fakeCandidate}) was not found in the cache", Times.Once());
     }
 }

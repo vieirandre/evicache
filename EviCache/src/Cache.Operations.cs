@@ -186,7 +186,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
             throw new CacheFullException($"Cache is full (capacity: {_capacity}) and uses {_evictionPolicy} policy", _capacity);
 
         if (!TryEvictItem())
-            throw new CacheFullException($"Cache is full (capacity: {_capacity}) and eviction failed for key: {key}", _capacity);
+            throw new CacheFullException($"Cache is full (capacity: {_capacity}). Failed to evict any item while adding key: {key}", _capacity);
     }
 
     private bool TryEvictItem()
