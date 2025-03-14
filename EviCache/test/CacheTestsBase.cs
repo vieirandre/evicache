@@ -23,6 +23,10 @@ public abstract class CacheTestsBase
     public CacheTestsBase()
     {
         _loggerMock = new Mock<ILogger>();
+
+        _loggerMock
+            .Setup(logger => logger.IsEnabled(LogLevel.Debug))
+            .Returns(true);
     }
 
     [Theory]

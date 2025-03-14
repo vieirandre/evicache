@@ -206,7 +206,9 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         RemoveItem(candidate);
 
         Interlocked.Increment(ref _evictions);
-        _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
 
         DisposeItem(value);
 
