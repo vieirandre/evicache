@@ -12,7 +12,7 @@ namespace EviCache;
 /// </summary>
 /// <typeparam name="TKey">The type of keys stored in the cache.</typeparam>
 /// <typeparam name="TValue">The type of values stored in the cache.</typeparam>
-public partial class Cache<TKey, TValue> where TKey : notnull
+public partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKey : notnull
 {
     private readonly int _capacity;
     private readonly EvictionPolicy _evictionPolicy;
