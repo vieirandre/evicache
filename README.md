@@ -2,19 +2,33 @@
 
 `EviCache` is a lightweight, thread-safe, in-memory caching library for .NET.
 
-It supports multiple eviction policies and offers extended cache operations. Moreover, it provides metrics and inspection capabilites.
+It supports multiple eviction policies and offers extended cache operations. Moreover, it provides metrics and inspection capabilities.
 
 ## Key Features
 
 - **Thread-safe operations**: All cache operations are synchronized, ensuring thread safety for concurrent access.
-- **Multiple eviction policies** (work in progress for others):
+- **Multiple eviction policies**:
     - Least Recently Used (LRU): Evicts the item that has not been accessed for the longest period.
     - Least Frequently Used (LFU): Evicts the item with the lowest access frequency.
+    - First-In, First-Out (FIFO): Evicts the item that was inserted first.
     - No Eviction: New items are not accepted when the cache is full.
 - **Built-in metrics**: Tracks cache count, hits, misses, and evictions.
 - **Cache inspection**: Retrieves snapshots and list of keys currently in the cache.
 
 ## How to Use
+
+**Interfaces**
+
+* `ICache<TKey, TValue>`: Combines all functionality exposed by the interfaces below.
+* `ICacheOperations<TKey, TValue>`: Provides cache operations (`Get`, `Put`, etc.).
+* `ICacheOperationsAsync<TKey, TValue>`: Provides asynchronous versions of cache operations (`GetAsync`, `PutAsync`, etc.).
+* `ICacheMetrics`: Access performance and usage metrics.
+* `ICacheInspection<TKey, TValue>`: Inspect cache contents (keys and snapshots).
+
+**Exceptions**
+
+* `KeyNotFoundException`: Thrown when attempting to retrieve a key that does not exist (via `Get`).
+* `CacheFullException`: Thrown when the cache is full and (a) eviction fails, or (b) eviction is disabled (`NoEviction` policy).
 
 **Initializing the cache**
 
@@ -27,9 +41,10 @@ using EviCache.Enums;
 var cacheOptions = new CacheOptions(5, EvictionPolicy.LRU);
 
 // Instantiate the cache
-// 'int' is the type for keys (TKey) and must be non-nullable
-// 'string' is the type for values (TValue) stored in the cache
 var cache = new Cache<int, string>(cacheOptions);
+
+// Optionally, provide an ILogger instance
+var cache = new Cache<int, string>(cacheOptions, logger);
 ```
 
 **Inserting and retrieving values**
@@ -52,7 +67,7 @@ bool retrieved = cache.TryGet(1, out string value);
 string value = cache.GetOrAdd(2, "two");
 
 // Update the value if the key exists; otherwise, add it
-string updatedValue = cache.AddOrUpdate(1, "newOne");
+string newValue = cache.AddOrUpdate(1, "newOne");
 ```
 
 **Checking, removing, and clearing entries**
@@ -82,6 +97,7 @@ ImmutableList<TKey> keys = cache.GetKeys();
 
 ```csharp
 // Access cache metrics
+Console.WriteLine($"Cache Capacity: {cache.Capacity}");
 Console.WriteLine($"Cache Count: {cache.Count}");
 Console.WriteLine($"Cache Hits: {cache.Hits}");
 Console.WriteLine($"Cache Misses: {cache.Misses}");
