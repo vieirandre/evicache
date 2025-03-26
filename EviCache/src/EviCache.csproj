@@ -13,6 +13,7 @@
 		<Title>EviCache</Title>
 		<PackageTags>cache; caching; lightweight; thread-safe; in-memory; eviction; replacement; lru; lfu; fifo</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<ProjectUrl>https://github.com/vieirandre/evicache</ProjectUrl>
 		<RepositoryUrl>https://github.com/vieirandre/evicache</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
