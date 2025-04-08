@@ -27,7 +27,7 @@ It supports multiple eviction policies and offers extended cache operations. Mor
 
 **Exceptions**
 
-* `KeyNotFoundException`: Thrown when attempting to retrieve a key that does not exist (via `Get`).
+* `KeyNotFoundException`: Thrown when attempting to retrieve a key that does not exist (only via `Get`).
 * `CacheFullException`: Thrown when the cache is full and (a) eviction fails, or (b) eviction is disabled (`NoEviction` policy).
 
 **Initializing the cache**

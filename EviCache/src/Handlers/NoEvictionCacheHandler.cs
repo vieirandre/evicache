@@ -5,7 +5,7 @@ namespace EviCache.Handlers;
 
 internal class NoEvictionCacheHandler<TKey> : ICacheHandler<TKey> where TKey : notnull
 {
-    private readonly List<TKey> _keys = new();
+    private readonly HashSet<TKey> _keys = new();
 
     public void RegisterAccess(TKey key) { }
 
