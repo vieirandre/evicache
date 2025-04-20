@@ -18,7 +18,7 @@ public partial class Cache<TKey, TValue> : ICacheInspection<TKey, TValue>  where
         lock (_syncLock)
         {
             return _cacheHandler.GetKeys()
-                .Where(key => _cacheMap.TryGetValue(key, out var entry))
+                .Where(key => _cacheMap.TryGetValue(key, out _))
                 .Select(key => new KeyValuePair<TKey, TValue>(key, _cacheMap[key].Value))
                 .ToImmutableList();
         }

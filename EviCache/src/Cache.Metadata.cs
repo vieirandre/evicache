@@ -3,26 +3,26 @@ using EviCache.Models;
 
 namespace EviCache;
 
-public partial class Cache<TKey, TValue> : ICacheMetadataOperations<TKey> where TKey : notnull
+public partial class Cache<TKey, TValue> : ICacheMetadata<TKey> where TKey : notnull
 {
-    public CacheEntryMetadata GetMetadata(TKey key)
+    public CacheItemMetadata GetMetadata(TKey key)
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var entry))
-                return entry.Metadata;
+            if (_cacheMap.TryGetValue(key, out var item))
+                return item.Metadata;
 
             throw new KeyNotFoundException($"The key '{key}' was not found in the cache");
         }
     }
 
-    public bool TryGetMetadata(TKey key, out CacheEntryMetadata? metadata)
+    public bool TryGetMetadata(TKey key, out CacheItemMetadata? metadata)
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var entry))
+            if (_cacheMap.TryGetValue(key, out var item))
             {
-                metadata = entry.Metadata;
+                metadata = item.Metadata;
                 return true;
             }
 

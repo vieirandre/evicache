@@ -24,7 +24,7 @@ public partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKey : not
     private readonly ICacheHandler<TKey> _cacheHandler;
     private readonly IEvictionCandidateSelector<TKey>? _evictionCandidateSelector;
 
-    private readonly Dictionary<TKey, CacheEntry<TValue>> _cacheMap;
+    private readonly Dictionary<TKey, CacheItem<TValue>> _cacheMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Cache{TKey, TValue}"/> class with the specified options.
@@ -41,7 +41,7 @@ public partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKey : not
         _capacity = options.Capacity;
         _evictionPolicy = options.EvictionPolicy;
 
-        _cacheMap = new Dictionary<TKey, CacheEntry<TValue>>(_capacity);
+        _cacheMap = new Dictionary<TKey, CacheItem<TValue>>(_capacity);
         _cacheHandler = CacheHandlerFactory.Create<TKey>(options.EvictionPolicy);
         _evictionCandidateSelector = _cacheHandler as IEvictionCandidateSelector<TKey>;
 

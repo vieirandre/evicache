@@ -5,7 +5,7 @@ public interface ICache<TKey, TValue> :
     ICacheOperationsAsync<TKey, TValue>,
     ICacheMetrics,
     ICacheInspection<TKey, TValue>,
-    ICacheMetadataOperations<TKey>,
+    ICacheMetadata<TKey>,
     IDisposable
     where TKey : notnull
 {

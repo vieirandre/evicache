@@ -1,6 +1,6 @@
 ﻿namespace EviCache.Models;
 
-public class CacheEntryMetadata
+public class CacheItemMetadata
 {
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset LastAccessedAt { get; private set; }
@@ -9,7 +9,7 @@ public class CacheEntryMetadata
 
     private long _accessCount;
 
-    internal CacheEntryMetadata()
+    internal CacheItemMetadata()
     {
         var now = DateTimeOffset.UtcNow;
         CreatedAt = now;
