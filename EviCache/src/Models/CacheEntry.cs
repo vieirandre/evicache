@@ -1,6 +1,6 @@
 ﻿namespace EviCache.Models;
 
-internal class CacheEntry<TValue>
+internal sealed class CacheEntry<TValue>
 {
     public TValue Value { get; }
     public CacheEntryMetadata Metadata { get; }
