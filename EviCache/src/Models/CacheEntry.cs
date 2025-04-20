@@ -1,6 +1,6 @@
 ﻿namespace EviCache.Models;
 
-internal sealed class CacheEntry<TValue>
+internal sealed class CacheEntry<TValue> : IDisposable
 {
     public TValue Value { get; }
     public CacheEntryMetadata Metadata { get; }
@@ -9,5 +9,11 @@ internal sealed class CacheEntry<TValue>
     {
         Value = value;
         Metadata = new CacheEntryMetadata();
+    }
+
+    public void Dispose()
+    {
+        if (Value is IDisposable disposable)
+            disposable.Dispose();
     }
 }

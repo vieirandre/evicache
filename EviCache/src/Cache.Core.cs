@@ -1,6 +1,7 @@
 ﻿using EviCache.Abstractions;
 using EviCache.Enums;
 using EviCache.Factories;
+using EviCache.Models;
 using EviCache.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -23,7 +24,7 @@ public partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKey : not
     private readonly ICacheHandler<TKey> _cacheHandler;
     private readonly IEvictionCandidateSelector<TKey>? _evictionCandidateSelector;
 
-    private readonly Dictionary<TKey, TValue> _cacheMap;
+    private readonly Dictionary<TKey, CacheEntry<TValue>> _cacheMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Cache{TKey, TValue}"/> class with the specified options.
@@ -40,7 +41,7 @@ public partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKey : not
         _capacity = options.Capacity;
         _evictionPolicy = options.EvictionPolicy;
 
-        _cacheMap = new Dictionary<TKey, TValue>(_capacity);
+        _cacheMap = new Dictionary<TKey, CacheEntry<TValue>>(_capacity);
         _cacheHandler = CacheHandlerFactory.Create<TKey>(options.EvictionPolicy);
         _evictionCandidateSelector = _cacheHandler as IEvictionCandidateSelector<TKey>;
 

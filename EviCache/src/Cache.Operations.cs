@@ -1,5 +1,6 @@
 ﻿using EviCache.Abstractions;
 using EviCache.Exceptions;
+using EviCache.Models;
 using Microsoft.Extensions.Logging;
 
 namespace EviCache;
@@ -10,12 +11,14 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var value))
+            if (_cacheMap.TryGetValue(key, out var entry))
             {
                 Interlocked.Increment(ref _hits);
 
+                entry.Metadata.RegisterAccess();
                 _cacheHandler.RegisterAccess(key);
-                return value;
+
+                return entry.Value;
             }
 
             Interlocked.Increment(ref _misses);
@@ -28,11 +31,14 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out value))
+            if (_cacheMap.TryGetValue(key, out var entry))
             {
                 Interlocked.Increment(ref _hits);
 
+                value = entry.Value;
+                entry.Metadata.RegisterAccess();
                 _cacheHandler.RegisterAccess(key);
+
                 return true;
             }
 
@@ -74,8 +80,10 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
             {
                 Interlocked.Increment(ref _hits);
 
+                existing.Metadata.RegisterAccess();
                 _cacheHandler.RegisterAccess(key);
-                return existing;
+
+                return existing.Value;
             }
 
             Interlocked.Increment(ref _misses);
@@ -112,11 +120,11 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         lock (_syncLock)
         {
-            if (!_cacheMap.TryGetValue(key, out var value))
+            if (!_cacheMap.TryGetValue(key, out var entry))
                 return false;
 
             RemoveItem(key);
-            DisposeItem(value);
+            DisposeItem(entry);
 
             return true;
         }
@@ -159,14 +167,18 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
     private void AddOrUpdateItem(TKey key, TValue value, bool isUpdate)
     {
+        var entry = new CacheEntry<TValue>(value);
+
         if (isUpdate)
         {
-            _cacheMap[key] = value;
+            _cacheMap[key] = entry;
+
+            entry.Metadata.RegisterUpdate();
             _cacheHandler.RegisterUpdate(key);
         }
         else
         {
-            _cacheMap.Add(key, value);
+            _cacheMap.Add(key, entry);
             _cacheHandler.RegisterInsertion(key);
         }
     }
@@ -197,7 +209,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
             return false;
         }
 
-        if (!_cacheMap.TryGetValue(candidate, out var value))
+        if (!_cacheMap.TryGetValue(candidate, out var entry))
         {
             _logger.LogError("Eviction candidate ({Candidate}) was not found in the cache", candidate);
             return false;
@@ -210,7 +222,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         if (_logger.IsEnabled(LogLevel.Debug))
             _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
 
-        DisposeItem(value);
+        DisposeItem(entry);
 
         return true;
     }
