@@ -17,4 +17,15 @@ internal class CacheEntryMetadata
         LastUpdatedAt = now;
         _accessCount = 0;
     }
+
+    internal void RegisterAccess()
+    {
+        LastAccessedAt = DateTimeOffset.UtcNow;
+        Interlocked.Increment(ref _accessCount);
+    }
+
+    internal void RegisterUpdate()
+    {
+        LastUpdatedAt = DateTimeOffset.UtcNow;
+    }
 }
