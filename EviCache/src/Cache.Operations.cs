@@ -192,10 +192,20 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
             return;
 
         if (_evictionCandidateSelector is null)
-            throw new CacheFullException($"Cache is full (capacity: {_capacity}) and uses {_evictionPolicy} policy", _capacity);
+            throw new CacheFullException(
+                $"Cache is full (capacity: {_capacity}) and uses {_evictionPolicy} policy",
+                _capacity,
+                key!.ToString(),
+                _evictionPolicy
+            );
 
         if (!TryEvictItem())
-            throw new CacheFullException($"Cache is full (capacity: {_capacity}). Failed to evict any item while adding key: {key}", _capacity);
+            throw new CacheFullException(
+                $"Cache is full (capacity: {_capacity}). Failed to evict any item while adding key: {key}",
+                _capacity,
+                key!.ToString(),
+                _evictionPolicy
+            );
     }
 
     private bool TryEvictItem()

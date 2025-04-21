@@ -78,6 +78,26 @@ public class NoEvictionTests : CacheTestsBase
     }
 
     [Fact]
+    public void Should_PopulateExceptionDataDictionary_WhenCacheIsFull()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(1);
+        cache.Put(1, "value1");
+
+        // act
+
+        var ex = Assert.Throws<CacheFullException>(() => cache.Put(2, "value2"));
+
+        // assert
+
+        Assert.True(ex.Data.Contains("Capacity"));
+        Assert.Equal(1, ex.Data["Capacity"]);
+        Assert.Equal("2", ex.Data["AttemptedKey"]);
+        Assert.Equal("NoEviction", ex.Data["EvictionPolicy"]);
+    }
+
+    [Fact]
     public void Should_UpdateExistingKey_WhenCacheIsFull_WithPut()
     {
         // arrange

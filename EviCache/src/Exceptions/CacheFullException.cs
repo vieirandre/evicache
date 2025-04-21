@@ -1,4 +1,6 @@
-﻿namespace EviCache.Exceptions;
+﻿using EviCache.Enums;
+
+namespace EviCache.Exceptions;
 
 /// <summary>
 /// The exception thrown when the cache is full and unable to add new items.
@@ -30,5 +32,14 @@ public class CacheFullException : Exception
     public CacheFullException(string message, int capacity) : base(message)
     {
         Capacity = capacity;
+        Data["Capacity"] = capacity;
+    }
+
+    public CacheFullException(string message, int capacity, string? attemptedKey, EvictionPolicy policy) : this(message, capacity)
+    {
+        if (attemptedKey is not null)
+            Data["AttemptedKey"] = attemptedKey;
+
+        Data["EvictionPolicy"] = policy.ToString();
     }
 }
