@@ -8,7 +8,7 @@ It supports multiple eviction policies and offers extended cache operations. Mor
 - [About](#about)
 - [Key Features](#key-features)
 - [How&nbsp;to&nbsp;Use](#how-to-use)
-- [Feedback & Contributing](#feedback-contributing)
+- [Feedback & Contributing](#feedback--contributing)
 
 ## Key Features
 
