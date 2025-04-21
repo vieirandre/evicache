@@ -1061,6 +1061,31 @@ public abstract class CacheTestsBase
         Assert.Contains("value2", cacheValues);
     }
 
+    #region Metadata tests
+
+    [Fact]
+    public void Should_ContainCorrectMetadataValues_AfterPut()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        var beforePut = DateTimeOffset.UtcNow;
+        cache.Put(1, "value1");
+        var afterPut = DateTimeOffset.UtcNow;
+
+        // act
+
+        var meta = cache.GetMetadata(1);
+
+        // assert
+
+        Assert.InRange(meta.CreatedAt, beforePut, afterPut);
+        Assert.InRange(meta.LastAccessedAt, beforePut, afterPut);
+        Assert.InRange(meta.LastUpdatedAt, beforePut, afterPut);
+        Assert.Equal(0, meta.AccessCount);
+    }
+
     [Fact]
     public void Should_UpdateAccessFields_AndIncrementAccessCount_OnGet()
     {
@@ -1070,8 +1095,8 @@ public abstract class CacheTestsBase
         cache.Put(1, "value1");
 
         long initialAccessCount = cache.GetMetadata(1).AccessCount;
-        DateTimeOffset initialAccess = cache.GetMetadata(1).LastAccessedAt;
-        DateTimeOffset initialUpdate = cache.GetMetadata(1).LastUpdatedAt;
+        var initialAccess = cache.GetMetadata(1).LastAccessedAt;
+        var initialUpdate = cache.GetMetadata(1).LastUpdatedAt;
 
         // act
 
@@ -1084,4 +1109,47 @@ public abstract class CacheTestsBase
         Assert.True(metaAfter.LastAccessedAt >= initialAccess);
         Assert.Equal(initialUpdate, metaAfter.LastUpdatedAt);
     }
+
+    [Fact]
+    public void Should_UpdateLastUpdatedAt_WithoutChangingAccessCount_OnAddOrUpdate()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+        cache.Put(1, "value1");
+
+        long initialAccessCount = cache.GetMetadata(1).AccessCount;
+        var initialAccess = cache.GetMetadata(1).LastAccessedAt;
+        var initialUpdate = cache.GetMetadata(1).LastUpdatedAt;
+
+        // act
+
+        cache.AddOrUpdate(1, "value1Updated");
+        var metaAfter = cache.GetMetadata(1);
+
+        // assert
+
+        Assert.True(metaAfter.LastUpdatedAt >= initialUpdate);
+        Assert.Equal(initialAccess, metaAfter.LastAccessedAt);
+        Assert.Equal(initialAccessCount, metaAfter.AccessCount);
+    }
+
+    [Fact]
+    public void Should_TryGetMetadata_ReturnFalse_WhenKeyDoesNotExist()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        // act
+
+        bool found = cache.TryGetMetadata(42, out var meta);
+
+        // assert
+
+        Assert.False(found);
+        Assert.Null(meta);
+    }
+
+    #endregion
 }
