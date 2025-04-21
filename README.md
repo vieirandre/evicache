@@ -113,3 +113,7 @@ Console.WriteLine($"Last accessed: {itemMetadata.LastAccessedAt}");
 Console.WriteLine($"Last updated: {itemMetadata.LastUpdatedAt}");
 Console.WriteLine($"Access count: {itemMetadata.AccessCount}");
 ```
+
+## Feedback & Contributing
+
+`EviCache` is released as open source under the [MIT license](https://licenses.nuget.org/MIT). Bug reports and contributions are welcome at [the GitHub repository](https://github.com/vieirandre/evicache).
