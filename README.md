@@ -114,12 +114,15 @@ Console.WriteLine($"Cache Evictions: {cache.Evictions}");
 **Accessing cache item metadata**
 
 ```csharp
-var itemMetadata = cache.GetMetadata("key1");
+var meta = cache.GetMetadata("key1"); // throws KeyNotFoundException if key does not exist
 
-Console.WriteLine($"Created: {itemMetadata.CreatedAt}");
-Console.WriteLine($"Last accessed: {itemMetadata.LastAccessedAt}");
-Console.WriteLine($"Last updated: {itemMetadata.LastUpdatedAt}");
-Console.WriteLine($"Access count: {itemMetadata.AccessCount}");
+// A "try" option is available
+// bool found = cache.TryGetMetadata("key1", out var meta);
+
+Console.WriteLine($"Created: {meta.CreatedAt}");
+Console.WriteLine($"Last accessed: {meta.LastAccessedAt}");
+Console.WriteLine($"Last updated: {meta.LastUpdatedAt}");
+Console.WriteLine($"Access count: {meta.AccessCount}");
 ```
 
 <a id="feedback"></a>
