@@ -8,7 +8,7 @@ It supports multiple eviction policies and offers extended cache operations. Mor
 - [About](#about)
 - [Key Features](#key-features)
 - [How&nbsp;to&nbsp;Use](#how-to-use)
-- [Feedback & Contributing](#feedback--contributing)
+- [Feedback & Contributing](#feedback)
 
 ## Key Features
 
@@ -122,6 +122,7 @@ Console.WriteLine($"Last updated: {itemMetadata.LastUpdatedAt}");
 Console.WriteLine($"Access count: {itemMetadata.AccessCount}");
 ```
 
+<a id="feedback"></a>
 ## Feedback & Contributing
 
 `EviCache` is released as open source under the [MIT license](https://licenses.nuget.org/MIT). Bug reports and contributions are welcome at [the GitHub repository](https://github.com/vieirandre/evicache).
