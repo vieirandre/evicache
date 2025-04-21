@@ -29,6 +29,7 @@ It supports multiple eviction policies and offers extended cache operations. Mor
 
 * `KeyNotFoundException`: Thrown when attempting to retrieve a key that does not exist (only via `Get`).
 * `CacheFullException`: Thrown when the cache is full and (a) eviction fails, or (b) eviction is disabled (`NoEviction` policy).
+  * The exception’s **`Data`** dictionary is populated for easy diagnostics: `Capacity` (int), `AttemptedKey` (string), and `EvictionPolicy` (string).
 
 **Initializing the cache**
 
