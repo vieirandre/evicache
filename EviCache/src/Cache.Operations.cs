@@ -167,18 +167,15 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
     private void AddOrUpdateItem(TKey key, TValue value, bool isUpdate)
     {
-        var item = new CacheItem<TValue>(value);
-
         if (isUpdate)
         {
-            _cacheMap[key] = item;
-
-            item.Metadata.RegisterUpdate();
+            var item = _cacheMap[key];
+            item.ReplaceValue(value);
             _cacheHandler.RegisterUpdate(key);
         }
         else
         {
-            _cacheMap.Add(key, item);
+            _cacheMap.Add(key, new CacheItem<TValue>(value));
             _cacheHandler.RegisterInsertion(key);
         }
     }

@@ -1060,4 +1060,28 @@ public abstract class CacheTestsBase
         Assert.Contains("value1", cacheValues);
         Assert.Contains("value2", cacheValues);
     }
+
+    [Fact]
+    public void Should_UpdateAccessFields_AndIncrementAccessCount_OnGet()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+        cache.Put(1, "value1");
+
+        long initialAccessCount = cache.GetMetadata(1).AccessCount;
+        DateTimeOffset initialAccess = cache.GetMetadata(1).LastAccessedAt;
+        DateTimeOffset initialUpdate = cache.GetMetadata(1).LastUpdatedAt;
+
+        // act
+
+        cache.Get(1);
+        var metaAfter = cache.GetMetadata(1);
+
+        // assert
+
+        Assert.Equal(initialAccessCount + 1, metaAfter.AccessCount);
+        Assert.True(metaAfter.LastAccessedAt >= initialAccess);
+        Assert.Equal(initialUpdate, metaAfter.LastUpdatedAt);
+    }
 }
