@@ -96,10 +96,20 @@ ImmutableList<TKey> keys = cache.GetKeys();
 **Accessing cache metrics**
 
 ```csharp
-// Access cache metrics
 Console.WriteLine($"Cache Capacity: {cache.Capacity}");
 Console.WriteLine($"Cache Count: {cache.Count}");
 Console.WriteLine($"Cache Hits: {cache.Hits}");
 Console.WriteLine($"Cache Misses: {cache.Misses}");
 Console.WriteLine($"Cache Evictions: {cache.Evictions}");
+```
+
+**Accessing cache item metadata**
+
+```csharp
+var itemMetadata = cache.GetMetadata("key1");
+
+Console.WriteLine($"Created: {itemMetadata.CreatedAt}");
+Console.WriteLine($"Last accessed: {itemMetadata.LastAccessedAt}");
+Console.WriteLine($"Last updated: {itemMetadata.LastUpdatedAt}");
+Console.WriteLine($"Access count: {itemMetadata.AccessCount}");
 ```
