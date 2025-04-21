@@ -4,6 +4,12 @@
 
 It supports multiple eviction policies and offers extended cache operations. Moreover, it provides metrics and inspection capabilities.
 
+## Table of Contents
+- [About](#about)
+- [Key Features](#key-features)
+- [How&nbsp;to&nbsp;Use](#how-to-use)
+- [Feedback & Contributing](#feedback-contributing)
+
 ## Key Features
 
 - **Thread-safe operations**: All cache operations are synchronized, ensuring thread safety for concurrent access.
@@ -24,6 +30,7 @@ It supports multiple eviction policies and offers extended cache operations. Mor
 * `ICacheOperationsAsync<TKey, TValue>`: Provides asynchronous versions of cache operations (`GetAsync`, `PutAsync`, etc.).
 * `ICacheMetrics`: Access performance and usage metrics.
 * `ICacheInspection<TKey, TValue>`: Inspect cache contents (keys and snapshots).
+* `ICacheItemMetadata<TKey>`: Provides methods for accessing cache item metadata.
 
 **Exceptions**
 
