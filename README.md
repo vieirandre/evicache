@@ -1,5 +1,7 @@
 ## About
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a9cd49cb2c564eb4ac13204e9f6668cf)](https://app.codacy.com/gh/vieirandre/evicache?utm_source=github.com&utm_medium=referral&utm_content=vieirandre/evicache&utm_campaign=Badge_Grade)
+
 `EviCache` is a lightweight, thread-safe, in-memory caching library for .NET.
 
 It supports multiple eviction policies and offers extended cache operations. Moreover, it provides metrics and inspection capabilities.
