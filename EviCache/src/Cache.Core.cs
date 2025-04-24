@@ -33,7 +33,7 @@ public partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKey : not
     /// <param name="logger">An optional logger for logging cache events.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="options"/> is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the capacity is zero or negative.</exception>
-    public Cache(CacheOptions options, ILogger? logger = null)
+    public Cache(CacheOptions options, ILogger logger)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
         if (options.Capacity <= 0) throw new ArgumentOutOfRangeException(nameof(options.Capacity));
@@ -48,4 +48,7 @@ public partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKey : not
         _logger = logger ?? NullLogger<Cache<TKey, TValue>>.Instance;
         _logger.LogInformation("Cache initialized with capacity {Capacity} and eviction policy {EvictionPolicy}", _capacity, _evictionPolicy);
     }
+
+    /// <inheritdoc cref="Cache{TKey,TValue}.Cache(CacheOptions,ILogger)" />
+    public Cache(CacheOptions options) : this(options, NullLogger<Cache<TKey, TValue>>.Instance) { }
 }

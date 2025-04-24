@@ -14,7 +14,13 @@ public abstract class CacheTestsBase
     protected virtual bool SupportsEviction => true;
     protected readonly Mock<ILogger> _loggerMock;
 
-    protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity, ILogger? logger = null) where TKey : notnull
+    protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity) where TKey : notnull
+    {
+        var options = new CacheOptions(capacity, EvictionPolicy);
+        return new Cache<TKey, TValue>(options);
+    }
+
+    protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity, ILogger logger) where TKey : notnull
     {
         var options = new CacheOptions(capacity, EvictionPolicy);
         return new Cache<TKey, TValue>(options, logger);
