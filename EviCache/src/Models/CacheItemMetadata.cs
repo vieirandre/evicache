@@ -24,8 +24,11 @@ public class CacheItemMetadata
     /// Gets the number of times this item has been accessed.
     /// </summary>
     public long AccessCount => Interlocked.Read(ref _accessCount);
-
     private long _accessCount;
+
+    public DateTimeOffset? ExpiresAt { get; internal set; }
+
+    public bool IsExpired => ExpiresAt.HasValue && DateTimeOffset.UtcNow >= ExpiresAt.Value;
 
     internal CacheItemMetadata()
     {
