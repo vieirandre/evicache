@@ -738,6 +738,8 @@ public abstract class CacheTestsBase
                             try { cache.GetOrAdd(key, value); }
                             catch (CacheFullException ex) { getOrAddException ??= ex; }
                             break;
+                        default:
+                            break;
                     }
                 }
             }));

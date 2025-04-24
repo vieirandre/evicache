@@ -17,7 +17,7 @@ public static partial class LoggerMockExtensions
             x => x.Log(
                 logLevel,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) =>
+                It.Is<It.IsAnyType>((v, _) =>
                     Regex.IsMatch(v.ToString(), escapedMessage, RegexOptions.None)),
                 null,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
