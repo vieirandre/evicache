@@ -7,7 +7,7 @@ namespace EviCache.Abstractions;
 /// </summary>
 /// <typeparam name="TKey">The type of keys in the cache.</typeparam>
 /// <typeparam name="TValue">The type of values in the cache.</typeparam>
-public interface ICacheOperations<TKey, TValue> where TKey : notnull
+public interface ICacheOperations<in TKey, TValue> where TKey : notnull
 {
     /// <summary>
     /// Retrieves the value associated with the specified key.
