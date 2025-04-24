@@ -5,10 +5,13 @@ internal sealed class CacheItem<TValue> : IDisposable
     public TValue Value { get; private set; }
     public CacheItemMetadata Metadata { get; }
 
-    public CacheItem(TValue value)
+    public CacheItem(TValue value, TimeSpan? ttl = null)
     {
         Value = value;
         Metadata = new CacheItemMetadata();
+
+        if (ttl.HasValue)
+            Metadata.ExpiresAt = DateTimeOffset.UtcNow.Add(ttl.Value);
     }
 
     public void Dispose()
