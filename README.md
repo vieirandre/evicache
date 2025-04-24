@@ -1,5 +1,7 @@
 ## About
 
+[![nuget](https://img.shields.io/nuget/v/evicache.svg)](https://www.nuget.org/packages/EviCache/)
+
 `EviCache` is a lightweight, thread-safe, in-memory caching library for .NET.
 
 It supports multiple eviction policies and offers extended cache operations. Moreover, it provides metrics and inspection capabilities.
