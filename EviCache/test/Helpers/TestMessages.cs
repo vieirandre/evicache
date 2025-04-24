@@ -2,5 +2,5 @@
 
 public static class TestMessages
 {
-    public const string EvictionNotSupported = "Policy does not support eviction";
+    public static readonly string EvictionNotSupported = "Policy does not support eviction";
 }
