@@ -21,7 +21,7 @@ public partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKey : not
     private readonly object _syncLock = new();
     private readonly ILogger _logger;
 
-    private readonly ICacheHandler<TKey> _cacheHandler;
+    private readonly CacheHandlerBase<TKey> _cacheHandler;
     private readonly IEvictionCandidateSelector<TKey>? _evictionCandidateSelector;
 
     private readonly Dictionary<TKey, CacheItem<TValue>> _cacheMap;

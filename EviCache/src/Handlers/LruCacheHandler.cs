@@ -3,35 +3,23 @@ using System.Collections.Immutable;
 
 namespace EviCache.Handlers;
 
-internal class LruCacheHandler<TKey> : ICacheHandler<TKey>, IEvictionCandidateSelector<TKey> where TKey : notnull
+internal class LruCacheHandler<TKey> : CacheHandlerBase<TKey>, IEvictionCandidateSelector<TKey> where TKey : notnull
 {
     private readonly LinkedList<TKey> _lruList = new();
 
-    public void RegisterAccess(TKey key)
+    public override void RegisterAccess(TKey key)
     {
         _lruList.Remove(key);
         _lruList.AddFirst(key);
     }
 
-    public void RegisterInsertion(TKey key)
-    {
-        _lruList.AddFirst(key);
-    }
+    public override void RegisterInsertion(TKey key) => _lruList.AddFirst(key);
 
-    public void RegisterUpdate(TKey key)
-    {
-        RegisterAccess(key);
-    }
+    public override void RegisterUpdate(TKey key) => RegisterAccess(key);
 
-    public void RegisterRemoval(TKey key)
-    {
-        _lruList.Remove(key);
-    }
+    public override void RegisterRemoval(TKey key) => _lruList.Remove(key);
 
-    public void Clear()
-    {
-        _lruList.Clear();
-    }
+    public override void Clear() => _lruList.Clear();
 
     public bool TrySelectEvictionCandidate(out TKey candidate)
     {
@@ -45,8 +33,5 @@ internal class LruCacheHandler<TKey> : ICacheHandler<TKey>, IEvictionCandidateSe
         return true;
     }
 
-    public ImmutableList<TKey> GetKeys()
-    {
-        return _lruList.ToImmutableList();
-    }
+    public override ImmutableList<TKey> GetKeys() => _lruList.ToImmutableList();
 }

@@ -6,7 +6,7 @@ namespace EviCache.Factories;
 
 internal static class CacheHandlerFactory
 {
-    internal static ICacheHandler<TKey> Create<TKey>(EvictionPolicy policyType) where TKey : notnull
+    internal static CacheHandlerBase<TKey> Create<TKey>(EvictionPolicy policyType) where TKey : notnull
     {
         return policyType switch
         {

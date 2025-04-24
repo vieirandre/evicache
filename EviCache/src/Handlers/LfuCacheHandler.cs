@@ -3,12 +3,12 @@ using System.Collections.Immutable;
 
 namespace EviCache.Handlers;
 
-internal class LfuCacheHandler<TKey> : ICacheHandler<TKey>, IEvictionCandidateSelector<TKey> where TKey : notnull
+internal class LfuCacheHandler<TKey> : CacheHandlerBase<TKey>, IEvictionCandidateSelector<TKey> where TKey : notnull
 {
     private readonly Dictionary<TKey, int> _keyFrequencies = new();
     private readonly SortedDictionary<int, LinkedList<TKey>> _frequencyBuckets = new();
 
-    public void RegisterAccess(TKey key)
+    public override void RegisterAccess(TKey key)
     {
         if (!_keyFrequencies.TryGetValue(key, out int oldFreq))
         {
@@ -36,7 +36,7 @@ internal class LfuCacheHandler<TKey> : ICacheHandler<TKey>, IEvictionCandidateSe
         newBucket.AddLast(key);
     }
 
-    public void RegisterInsertion(TKey key)
+    public override void RegisterInsertion(TKey key)
     {
         _keyFrequencies[key] = 1;
 
@@ -49,12 +49,9 @@ internal class LfuCacheHandler<TKey> : ICacheHandler<TKey>, IEvictionCandidateSe
         bucket.AddLast(key);
     }
 
-    public void RegisterUpdate(TKey key)
-    {
-        RegisterAccess(key);
-    }
+    public override void RegisterUpdate(TKey key) => RegisterAccess(key);
 
-    public void RegisterRemoval(TKey key)
+    public override void RegisterRemoval(TKey key)
     {
         if (!_keyFrequencies.TryGetValue(key, out int freq))
             return;
@@ -70,7 +67,7 @@ internal class LfuCacheHandler<TKey> : ICacheHandler<TKey>, IEvictionCandidateSe
             _frequencyBuckets.Remove(freq);
     }
 
-    public void Clear()
+    public override void Clear()
     {
         _keyFrequencies.Clear();
         _frequencyBuckets.Clear();
@@ -88,8 +85,5 @@ internal class LfuCacheHandler<TKey> : ICacheHandler<TKey>, IEvictionCandidateSe
         return true;
     }
 
-    public ImmutableList<TKey> GetKeys()
-    {
-        return _keyFrequencies.Keys.ToImmutableList();
-    }
+    public override ImmutableList<TKey> GetKeys() => _keyFrequencies.Keys.ToImmutableList();
 }
