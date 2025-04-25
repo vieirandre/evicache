@@ -253,7 +253,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         if (isUpdate)
         {
             var item = _cacheMap[key];
-            item.ReplaceValue(value);
+            item.UpdateItem(value);
             _cacheHandler.RegisterUpdate(key);
         }
         else
@@ -268,8 +268,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         if (isUpdate)
         {
             var item = _cacheMap[key];
-            item.ReplaceValue(value);
-            item.UpdateTtl(ttl);
+            item.UpdateItem(value, ttl);
             _cacheHandler.RegisterUpdate(key);
         }
         else

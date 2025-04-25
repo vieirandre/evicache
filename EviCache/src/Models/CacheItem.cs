@@ -25,7 +25,7 @@ internal sealed class CacheItem<TValue> : IDisposable
             disposable.Dispose();
     }
 
-    internal void ReplaceValue(TValue newValue)
+    internal void UpdateItem(TValue newValue)
     {
         if (!ReferenceEquals(Value, newValue) && Value is IDisposable d)
             d.Dispose();
@@ -34,8 +34,12 @@ internal sealed class CacheItem<TValue> : IDisposable
         Metadata.RegisterUpdate();
     }
 
-    internal void UpdateTtl(TimeSpan ttl)
+    internal void UpdateItem(TValue newValue, TimeSpan ttl)
     {
+        if (!ReferenceEquals(Value, newValue) && Value is IDisposable d)
+            d.Dispose();
+
+        Value = newValue;
         SetTtl(ttl);
         Metadata.RegisterUpdate();
     }
