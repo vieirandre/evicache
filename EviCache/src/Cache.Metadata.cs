@@ -9,7 +9,7 @@ public partial class Cache<TKey, TValue> : ICacheMetadata<TKey> where TKey : not
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var item))
+            if (TryGetItem(key, out var item))
                 return item.Metadata;
 
             throw new KeyNotFoundException($"The key '{key}' was not found in the cache");
@@ -20,7 +20,7 @@ public partial class Cache<TKey, TValue> : ICacheMetadata<TKey> where TKey : not
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var item))
+            if (TryGetItem(key, out var item))
             {
                 metadata = item.Metadata;
                 return true;

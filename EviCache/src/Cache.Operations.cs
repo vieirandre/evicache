@@ -11,7 +11,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var item))
+            if (TryGetItem(key, out var item))
             {
                 Interlocked.Increment(ref _hits);
 
@@ -31,7 +31,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var item))
+            if (TryGetItem(key, out var item))
             {
                 Interlocked.Increment(ref _hits);
 
@@ -53,22 +53,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         lock (_syncLock)
         {
-            return _cacheMap.ContainsKey(key);
-        }
-    }
-
-    public void Put(TKey key, TValue value)
-    {
-        lock (_syncLock)
-        {
-            if (_cacheMap.ContainsKey(key))
-            {
-                AddOrUpdateItem(key, value, isUpdate: true);
-                return;
-            }
-
-            EnsureCapacityForKey(key);
-            AddOrUpdateItem(key, value, isUpdate: false);
+            return TryGetItem(key, out _);
         }
     }
 
@@ -76,7 +61,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         lock (_syncLock)
         {
-            if (_cacheMap.TryGetValue(key, out var item))
+            if (TryGetItem(key, out var item))
             {
                 Interlocked.Increment(ref _hits);
 
@@ -95,22 +80,38 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         }
     }
 
+    public void Put(TKey key, TValue value)
+    {
+        lock (_syncLock)
+        {
+            if (TryGetItem(key, out _))
+            {
+                AddOrUpdateItem(key, value, isUpdate: true);
+                return;
+            }
+
+            EnsureCapacityForKey(key);
+            AddOrUpdateItem(key, value, isUpdate: false);
+        }
+    }
+
     public TValue AddOrUpdate(TKey key, TValue value)
     {
         lock (_syncLock)
         {
-            if (_cacheMap.ContainsKey(key))
+            if (TryGetItem(key, out _))
             {
                 Interlocked.Increment(ref _hits);
 
                 AddOrUpdateItem(key, value, isUpdate: true);
-                return value;
             }
+            else
+            {
+                Interlocked.Increment(ref _misses);
 
-            Interlocked.Increment(ref _misses);
-
-            EnsureCapacityForKey(key);
-            AddOrUpdateItem(key, value, isUpdate: false);
+                EnsureCapacityForKey(key);
+                AddOrUpdateItem(key, value, isUpdate: false);
+            }
 
             return value;
         }
@@ -120,7 +121,7 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
     {
         lock (_syncLock)
         {
-            if (!_cacheMap.TryGetValue(key, out var item))
+            if (!TryGetItem(key, out var item))
                 return false;
 
             RemoveItem(key);
@@ -163,6 +164,28 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         });
 
         _logger.LogInformation("Cache cleared. Removed {Count} items", removedCount);
+    }
+
+    private bool TryGetItem(TKey key, out CacheItem<TValue> item)
+    {
+        if (!_cacheMap.TryGetValue(key, out item!))
+            return false;
+
+        if (IsExpired(key, item))
+            return false;
+
+        return true;
+    }
+
+    private bool IsExpired(TKey key, CacheItem<TValue> item)
+    {
+        if (item.Metadata.IsExpired)
+        {
+            Remove(key);
+            return true;
+        }
+
+        return false;
     }
 
     private void AddOrUpdateItem(TKey key, TValue value, bool isUpdate)
