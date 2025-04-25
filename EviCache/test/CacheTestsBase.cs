@@ -26,7 +26,7 @@ public abstract class CacheTestsBase
         return new Cache<TKey, TValue>(options, logger);
     }
 
-    public CacheTestsBase()
+    protected CacheTestsBase()
     {
         _loggerMock = new Mock<ILogger>();
 
@@ -739,6 +739,7 @@ public abstract class CacheTestsBase
                             catch (CacheFullException ex) { getOrAddException ??= ex; }
                             break;
                         default:
+                            // nothing
                             break;
                     }
                 }
