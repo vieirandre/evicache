@@ -26,14 +26,30 @@ public partial class Cache<TKey, TValue> : ICacheOperationsAsync<TKey, TValue> w
         return Task.CompletedTask;
     }
 
+    public Task PutAsync(TKey key, TValue value, TimeSpan ttl)
+    {
+        Put(key, value, ttl);
+        return Task.CompletedTask;
+    }
+
     public Task<TValue> GetOrAddAsync(TKey key, TValue value)
     {
         return Task.FromResult(GetOrAdd(key, value));
     }
 
+    public Task<TValue> GetOrAddAsync(TKey key, TValue value, TimeSpan ttl)
+    {
+        return Task.FromResult(GetOrAdd(key, value, ttl));
+    }
+
     public Task<TValue> AddOrUpdateAsync(TKey key, TValue value)
     {
         return Task.FromResult(AddOrUpdate(key, value));
+    }
+
+    public Task<TValue> AddOrUpdateAsync(TKey key, TValue value, TimeSpan ttl)
+    {
+        return Task.FromResult(AddOrUpdate(key, value, ttl));
     }
 
     public async Task<bool> RemoveAsync(TKey key)

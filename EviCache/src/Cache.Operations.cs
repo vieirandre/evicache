@@ -80,6 +80,29 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         }
     }
 
+    public TValue GetOrAdd(TKey key, TValue value, TimeSpan ttl)
+    {
+        lock (_syncLock)
+        {
+            if (TryGetItem(key, out var item))
+            {
+                Interlocked.Increment(ref _hits);
+
+                item.Metadata.RegisterAccess();
+                _cacheHandler.RegisterAccess(key);
+
+                return item.Value;
+            }
+
+            Interlocked.Increment(ref _misses);
+
+            EnsureCapacityForKey(key);
+            AddOrUpdateItem(key, value, ttl, isUpdate: false);
+
+            return value;
+        }
+    }
+
     public void Put(TKey key, TValue value)
     {
         lock (_syncLock)
@@ -92,6 +115,21 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
             EnsureCapacityForKey(key);
             AddOrUpdateItem(key, value, isUpdate: false);
+        }
+    }
+
+    public void Put(TKey key, TValue value, TimeSpan ttl)
+    {
+        lock (_syncLock)
+        {
+            if (TryGetItem(key, out _))
+            {
+                AddOrUpdateItem(key, value, ttl, isUpdate: true);
+                return;
+            }
+
+            EnsureCapacityForKey(key);
+            AddOrUpdateItem(key, value, ttl, isUpdate: false);
         }
     }
 
@@ -111,6 +149,28 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
 
                 EnsureCapacityForKey(key);
                 AddOrUpdateItem(key, value, isUpdate: false);
+            }
+
+            return value;
+        }
+    }
+
+    public TValue AddOrUpdate(TKey key, TValue value, TimeSpan ttl)
+    {
+        lock (_syncLock)
+        {
+            if (TryGetItem(key, out _))
+            {
+                Interlocked.Increment(ref _hits);
+
+                AddOrUpdateItem(key, value, ttl, isUpdate: true);
+            }
+            else
+            {
+                Interlocked.Increment(ref _misses);
+
+                EnsureCapacityForKey(key);
+                AddOrUpdateItem(key, value, ttl, isUpdate: false);
             }
 
             return value;
@@ -199,6 +259,22 @@ public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where 
         else
         {
             _cacheMap.Add(key, new CacheItem<TValue>(value));
+            _cacheHandler.RegisterInsertion(key);
+        }
+    }
+
+    private void AddOrUpdateItem(TKey key, TValue value, TimeSpan ttl, bool isUpdate)
+    {
+        if (isUpdate)
+        {
+            var item = _cacheMap[key];
+            item.ReplaceValue(value);
+            item.UpdateTtl(ttl);
+            _cacheHandler.RegisterUpdate(key);
+        }
+        else
+        {
+            _cacheMap.Add(key, new CacheItem<TValue>(value, ttl));
             _cacheHandler.RegisterInsertion(key);
         }
     }
