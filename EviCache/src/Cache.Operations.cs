@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace EviCache;
 
-public partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where TKey : notnull
+public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue> where TKey : notnull
 {
     public TValue Get(TKey key)
     {

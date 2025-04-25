@@ -3,7 +3,7 @@ using EviCache.Models;
 
 namespace EviCache;
 
-public partial class Cache<TKey, TValue> : ICacheMetadata<TKey> where TKey : notnull
+public sealed partial class Cache<TKey, TValue> : ICacheMetadata<TKey> where TKey : notnull
 {
     public CacheItemMetadata GetMetadata(TKey key)
     {

@@ -2,7 +2,7 @@
 
 namespace EviCache;
 
-public partial class Cache<TKey, TValue> : ICacheOperationsAsync<TKey, TValue> where TKey : notnull
+public sealed partial class Cache<TKey, TValue> : ICacheOperationsAsync<TKey, TValue> where TKey : notnull
 {
     public Task<TValue> GetAsync(TKey key)
     {
