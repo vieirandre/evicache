@@ -1,4 +1,5 @@
 ﻿using EviCache.Exceptions;
+using EviCache.Options;
 
 namespace EviCache.Abstractions;
 
@@ -30,7 +31,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <param name="key">The key to check for existence.</param>
     /// <returns>A task representing the asynchronous operation, containing a boolean that indicates whether the key exists.</returns>
     /// <remarks>
-    /// [Note] Unlike other retrieval methods, this one does not trigger cache hit or miss counters.
+    /// Unlike other retrieval methods, this one does not trigger cache hit or miss counters.
     /// </remarks>
     Task<bool> ContainsKeyAsync(TKey key);
 
@@ -39,30 +40,42 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// </summary>
     /// <param name="key">The key of the item to add or update.</param>
     /// <param name="value">The value to associate with the key.</param>
+    /// <param name="options">Settings for the cache item.</param>
     /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     /// <returns>A task representing the asynchronous operation.</returns>
     /// <remarks>
-    /// [Note] Unlike other insertion methods, this one does not trigger cache hit or miss counters.
+    /// Unlike other insertion methods, this one does not trigger cache hit or miss counters.
     /// </remarks>
     Task PutAsync(TKey key, TValue value);
+
+    /// <inheritdoc cref="ICacheOperationsAsync{TKey, TValue}.PutAsync(TKey, TValue)" />
+    Task PutAsync(TKey key, TValue value, CacheItemOptions options);
 
     /// <summary>
     /// Asynchronously retrieves the value associated with the specified key, or adds the value if the key is not present.
     /// </summary>
     /// <param name="key">The key to look up or add.</param>
     /// <param name="value">The value to add if the key is not found.</param>
+    /// <param name="options">Settings for the cache item.</param>
     /// <returns>A task representing the asynchronous operation, containing the existing or newly added value.</returns>
     /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     Task<TValue> GetOrAddAsync(TKey key, TValue value);
+
+    /// <inheritdoc cref="ICacheOperationsAsync{TKey, TValue}.GetOrAddAsync(TKey, TValue)" />
+    Task<TValue> GetOrAddAsync(TKey key, TValue value, CacheItemOptions options);
 
     /// <summary>
     /// Asynchronously adds a new item or updates the value of an existing item.
     /// </summary>
     /// <param name="key">The key to add or update.</param>
     /// <param name="value">The new value to associate with the key.</param>
+    /// <param name="options">Settings for the cache item.</param>
     /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     /// <returns>A task representing the asynchronous operation, containing the new value.</returns>
     Task<TValue> AddOrUpdateAsync(TKey key, TValue value);
+
+    /// <inheritdoc cref="ICacheOperationsAsync{TKey, TValue}.AddOrUpdateAsync(TKey, TValue)" />
+    Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CacheItemOptions options);
 
     /// <summary>
     /// Asynchronously removes the item with the specified key from the cache.
