@@ -184,8 +184,7 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
             if (!TryGetItem(key, out var item))
                 return false;
 
-            RemoveItem(key);
-            DisposeItem(item);
+            RemoveItem(key, item);
 
             return true;
         }
@@ -241,7 +240,7 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
     {
         if (item.Metadata.IsExpired)
         {
-            Remove(key);
+            RemoveItem(key, item);
             return true;
         }
 
@@ -278,10 +277,12 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
         }
     }
 
-    private void RemoveItem(TKey key)
+    private void RemoveItem(TKey key, CacheItem<TValue> item)
     {
         _cacheMap.Remove(key);
         _cacheHandler.RegisterRemoval(key);
+
+        DisposeItem(item);
     }
 
     private void EnsureCapacityForKey(TKey key)
@@ -320,7 +321,7 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
             return false;
         }
 
-        RemoveItem(candidate);
+        RemoveItem(candidate, item);
 
         Interlocked.Increment(ref _evictions);
 
