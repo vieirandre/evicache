@@ -23,14 +23,7 @@ public record CacheOptions
     /// </remarks>
     public EvictionPolicy EvictionPolicy { get; init; }
 
-    /// <summary>
-    /// Gets the default Time To Live (TTL) for cache items.
-    /// </summary>
-    /// <remarks>
-    /// If not specified, items will not expire by default.
-    /// Individual item TTLs take precedence over this value.
-    /// </remarks>
-    public TimeSpan? TimeToLive { get; init; }
+    public ExpirationOptions? Expiration { get; init; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CacheOptions"/> record.
@@ -46,10 +39,8 @@ public record CacheOptions
     }
 
     /// <inheritdoc cref="CacheOptions(int,EvictionPolicy)" />
-    public CacheOptions(int capacity, EvictionPolicy evictionPolicy, TimeSpan timeToLive)
+    public CacheOptions(int capacity, EvictionPolicy evictionPolicy, ExpirationOptions expirationOptions) : this(capacity, evictionPolicy)
     {
-        Capacity = capacity;
-        EvictionPolicy = evictionPolicy;
-        TimeToLive = timeToLive;
+        Expiration = expirationOptions;
     }
 }

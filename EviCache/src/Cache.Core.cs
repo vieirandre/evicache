@@ -17,7 +17,7 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
 {
     private readonly int _capacity;
     private readonly EvictionPolicy _evictionPolicy;
-    private readonly TimeSpan? _timeToLive;
+    private readonly ExpirationOptions? _defaultExpiration;
 
     private readonly object _syncLock = new();
     private readonly ILogger _logger;
@@ -41,7 +41,7 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
 
         _capacity = options.Capacity;
         _evictionPolicy = options.EvictionPolicy;
-        _timeToLive = options.TimeToLive;
+        _defaultExpiration = options.Expiration;
 
         _cacheMap = new Dictionary<TKey, CacheItem<TValue>>(_capacity);
         _cacheHandler = CacheHandlerFactory.Create<TKey>(options.EvictionPolicy);
@@ -51,10 +51,12 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
 
         _logger.LogInformation("Cache initialized with capacity {Capacity}, " +
             "eviction policy {EvictionPolicy}, " +
-            "and default TTL {TimeToLive}",
+            "and default expiration {DefaultExpiration}",
             _capacity,
             _evictionPolicy,
-            _timeToLive.HasValue ? _timeToLive.Value.ToString() : "not set");
+            _defaultExpiration != null
+            ? $"TTL: {_defaultExpiration.TimeToLive}, Mode: {_defaultExpiration.Mode}"
+            : "not set");
     }
 
     /// <inheritdoc cref="Cache{TKey,TValue}.Cache(CacheOptions,ILogger)" />
