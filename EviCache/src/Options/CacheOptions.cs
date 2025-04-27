@@ -21,7 +21,7 @@ public record CacheOptions
     /// <remarks>
     /// The eviction policy determines which items are removed when the cache is full.
     /// </remarks>
-    public EvictionPolicy EvictionPolicy { get; init; }
+    public EvictionPolicy EvictionPolicy { get; init; } = EvictionPolicy.LRU;
 
     public ExpirationOptions? Expiration { get; init; }
 
