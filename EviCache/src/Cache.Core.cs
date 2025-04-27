@@ -47,7 +47,7 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
         _cacheHandler = CacheHandlerFactory.Create<TKey>(options.EvictionPolicy);
         _evictionCandidateSelector = _cacheHandler as IEvictionCandidateSelector<TKey>;
 
-        _logger = logger ?? NullLogger<Cache<TKey, TValue>>.Instance;
+        _logger = logger;
 
         _logger.LogInformation("Cache initialized with capacity {Capacity}, " +
             "eviction policy {EvictionPolicy}, " +

@@ -249,15 +249,26 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
 
     private void AddOrUpdateItem(TKey key, TValue value, bool isUpdate)
     {
+        bool defaultTtlExists = _timeToLive.HasValue;
+
         if (isUpdate)
         {
             var item = _cacheMap[key];
-            item.UpdateItem(value);
+
+            if (defaultTtlExists)
+                item.UpdateItem(value, _timeToLive!.Value);
+            else
+                item.UpdateItem(value);
+
             _cacheHandler.RegisterUpdate(key);
         }
         else
         {
-            _cacheMap.Add(key, new CacheItem<TValue>(value));
+            _cacheMap.Add(key,
+                defaultTtlExists
+                ? new CacheItem<TValue>(value, _timeToLive!.Value)
+                : new CacheItem<TValue>(value));
+
             _cacheHandler.RegisterInsertion(key);
         }
     }
