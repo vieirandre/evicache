@@ -37,7 +37,7 @@ public class CacheItemMetadata
         {
             return Expiration?.Mode switch
             {
-                ExpirationMode.Absolute when ExpiresAt.HasValue => ExpiresAt.HasValue && DateTimeOffset.UtcNow >= ExpiresAt.Value,
+                ExpirationMode.Absolute when ExpiresAt.HasValue => DateTimeOffset.UtcNow >= ExpiresAt.Value,
                 ExpirationMode.Sliding when Expiration.TimeToLive.HasValue => DateTimeOffset.UtcNow > LastAccessedAt + Expiration.TimeToLive.Value,
                 _ => false
             };

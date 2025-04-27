@@ -56,5 +56,7 @@ internal sealed class CacheItem<TValue> : IDisposable
 
         if (expiration.TimeToLive.HasValue && expiration.Mode == ExpirationMode.Absolute)
             Metadata.ExpiresAt = DateTimeOffset.UtcNow.Add(expiration.TimeToLive.Value);
+        else
+            Metadata.ExpiresAt = null;
     }
 }
