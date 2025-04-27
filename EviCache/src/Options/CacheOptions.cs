@@ -23,7 +23,7 @@ public record CacheOptions
     /// </remarks>
     public EvictionPolicy EvictionPolicy { get; init; } = EvictionPolicy.LRU;
 
-    public ExpirationOptions? Expiration { get; init; }
+    public ExpirationOptions? DefaultExpiration { get; init; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CacheOptions"/> record.
@@ -38,9 +38,9 @@ public record CacheOptions
         EvictionPolicy = evictionPolicy;
     }
 
-    /// <inheritdoc cref="CacheOptions(int,EvictionPolicy)" />
+    /// <inheritdoc cref="CacheOptions(int, EvictionPolicy)" />
     public CacheOptions(int capacity, EvictionPolicy evictionPolicy, ExpirationOptions expirationOptions) : this(capacity, evictionPolicy)
     {
-        Expiration = expirationOptions;
+        DefaultExpiration = expirationOptions;
     }
 }

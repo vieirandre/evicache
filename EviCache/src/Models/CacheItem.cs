@@ -1,4 +1,7 @@
-﻿namespace EviCache.Models;
+﻿using EviCache.Enums;
+using EviCache.Options;
+
+namespace EviCache.Models;
 
 internal sealed class CacheItem<TValue> : IDisposable
 {
@@ -11,12 +14,12 @@ internal sealed class CacheItem<TValue> : IDisposable
         Metadata = new CacheItemMetadata();
     }
 
-    public CacheItem(TValue value, TimeSpan ttl)
+    public CacheItem(TValue value, CacheItemOptions options)
     {
         Value = value;
         Metadata = new CacheItemMetadata();
 
-        SetTtl(ttl);
+        SetExpiration(options.Expiration);
     }
 
     public void Dispose()
@@ -34,15 +37,24 @@ internal sealed class CacheItem<TValue> : IDisposable
         Metadata.RegisterUpdate();
     }
 
-    internal void UpdateItem(TValue newValue, TimeSpan ttl)
+    internal void UpdateItem(TValue newValue, CacheItemOptions options)
     {
         if (!ReferenceEquals(Value, newValue) && Value is IDisposable d)
             d.Dispose();
 
         Value = newValue;
-        SetTtl(ttl);
+        SetExpiration(options.Expiration);
         Metadata.RegisterUpdate();
     }
 
-    private void SetTtl(TimeSpan ttl) => Metadata.ExpiresAt = DateTimeOffset.UtcNow.Add(ttl);
+    private void SetExpiration(ExpirationOptions? expiration)
+    {
+        if (expiration is null)
+            return;
+
+        Metadata.Expiration = expiration;
+
+        if (expiration.TimeToLive.HasValue && expiration.Mode == ExpirationMode.Absolute)
+            Metadata.ExpiresAt = DateTimeOffset.UtcNow.Add(expiration.TimeToLive.Value);
+    }
 }

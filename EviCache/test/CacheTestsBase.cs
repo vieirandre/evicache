@@ -62,7 +62,7 @@ public abstract class CacheTestsBase
         _loggerMock.VerifyLog(LogLevel.Information,
             $"Cache initialized with capacity {capacity}, " +
             $"eviction policy {EvictionPolicy}, " +
-            $"and default TTL not set",
+            $"default expiration not set",
             Times.Once());
     }
 

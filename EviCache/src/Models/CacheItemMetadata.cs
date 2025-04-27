@@ -1,4 +1,7 @@
-﻿namespace EviCache.Models;
+﻿using EviCache.Enums;
+using EviCache.Options;
+
+namespace EviCache.Models;
 
 /// <summary>
 /// Represents metadata for a cache item.
@@ -28,7 +31,20 @@ public class CacheItemMetadata
 
     public DateTimeOffset? ExpiresAt { get; internal set; }
 
-    public bool IsExpired => ExpiresAt.HasValue && DateTimeOffset.UtcNow >= ExpiresAt.Value;
+    public bool IsExpired
+    {
+        get
+        {
+            return Expiration?.Mode switch
+            {
+                ExpirationMode.Absolute when ExpiresAt.HasValue => ExpiresAt.HasValue && DateTimeOffset.UtcNow >= ExpiresAt.Value,
+                ExpirationMode.Sliding when Expiration.TimeToLive.HasValue => DateTimeOffset.UtcNow > LastAccessedAt + Expiration.TimeToLive.Value,
+                _ => false
+            };
+        }
+    }
+
+    public ExpirationOptions? Expiration { get; internal set; }
 
     internal CacheItemMetadata()
     {
@@ -37,6 +53,11 @@ public class CacheItemMetadata
         LastAccessedAt = now;
         LastUpdatedAt = now;
         _accessCount = 0;
+    }
+
+    internal CacheItemMetadata(ExpirationOptions expirationOptions) : this()
+    {
+        Expiration = expirationOptions;
     }
 
     internal void RegisterAccess()

@@ -41,7 +41,7 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
 
         _capacity = options.Capacity;
         _evictionPolicy = options.EvictionPolicy;
-        _defaultExpiration = options.Expiration;
+        _defaultExpiration = options.DefaultExpiration;
 
         _cacheMap = new Dictionary<TKey, CacheItem<TValue>>(_capacity);
         _cacheHandler = CacheHandlerFactory.Create<TKey>(options.EvictionPolicy);
@@ -51,7 +51,7 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
 
         _logger.LogInformation("Cache initialized with capacity {Capacity}, " +
             "eviction policy {EvictionPolicy}, " +
-            "and default expiration {DefaultExpiration}",
+            "default expiration {DefaultExpiration}",
             _capacity,
             _evictionPolicy,
             _defaultExpiration != null
@@ -59,6 +59,6 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
             : "not set");
     }
 
-    /// <inheritdoc cref="Cache{TKey,TValue}.Cache(CacheOptions,ILogger)" />
+    /// <inheritdoc cref="Cache{TKey,TValue}.Cache(CacheOptions, ILogger)" />
     public Cache(CacheOptions options) : this(options, NullLogger<Cache<TKey, TValue>>.Instance) { }
 }

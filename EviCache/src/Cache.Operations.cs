@@ -1,6 +1,7 @@
 ﻿using EviCache.Abstractions;
 using EviCache.Exceptions;
 using EviCache.Models;
+using EviCache.Options;
 using Microsoft.Extensions.Logging;
 
 namespace EviCache;
@@ -80,7 +81,7 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
         }
     }
 
-    public TValue GetOrAdd(TKey key, TValue value, TimeSpan ttl)
+    public TValue GetOrAdd(TKey key, TValue value, CacheItemOptions options)
     {
         lock (_syncLock)
         {
@@ -97,7 +98,7 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
             Interlocked.Increment(ref _misses);
 
             EnsureCapacityForKey(key);
-            AddOrUpdateItem(key, value, ttl, isUpdate: false);
+            AddOrUpdateItem(key, value, options, isUpdate: false);
 
             return value;
         }
@@ -118,18 +119,20 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
         }
     }
 
-    public void Put(TKey key, TValue value, TimeSpan ttl)
+    public void Put(TKey key, TValue value, CacheItemOptions options)
     {
+        //var expiration = options?.Expiration ?? _defaultExpiration;
+
         lock (_syncLock)
         {
             if (TryGetItem(key, out _))
             {
-                AddOrUpdateItem(key, value, ttl, isUpdate: true);
+                AddOrUpdateItem(key, value, options, isUpdate: true);
                 return;
             }
 
             EnsureCapacityForKey(key);
-            AddOrUpdateItem(key, value, ttl, isUpdate: false);
+            AddOrUpdateItem(key, value, options, isUpdate: false);
         }
     }
 
@@ -155,7 +158,7 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
         }
     }
 
-    public TValue AddOrUpdate(TKey key, TValue value, TimeSpan ttl)
+    public TValue AddOrUpdate(TKey key, TValue value, CacheItemOptions options)
     {
         lock (_syncLock)
         {
@@ -163,14 +166,14 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
             {
                 Interlocked.Increment(ref _hits);
 
-                AddOrUpdateItem(key, value, ttl, isUpdate: true);
+                AddOrUpdateItem(key, value, options, isUpdate: true);
             }
             else
             {
                 Interlocked.Increment(ref _misses);
 
                 EnsureCapacityForKey(key);
-                AddOrUpdateItem(key, value, ttl, isUpdate: false);
+                AddOrUpdateItem(key, value, options, isUpdate: false);
             }
 
             return value;
@@ -249,14 +252,14 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
 
     private void AddOrUpdateItem(TKey key, TValue value, bool isUpdate)
     {
-        bool defaultTtlExists = _timeToLive.HasValue;
+        bool defaultExpirationExists = _defaultExpiration is not null;
 
         if (isUpdate)
         {
             var item = _cacheMap[key];
 
-            if (defaultTtlExists)
-                item.UpdateItem(value, _timeToLive!.Value);
+            if (defaultExpirationExists)
+                item.UpdateItem(value, new CacheItemOptions { Expiration = _defaultExpiration });
             else
                 item.UpdateItem(value);
 
@@ -265,25 +268,25 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
         else
         {
             _cacheMap.Add(key,
-                defaultTtlExists
-                ? new CacheItem<TValue>(value, _timeToLive!.Value)
+                defaultExpirationExists
+                ? new CacheItem<TValue>(value, new CacheItemOptions { Expiration = _defaultExpiration })
                 : new CacheItem<TValue>(value));
 
             _cacheHandler.RegisterInsertion(key);
         }
     }
 
-    private void AddOrUpdateItem(TKey key, TValue value, TimeSpan ttl, bool isUpdate)
+    private void AddOrUpdateItem(TKey key, TValue value, CacheItemOptions options, bool isUpdate)
     {
         if (isUpdate)
         {
             var item = _cacheMap[key];
-            item.UpdateItem(value, ttl);
+            item.UpdateItem(value, options);
             _cacheHandler.RegisterUpdate(key);
         }
         else
         {
-            _cacheMap.Add(key, new CacheItem<TValue>(value, ttl));
+            _cacheMap.Add(key, new CacheItem<TValue>(value, options));
             _cacheHandler.RegisterInsertion(key);
         }
     }
