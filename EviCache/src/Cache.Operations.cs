@@ -321,25 +321,35 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
 
     private bool TryEvictItem()
     {
-        if (_evictionCandidateSelector?.TrySelectEvictionCandidate(out var candidate) != true)
+        int attempts = 0;
+        int maxAttempts = _cacheMap.Count;
+
+        while (attempts < maxAttempts)
         {
-            _logger.LogError("Eviction selector did not return a candidate");
-            return false;
+            attempts++;
+
+            if (_evictionCandidateSelector?.TrySelectEvictionCandidate(out var candidate) != true)
+            {
+                _logger.LogError("Eviction selector did not return a candidate");
+                return false;
+            }
+
+            if (!_cacheMap.TryGetValue(candidate, out var item))
+            {
+                _logger.LogError("Eviction candidate ({Candidate}) was not found in the cache", candidate);
+                continue;
+            }
+
+            RemoveItem(candidate, item);
+
+            Interlocked.Increment(ref _evictions);
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
+
+            return true;
         }
 
-        if (!_cacheMap.TryGetValue(candidate, out var item))
-        {
-            _logger.LogError("Eviction candidate ({Candidate}) was not found in the cache", candidate);
-            return false;
-        }
-
-        RemoveItem(candidate, item);
-
-        Interlocked.Increment(ref _evictions);
-
-        if (_logger.IsEnabled(LogLevel.Debug))
-            _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
-
-        return true;
+        return false;
     }
 }
