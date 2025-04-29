@@ -194,27 +194,29 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
     public void Clear()
     {
         int removedCount;
-        List<IDisposable> disposables;
+        List<object> disposables;
 
         lock (_syncLock)
         {
             removedCount = _cacheMap.Count;
 
             disposables = _cacheMap.Values
-                .OfType<IDisposable>()
+                .Select(ci => ci.Value)
+                .Where(v => v is not null && (v is IDisposable or IAsyncDisposable))
+                .Cast<object>()
                 .ToList();
 
             _cacheMap.Clear();
             _cacheHandler.Clear();
         }
 
-        _ = Task.Run(() =>
+        _ = Task.Run(async () =>
         {
             foreach (var disposable in disposables)
             {
                 try
                 {
-                    disposable.Dispose();
+                    await DisposeValueAsync(disposable);
                 }
                 catch (Exception ex)
                 {
