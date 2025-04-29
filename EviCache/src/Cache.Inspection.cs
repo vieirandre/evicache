@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace EviCache;
 
-public sealed partial class Cache<TKey, TValue> : ICacheInspection<TKey, TValue>  where TKey : notnull
+public sealed partial class Cache<TKey, TValue> : ICacheInspection<TKey, TValue> where TKey : notnull
 {
     public ImmutableList<TKey> GetKeys()
     {
@@ -17,10 +17,15 @@ public sealed partial class Cache<TKey, TValue> : ICacheInspection<TKey, TValue>
     {
         lock (_syncLock)
         {
-            return _cacheHandler.GetKeys()
-                .Where(key => TryGetItem(key, out _))
-                .Select(key => new KeyValuePair<TKey, TValue>(key, _cacheMap[key].Value))
-                .ToImmutableList();
+            var builder = ImmutableList.CreateBuilder<KeyValuePair<TKey, TValue>>();
+
+            foreach (var (key, cacheItem) in _cacheMap)
+            {
+                if (IsExpired(key, cacheItem)) continue;
+                builder.Add(new(key, cacheItem.Value));
+            }
+
+            return builder.ToImmutable();
         }
     }
 }
