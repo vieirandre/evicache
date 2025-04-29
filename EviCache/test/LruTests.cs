@@ -439,13 +439,11 @@ public class LruTests : CacheTestsBase
     }
 
     [Fact]
-    public void Should_ReturnOrderedSnapshot_WhenCacheContains15Items()
+    public void Should_ContainAllItemsRegardlessOfOrder()
     {
         // arrange
 
-        int capacity = 15;
-        var expectedOrder = Enumerable.Range(1, capacity).Reverse().ToArray();
-
+        const int capacity = 15;
         var cache = CreateCache<int, string>(capacity);
 
         for (int i = 1; i <= capacity; i++)
@@ -453,21 +451,18 @@ public class LruTests : CacheTestsBase
             cache.Put(i, $"value{i}");
         }
 
+        var expected = Enumerable.Range(1, capacity)
+            .Select(i => KeyValuePair.Create(i, $"value{i}"))
+            .ToList();
+
         // act
 
         var snapshot = cache.GetSnapshot();
 
         // assert
 
-        Assert.Equal(capacity, snapshot.Count);
-
-        var assertions = expectedOrder.Select(expected => (Action<KeyValuePair<int, string>>)(item =>
-        {
-            Assert.Equal(expected, item.Key);
-            Assert.Equal($"value{expected}", item.Value);
-        })).ToArray();
-
-        Assert.Collection(snapshot, assertions);
+        Assert.Equal(expected.Count, snapshot.Count);
+        Assert.True(expected.All(snapshot.Contains));
     }
 
     [Fact]

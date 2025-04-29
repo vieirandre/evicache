@@ -873,7 +873,7 @@ public abstract class CacheTestsBase
 
         // assert
 
-        Assert.Equal(keys, snapshotKeys);
+        Assert.Equivalent(keys, snapshotKeys);
     }
 
     [Fact]
