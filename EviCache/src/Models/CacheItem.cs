@@ -34,7 +34,9 @@ internal sealed class CacheItem<TValue> : IDisposable
             d.Dispose();
 
         Value = newValue;
+
         Metadata.RegisterUpdate();
+        Metadata.RegisterAccess();
     }
 
     internal void UpdateItem(TValue newValue, CacheItemOptions options)
@@ -44,7 +46,9 @@ internal sealed class CacheItem<TValue> : IDisposable
 
         Value = newValue;
         SetExpiration(options.Expiration);
+
         Metadata.RegisterUpdate();
+        Metadata.RegisterAccess();
     }
 
     private void SetExpiration(ExpirationOptions? expiration)
