@@ -1124,7 +1124,7 @@ public abstract class CacheTestsBase
     }
 
     [Fact]
-    public void Should_UpdateLastUpdatedAt_WithoutChangingAccessCount_OnAddOrUpdate()
+    public void Should_UpdateLastUpdatedAt_AndChangeAccessCount_OnAddOrUpdate()
     {
         // arrange
 
@@ -1143,8 +1143,8 @@ public abstract class CacheTestsBase
         // assert
 
         Assert.True(metaAfter.LastUpdatedAt >= initialUpdate);
-        Assert.Equal(initialAccess, metaAfter.LastAccessedAt);
-        Assert.Equal(initialAccessCount, metaAfter.AccessCount);
+        Assert.NotEqual(initialAccess, metaAfter.LastAccessedAt);
+        Assert.NotEqual(initialAccessCount, metaAfter.AccessCount);
     }
 
     [Fact]
