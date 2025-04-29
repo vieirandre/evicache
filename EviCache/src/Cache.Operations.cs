@@ -340,6 +340,10 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
                 continue;
             }
 
+            // purged but not counted as eviction
+            if (IsExpired(candidate, item))
+                continue;
+
             RemoveItem(candidate, item);
 
             Interlocked.Increment(ref _evictions);
