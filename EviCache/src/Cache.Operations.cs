@@ -340,8 +340,6 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
         if (_logger.IsEnabled(LogLevel.Debug))
             _logger.LogDebug("Evicted key from cache: {Key} | Total evictions: {Evictions}", candidate, _evictions);
 
-        DisposeItem(item);
-
         return true;
     }
 }
