@@ -29,8 +29,14 @@ public class CacheItemMetadata
     public long AccessCount => Interlocked.Read(ref _accessCount);
     private long _accessCount;
 
+    /// <summary>
+    /// Gets the date and time when the cache item expires, if absolute expiration is set; otherwise, null.
+    /// </summary>
     public DateTimeOffset? ExpiresAt { get; internal set; }
 
+    /// <summary>
+    /// Gets a value indicating whether the cache item has expired based on its expiration settings.
+    /// </summary>
     public bool IsExpired
     {
         get
@@ -44,6 +50,9 @@ public class CacheItemMetadata
         }
     }
 
+    /// <summary>
+    /// Gets the expiration settings for the cache item, if configured; otherwise, null.
+    /// </summary>
     public ExpirationOptions? Expiration { get; internal set; }
 
     internal CacheItemMetadata()

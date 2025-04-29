@@ -3,7 +3,7 @@
 namespace EviCache.Abstractions;
 
 /// <summary>
-/// Provides methods for accessing cache item metadata.
+/// Provides access to cache item metadata.
 /// </summary>
 /// <typeparam name="TKey">The type of keys in the cache.</typeparam>
 public interface ICacheMetadata<TKey> where TKey : notnull

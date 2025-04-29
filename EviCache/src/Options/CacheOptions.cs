@@ -23,6 +23,9 @@ public record CacheOptions
     /// </remarks>
     public EvictionPolicy EvictionPolicy { get; init; } = EvictionPolicy.LRU;
 
+    /// <summary>
+    /// Gets the default expiration options applied to cache items when no item-specific expiration is provided.
+    /// </summary>
     public ExpirationOptions? DefaultExpiration { get; init; }
 
     /// <summary>

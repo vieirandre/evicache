@@ -121,8 +121,6 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperations<TKey, TValue>
 
     public void Put(TKey key, TValue value, CacheItemOptions options)
     {
-        //var expiration = options?.Expiration ?? _defaultExpiration;
-
         lock (_syncLock)
         {
             if (TryGetItem(key, out _))

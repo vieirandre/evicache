@@ -33,7 +33,7 @@ It supports multiple eviction policies and offers extended cache operations. Mor
 * `ICacheOperationsAsync<TKey, TValue>`: Provides asynchronous versions of cache operations (`GetAsync`, `PutAsync`, etc.).
 * `ICacheMetrics`: Access performance and usage metrics.
 * `ICacheInspection<TKey, TValue>`: Inspect cache contents (keys and snapshots).
-* `ICacheItemMetadata<TKey>`: Provides methods for accessing cache item metadata.
+* `ICacheItemMetadata<TKey>`: Provides access to cache item metadata.
 
 **Exceptions**
 
