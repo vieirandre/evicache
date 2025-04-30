@@ -19,7 +19,6 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
     private readonly EvictionPolicy _evictionPolicy;
     private readonly ExpirationOptions? _defaultExpiration;
 
-    private readonly object _syncLock = new();
     private readonly ILogger _logger;
 
     private readonly CacheHandlerBase<TKey> _cacheHandler;
@@ -59,6 +58,6 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
             : "not set");
     }
 
-    /// <inheritdoc cref="Cache{TKey,TValue}.Cache(CacheOptions, ILogger)" />
+    /// <inheritdoc cref="Cache{TKey, TValue}.Cache(CacheOptions, ILogger)" />
     public Cache(CacheOptions options) : this(options, NullLogger<Cache<TKey, TValue>>.Instance) { }
 }

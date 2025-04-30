@@ -11,15 +11,7 @@ public sealed partial class Cache<TKey, TValue> : ICacheMetrics where TKey : not
     public int Capacity => _capacity;
 
     public int Count
-    {
-        get
-        {
-            lock (_syncLock)
-            {
-                return _cacheMap.Count;
-            }
-        }
-    }
+        => WithLock(() => _cacheMap.Count);
 
     public long Hits => Interlocked.Read(ref _hits);
     public long Misses => Interlocked.Read(ref _misses);

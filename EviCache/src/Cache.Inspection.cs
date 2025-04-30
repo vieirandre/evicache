@@ -5,17 +5,12 @@ namespace EviCache;
 
 public sealed partial class Cache<TKey, TValue> : ICacheInspection<TKey, TValue> where TKey : notnull
 {
-    public ImmutableList<TKey> GetKeys()
-    {
-        lock (_syncLock)
-        {
-            return _cacheHandler.GetKeys();
-        }
-    }
+    public ImmutableList<TKey> GetKeys() =>
+        WithLock(_cacheHandler.GetKeys);
 
     public ImmutableList<KeyValuePair<TKey, TValue>> GetSnapshot()
     {
-        lock (_syncLock)
+        return WithLock(() =>
         {
             var builder = ImmutableList.CreateBuilder<KeyValuePair<TKey, TValue>>();
 
@@ -26,6 +21,6 @@ public sealed partial class Cache<TKey, TValue> : ICacheInspection<TKey, TValue>
             }
 
             return builder.ToImmutable();
-        }
+        });
     }
 }

@@ -5,61 +5,40 @@ namespace EviCache;
 
 public sealed partial class Cache<TKey, TValue> : ICacheOperationsAsync<TKey, TValue> where TKey : notnull
 {
-    public Task<TValue> GetAsync(TKey key)
-    {
-        return Task.FromResult(Get(key));
-    }
+    public Task<TValue> GetAsync(TKey key, CancellationToken ct = default)
+        => WithLockAsync(() => GetCore(key), ct);
 
-    public Task<(bool Found, TValue Value)> TryGetAsync(TKey key)
-    {
-        bool found = TryGet(key, out TValue value);
-        return Task.FromResult((found, value));
-    }
+    public Task<(bool Found, TValue Value)> TryGetAsync(TKey key, CancellationToken ct = default)
+        => WithLockAsync(() =>
+        {
+            bool found = TryGetCore(key, out var value);
+            return (found, value);
+        }, ct);
 
-    public Task<bool> ContainsKeyAsync(TKey key)
-    {
-        return Task.FromResult(ContainsKey(key));
-    }
+    public Task<bool> ContainsKeyAsync(TKey key, CancellationToken ct = default)
+        => WithLockAsync(() => ContainsKeyCore(key), ct);
 
-    public Task PutAsync(TKey key, TValue value)
-    {
-        Put(key, value);
-        return Task.CompletedTask;
-    }
+    public Task PutAsync(TKey key, TValue value, CancellationToken ct = default)
+        => WithLockAsync(() => PutCore(key, value), ct);
 
-    public Task PutAsync(TKey key, TValue value, CacheItemOptions options)
-    {
-        Put(key, value, options);
-        return Task.CompletedTask;
-    }
+    public Task PutAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default)
+        => WithLockAsync(() => PutCore(key, value, options), ct);
 
-    public Task<TValue> GetOrAddAsync(TKey key, TValue value)
-    {
-        return Task.FromResult(GetOrAdd(key, value));
-    }
+    public Task<TValue> GetOrAddAsync(TKey key, TValue value, CancellationToken ct = default)
+        => WithLockAsync(() => GetOrAddCore(key, value), ct);
 
-    public Task<TValue> GetOrAddAsync(TKey key, TValue value, CacheItemOptions options)
-    {
-        return Task.FromResult(GetOrAdd(key, value, options));
-    }
+    public Task<TValue> GetOrAddAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default)
+        => WithLockAsync(() => GetOrAddCore(key, value, options), ct);
 
-    public Task<TValue> AddOrUpdateAsync(TKey key, TValue value)
-    {
-        return Task.FromResult(AddOrUpdate(key, value));
-    }
+    public Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CancellationToken ct = default)
+        => WithLockAsync(() => AddOrUpdateCore(key, value), ct);
 
-    public Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CacheItemOptions options)
-    {
-        return Task.FromResult(AddOrUpdate(key, value, options));
-    }
+    public Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default)
+        => WithLockAsync(() => AddOrUpdateCore(key, value, options), ct);
 
-    public async Task<bool> RemoveAsync(TKey key)
-    {
-        return await Task.Run(() => Remove(key));
-    }
+    public Task<bool> RemoveAsync(TKey key, CancellationToken ct = default)
+        => WithLockAsync(() => RemoveCore(key), ct);
 
-    public async Task ClearAsync()
-    {
-        await Task.Run(Clear);
-    }
+    public Task ClearAsync(CancellationToken ct = default)
+        => WithLockAsync(Clear, ct);
 }
