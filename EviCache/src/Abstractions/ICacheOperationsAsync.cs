@@ -16,14 +16,14 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <param name="key">The key whose value to retrieve.</param>
     /// <returns>A task representing the asynchronous operation, containing the value associated with the key.</returns>
     /// <exception cref="KeyNotFoundException">Thrown if the key is not found in the cache.</exception>
-    Task<TValue> GetAsync(TKey key, CancellationToken ct);
+    Task<TValue> GetAsync(TKey key, CancellationToken ct = default);
 
     /// <summary>
     /// Asynchronously attempts to retrieve the value associated with the specified key.
     /// </summary>
     /// <param name="key">The key to locate.</param>
     /// <returns>A task representing the asynchronous operation, with a tuple indicating whether the key was found and its associated value.</returns>
-    Task<(bool Found, TValue Value)> TryGetAsync(TKey key, CancellationToken ct);
+    Task<(bool Found, TValue Value)> TryGetAsync(TKey key, CancellationToken ct = default);
 
     /// <summary>
     /// Asynchronously determines whether the cache contains the specified key.
@@ -33,7 +33,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <remarks>
     /// Unlike other retrieval methods, this one does not trigger cache hit or miss counters.
     /// </remarks>
-    Task<bool> ContainsKeyAsync(TKey key, CancellationToken ct);
+    Task<bool> ContainsKeyAsync(TKey key, CancellationToken ct = default);
 
     /// <summary>
     /// Asynchronously inserts an item into the cache or updates it if the key already exists.
@@ -46,10 +46,10 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <remarks>
     /// Unlike other insertion methods, this one does not trigger cache hit or miss counters.
     /// </remarks>
-    Task PutAsync(TKey key, TValue value, CancellationToken ct);
+    Task PutAsync(TKey key, TValue value, CancellationToken ct = default);
 
     /// <inheritdoc cref="ICacheOperationsAsync{TKey, TValue}.PutAsync(TKey, TValue)" />
-    Task PutAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct);
+    Task PutAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default);
 
     /// <summary>
     /// Asynchronously retrieves the value associated with the specified key, or adds the value if the key is not present.
@@ -59,10 +59,10 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <param name="options">Settings for the cache item.</param>
     /// <returns>A task representing the asynchronous operation, containing the existing or newly added value.</returns>
     /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
-    Task<TValue> GetOrAddAsync(TKey key, TValue value, CancellationToken ct);
+    Task<TValue> GetOrAddAsync(TKey key, TValue value, CancellationToken ct = default);
 
     /// <inheritdoc cref="ICacheOperationsAsync{TKey, TValue}.GetOrAddAsync(TKey, TValue)" />
-    Task<TValue> GetOrAddAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct);
+    Task<TValue> GetOrAddAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default);
 
     /// <summary>
     /// Asynchronously adds a new item or updates the value of an existing item.
@@ -72,21 +72,21 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <param name="options">Settings for the cache item.</param>
     /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     /// <returns>A task representing the asynchronous operation, containing the new value.</returns>
-    Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CancellationToken ct);
+    Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CancellationToken ct = default);
 
     /// <inheritdoc cref="ICacheOperationsAsync{TKey, TValue}.AddOrUpdateAsync(TKey, TValue)" />
-    Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct);
+    Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default);
 
     /// <summary>
     /// Asynchronously removes the item with the specified key from the cache.
     /// </summary>
     /// <param name="key">The key of the item to remove.</param>
     /// <returns>A task representing the asynchronous operation, containing a boolean that indicates whether the removal was successful.</returns>
-    Task<bool> RemoveAsync(TKey key, CancellationToken ct);
+    Task<bool> RemoveAsync(TKey key, CancellationToken ct = default);
 
     /// <summary>
     /// Asynchronously clears all items from the cache.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task ClearAsync(CancellationToken ct);
+    Task ClearAsync(CancellationToken ct = default);
 }
