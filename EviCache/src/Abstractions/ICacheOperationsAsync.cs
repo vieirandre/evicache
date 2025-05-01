@@ -14,6 +14,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// Asynchronously retrieves the value associated with the specified key.
     /// </summary>
     /// <param name="key">The key whose value to retrieve.</param>
+    /// <param name="ct">The cancellation token to observe while waiting for the operation.</param>
     /// <returns>A task representing the asynchronous operation, containing the value associated with the key.</returns>
     /// <exception cref="KeyNotFoundException">Thrown if the key is not found in the cache.</exception>
     Task<TValue> GetAsync(TKey key, CancellationToken ct = default);
@@ -22,6 +23,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// Asynchronously attempts to retrieve the value associated with the specified key.
     /// </summary>
     /// <param name="key">The key to locate.</param>
+    /// <param name="ct">The cancellation token to observe while waiting for the operation.</param>
     /// <returns>A task representing the asynchronous operation, with a tuple indicating whether the key was found and its associated value.</returns>
     Task<(bool Found, TValue Value)> TryGetAsync(TKey key, CancellationToken ct = default);
 
@@ -29,6 +31,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// Asynchronously determines whether the cache contains the specified key.
     /// </summary>
     /// <param name="key">The key to check for existence.</param>
+    /// <param name="ct">The cancellation token to observe while waiting for the operation.</param>
     /// <returns>A task representing the asynchronous operation, containing a boolean that indicates whether the key exists.</returns>
     /// <remarks>
     /// Unlike other retrieval methods, this one does not trigger cache hit or miss counters.
@@ -41,6 +44,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <param name="key">The key of the item to add or update.</param>
     /// <param name="value">The value to associate with the key.</param>
     /// <param name="options">Settings for the cache item.</param>
+    /// <param name="ct">The cancellation token to observe while waiting for the operation.</param>
     /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     /// <returns>A task representing the asynchronous operation.</returns>
     /// <remarks>
@@ -57,6 +61,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <param name="key">The key to look up or add.</param>
     /// <param name="value">The value to add if the key is not found.</param>
     /// <param name="options">Settings for the cache item.</param>
+    /// <param name="ct">The cancellation token to observe while waiting for the operation.</param>
     /// <returns>A task representing the asynchronous operation, containing the existing or newly added value.</returns>
     /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     Task<TValue> GetOrAddAsync(TKey key, TValue value, CancellationToken ct = default);
@@ -70,6 +75,7 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// <param name="key">The key to add or update.</param>
     /// <param name="value">The new value to associate with the key.</param>
     /// <param name="options">Settings for the cache item.</param>
+    /// <param name="ct">The cancellation token to observe while waiting for the operation.</param>
     /// <exception cref="CacheFullException">Thrown if the cache is full and unable to add the new item.</exception>
     /// <returns>A task representing the asynchronous operation, containing the new value.</returns>
     Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CancellationToken ct = default);
@@ -81,12 +87,14 @@ public interface ICacheOperationsAsync<TKey, TValue> where TKey : notnull
     /// Asynchronously removes the item with the specified key from the cache.
     /// </summary>
     /// <param name="key">The key of the item to remove.</param>
+    /// <param name="ct">The cancellation token to observe while waiting for the operation.</param>
     /// <returns>A task representing the asynchronous operation, containing a boolean that indicates whether the removal was successful.</returns>
     Task<bool> RemoveAsync(TKey key, CancellationToken ct = default);
 
     /// <summary>
     /// Asynchronously clears all items from the cache.
     /// </summary>
+    /// <param name="ct">The cancellation token to observe while waiting for and processing the operation.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task ClearAsync(CancellationToken ct = default);
 }
