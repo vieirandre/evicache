@@ -23,14 +23,9 @@ public sealed partial class Cache<TKey, TValue> : IDisposable where TKey : notnu
 
     private static async Task DisposeValueAsync(object value)
     {
-        switch (value)
-        {
-            case IAsyncDisposable ad:
-                await ad.DisposeAsync().ConfigureAwait(false);
-                break;
-            case IDisposable d:
-                d.Dispose();
-                break;
-        }
+        if (value is IAsyncDisposable ad)
+            await ad.DisposeAsync().ConfigureAwait(false);
+        else if (value is IDisposable d)
+            d.Dispose();
     }
 }
