@@ -40,5 +40,5 @@ public sealed partial class Cache<TKey, TValue> : ICacheOperationsAsync<TKey, TV
         => WithLockAsync(() => RemoveCore(key), ct);
 
     public Task ClearAsync(CancellationToken ct = default)
-        => WithLockAsync(ClearCore, ct);
+        => WithLockAsync(() => ClearCore(ct), ct);
 }

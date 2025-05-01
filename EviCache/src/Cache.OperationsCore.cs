@@ -157,14 +157,13 @@ public sealed partial class Cache<TKey, TValue> where TKey : notnull
         return true;
     }
 
-    private void ClearCore()
+    private void ClearCore(CancellationToken ct = default)
     {
-        int removedCount;
-        List<object> disposables;
+        ct.ThrowIfCancellationRequested();
 
-        removedCount = _cacheMap.Count;
+        int removedCount = _cacheMap.Count;
 
-        disposables = _cacheMap.Values
+        List<object> disposables = _cacheMap.Values
             .Select(ci => ci.Value)
             .Where(v => v is not null && (v is IDisposable or IAsyncDisposable))
             .Cast<object>()
@@ -177,6 +176,9 @@ public sealed partial class Cache<TKey, TValue> where TKey : notnull
         {
             foreach (var disposable in disposables)
             {
+                if (ct.IsCancellationRequested)
+                    break;
+
                 try
                 {
                     await DisposeValueAsync(disposable);
@@ -186,7 +188,7 @@ public sealed partial class Cache<TKey, TValue> where TKey : notnull
                     _logger.LogError(ex, "Error while disposing cache item in the background");
                 }
             }
-        });
+        }, ct);
 
         _logger.LogInformation("Cache cleared. Removed {Count} items", removedCount);
     }
