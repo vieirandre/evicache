@@ -4,7 +4,7 @@ namespace EviCache.Tests.Helpers;
 
 public static class CacheExtensions
 {
-    public static void OverrideEvictionCandidateCollection<TKey, TValue>(this Cache<TKey, TValue> cache, string evictionCandidateCollectionFieldName, object fakeEvictionCandidateCollection) where TKey : notnull
+    public static Task OverrideEvictionCandidateCollection<TKey, TValue>(this Cache<TKey, TValue> cache, string evictionCandidateCollectionFieldName, object fakeEvictionCandidateCollection) where TKey : notnull
     {
         var selectorField = typeof(Cache<TKey, TValue>).GetField("_evictionCandidateSelector", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(selectorField);
@@ -16,5 +16,7 @@ public static class CacheExtensions
         Assert.NotNull(handlerCollectionField);
 
         handlerCollectionField.SetValue(evictionHandler, fakeEvictionCandidateCollection);
+
+        return Task.CompletedTask;
     }
 }
