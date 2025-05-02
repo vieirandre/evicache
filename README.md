@@ -2,6 +2,7 @@
 
 [![nuget](https://img.shields.io/nuget/v/evicache.svg)](https://www.nuget.org/packages/EviCache/)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/44d364a2788647de8886f9a99628496e)](https://app.codacy.com/gh/vieirandre/evicache/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/44d364a2788647de8886f9a99628496e)](https://app.codacy.com/gh/vieirandre/evicache/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 
 `EviCache` is a lightweight, thread-safe, in-memory caching library for .NET.
 
