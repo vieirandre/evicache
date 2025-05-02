@@ -27,13 +27,13 @@ jobs:
             --no-build \
             --collect:"XPlat Code Coverage" \
             /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput=./TestResults/Coverage/
+            /p:CoverletOutput=${{ github.workspace }}/TestResults/Coverage/coverage.cobertura.xml
 
       - name: Upload coverage to Codacy
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         run: |
           bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
-            -r ./TestResults/Coverage/coverage.cobertura.xml \
+            -r ${{ github.workspace }}/TestResults/Coverage/coverage.cobertura.xml \
             --language CSharp
         if: success() && env.CODACY_PROJECT_TOKEN != ''
