@@ -22,18 +22,19 @@ jobs:
 
       - name: Test and Collect Coverage
         run: |
+          mkdir -p TestResults/Coverage
           dotnet test EviCache.sln \
             --configuration Release \
             --no-build \
-            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
             /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput=${{ github.workspace }}/TestResults/Coverage/coverage.cobertura.xml
+            /p:CoverletOutput=TestResults/Coverage/
 
       - name: Upload coverage to Codacy
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         run: |
           bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
-            -r ${{ github.workspace }}/TestResults/Coverage/coverage.cobertura.xml \
+            -r TestResults/Coverage/*.cobertura.xml \
             --language CSharp
         if: success() && env.CODACY_PROJECT_TOKEN != ''
