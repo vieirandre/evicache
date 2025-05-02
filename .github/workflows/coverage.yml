@@ -1,0 +1,39 @@
+name: Build, Test and Upload Coverage
+
+on: [push, pull_request]
+
+jobs:
+  build-test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore EviCache.sln
+
+      - name: Build
+        run: dotnet build EviCache.sln --configuration Release --no-restore
+
+      - name: Test and Collect Coverage
+        run: |
+          dotnet test EviCache.sln \
+            --configuration Release \
+            --no-build \
+            --collect:"XPlat Code Coverage" \
+            /p:CoverletOutputFormat=cobertura \
+            /p:CoverletOutput=./TestResults/Coverage/
+
+      - name: Upload coverage to Codacy
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: |
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
+            -r ./TestResults/Coverage/coverage.cobertura.xml \
+            --language CSharp
+        if: success() && env.CODACY_PROJECT_TOKEN != ''
