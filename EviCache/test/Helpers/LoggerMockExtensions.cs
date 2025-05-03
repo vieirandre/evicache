@@ -19,7 +19,7 @@ public static partial class LoggerMockExtensions
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, _) =>
                     Regex.IsMatch(v.ToString(), escapedMessage, RegexOptions.None)),
-                null,
+                It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             times);
     }
