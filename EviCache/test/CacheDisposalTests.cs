@@ -1,4 +1,7 @@
-﻿using EviCache.Tests.Helpers.Disposal;
+﻿using EviCache.Tests.Helpers;
+using EviCache.Tests.Helpers.Disposal;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace EviCache.Tests;
 
@@ -9,7 +12,7 @@ public abstract partial class CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, SyncDisposable>(3);
+        var cache = CreateCache<int, SyncDisposable>(3, _loggerMock.Object);
 
         var item1 = new SyncDisposable();
         var item2 = new SyncDisposable();
@@ -28,6 +31,8 @@ public abstract partial class CacheTestsBase
         await Task.WhenAll(item1.DisposalTask, item2.DisposalTask);
         Assert.True(item1.IsDisposed);
         Assert.True(item2.IsDisposed);
+
+        _loggerMock.VerifyLog(LogLevel.Error, "Error while disposing cache item in the background", Times.Never());
     }
 
     [Fact]
@@ -35,7 +40,7 @@ public abstract partial class CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, AsyncDisposable>(3);
+        var cache = CreateCache<int, AsyncDisposable>(3, _loggerMock.Object);
 
         var item1 = new AsyncDisposable();
         var item2 = new AsyncDisposable();
@@ -54,6 +59,8 @@ public abstract partial class CacheTestsBase
         await Task.WhenAll(item1.DisposalTask, item2.DisposalTask);
         Assert.True(item1.IsAsyncDisposed);
         Assert.True(item2.IsAsyncDisposed);
+
+        _loggerMock.VerifyLog(LogLevel.Error, "Error while disposing cache item in the background", Times.Never());
     }
 
     [Fact]
@@ -61,7 +68,7 @@ public abstract partial class CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, SyncDisposable>(3);
+        var cache = CreateCache<int, SyncDisposable>(3, _loggerMock.Object);
 
         var item = new SyncDisposable();
         cache.Put(1, item);
@@ -74,6 +81,7 @@ public abstract partial class CacheTestsBase
 
         Assert.True(removed);
         Assert.True(item.IsDisposed);
+        _loggerMock.VerifyLog(LogLevel.Error, "Error while disposing cache item in the background", Times.Never());
     }
 
     [Fact]
@@ -81,7 +89,7 @@ public abstract partial class CacheTestsBase
     {
         // arrange
 
-        var cache = CreateCache<int, AsyncDisposable>(3);
+        var cache = CreateCache<int, AsyncDisposable>(3, _loggerMock.Object);
 
         var item = new AsyncDisposable();
         cache.Put(1, item);
@@ -94,6 +102,7 @@ public abstract partial class CacheTestsBase
 
         Assert.True(removed);
         Assert.True(item.IsAsyncDisposed);
+        _loggerMock.VerifyLog(LogLevel.Error, "Error while disposing cache item in the background", Times.Never());
     }
 
     [Fact]
@@ -104,7 +113,7 @@ public abstract partial class CacheTestsBase
         var item1 = new SyncDisposable();
         var item2 = new AsyncDisposable();
 
-        using (var cache = CreateCache<int, object>(3))
+        using (var cache = CreateCache<int, object>(3, _loggerMock.Object))
         {
             cache.Put(1, item1);
             cache.Put(2, item2);
@@ -117,5 +126,7 @@ public abstract partial class CacheTestsBase
         await Task.WhenAll(item1.DisposalTask, item2.DisposalTask);
         Assert.True(item1.IsDisposed);
         Assert.True(item2.IsAsyncDisposed);
+
+        _loggerMock.VerifyLog(LogLevel.Error, "Error while disposing cache item in the background", Times.Never());
     }
 }
