@@ -95,4 +95,27 @@ public abstract partial class CacheTestsBase
         Assert.True(removed);
         Assert.True(item.IsAsyncDisposed);
     }
+
+    [Fact]
+    public async Task Should_DisposeItems_WhenCacheIsDisposed()
+    {
+        // arrange
+
+        var item1 = new SyncDisposable();
+        var item2 = new AsyncDisposable();
+
+        using (var cache = CreateCache<int, object>(3))
+        {
+            cache.Put(1, item1);
+            cache.Put(2, item2);
+
+            // act: dispose called when exiting using block
+        }
+
+        // assert
+
+        await Task.WhenAll(item1.DisposalTask, item2.DisposalTask);
+        Assert.True(item1.IsDisposed);
+        Assert.True(item2.IsAsyncDisposed);
+    }
 }
