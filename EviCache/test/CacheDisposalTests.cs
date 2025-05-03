@@ -55,4 +55,44 @@ public abstract partial class CacheTestsBase
         Assert.True(item1.IsAsyncDisposed);
         Assert.True(item2.IsAsyncDisposed);
     }
+
+    [Fact]
+    public void Should_DisposeSyncDisposableItem_WhenRemoveIsCalled()
+    {
+        // arrange
+
+        var cache = CreateCache<int, SyncDisposable>(3);
+
+        var item = new SyncDisposable();
+        cache.Put(1, item);
+
+        // act
+
+        bool removed = cache.Remove(1);
+
+        // assert
+
+        Assert.True(removed);
+        Assert.True(item.IsDisposed);
+    }
+
+    [Fact]
+    public void Should_DisposeAsyncDisposableItem_WhenRemoveIsCalled()
+    {
+        // arrange
+
+        var cache = CreateCache<int, AsyncDisposable>(3);
+
+        var item = new AsyncDisposable();
+        cache.Put(1, item);
+
+        // act
+
+        bool removed = cache.Remove(1);
+
+        // assert
+
+        Assert.True(removed);
+        Assert.True(item.IsAsyncDisposed);
+    }
 }
