@@ -2,13 +2,14 @@
 using EviCache.Exceptions;
 using EviCache.Options;
 using EviCache.Tests.Helpers;
+using EviCache.Tests.Helpers.Disposal;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Collections.Immutable;
 
 namespace EviCache.Tests;
 
-public abstract class CacheTestsBase
+public abstract partial class CacheTestsBase
 {
     protected abstract EvictionPolicy EvictionPolicy { get; }
     protected virtual bool SupportsEviction => true;
@@ -145,27 +146,6 @@ public abstract class CacheTestsBase
         Assert.False(cache.TryGet(2, out _));
         Assert.Equal("newValue", cache.Get(1));
         Assert.Equal("value3", cache.Get(3));
-    }
-
-    [Fact]
-    public void Should_NotDisposeItem_WhenTryGetIsCalled()
-    {
-        // arrange
-
-        var cache = CreateCache<int, DisposableDummy>(2);
-
-        var disposableItem = new DisposableDummy();
-        cache.Put(1, disposableItem);
-
-        // act
-
-        bool found = cache.TryGet(1, out var result);
-
-        // assert
-
-        Assert.True(found);
-        Assert.False(disposableItem.IsDisposed);
-        Assert.Equal(disposableItem, result);
     }
 
     [SkippableFact]
@@ -443,26 +423,6 @@ public abstract class CacheTestsBase
         // assert
 
         Assert.Equal("The key '3' was not found in the cache", exception.Message);
-    }
-
-    [Fact]
-    public void Should_NotDisposeItem_WhenGetIsCalled()
-    {
-        // arrange
-
-        var cache = CreateCache<int, DisposableDummy>(2);
-
-        var disposableItem = new DisposableDummy();
-        cache.Put(1, disposableItem);
-
-        // act
-
-        var result = cache.Get(1);
-
-        // assert
-
-        Assert.False(disposableItem.IsDisposed);
-        Assert.Equal(disposableItem, result);
     }
 
     [Fact]

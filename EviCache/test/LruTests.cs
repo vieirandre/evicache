@@ -1,6 +1,7 @@
 using EviCache.Enums;
 using EviCache.Exceptions;
 using EviCache.Tests.Helpers;
+using EviCache.Tests.Helpers.Disposal;
 using Microsoft.Extensions.Logging;
 using Moq;
 

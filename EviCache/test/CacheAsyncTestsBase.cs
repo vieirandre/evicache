@@ -2,6 +2,7 @@
 using EviCache.Exceptions;
 using EviCache.Options;
 using EviCache.Tests.Helpers;
+using EviCache.Tests.Helpers.Disposal;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Collections.Immutable;
