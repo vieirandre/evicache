@@ -129,4 +129,24 @@ public abstract partial class CacheTestsBase
 
         _loggerMock.VerifyLog(LogLevel.Error, "Error while disposing cache item in the background", Times.Never());
     }
+
+    [Fact]
+    public void Should_NotAttemptToDisposeNonDisposableItems_WhenClearIsCalled()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3, _loggerMock.Object);
+
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        cache.Clear();
+
+        // assert
+
+        Assert.Equal(0, cache.Count);
+        _loggerMock.VerifyLog(LogLevel.Error, "Error while disposing cache item in the background", Times.Never());
+    }
 }
