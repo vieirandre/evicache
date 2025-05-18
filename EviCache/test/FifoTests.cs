@@ -81,14 +81,14 @@ public class FifoTests : CacheTestsBase
     }
 
     [Fact]
-    public void Should_ThrowException_WhenEvictionFails_DueToNoCandidate()
+    public async Task Should_ThrowException_WhenEvictionFails_DueToNoCandidateAsync()
     {
         // arrange
 
         var cache = CreateCache<int, string>(1, _loggerMock.Object);
         cache.Put(1, "value1");
 
-        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), new LinkedList<int>());
+        await cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), new LinkedList<int>());
 
         // act & assert
 
@@ -99,7 +99,7 @@ public class FifoTests : CacheTestsBase
     }
 
     [Fact]
-    public void Should_ThrowException_WhenEvictionFails_DueToCandidateNotInCache()
+    public async Task Should_ThrowException_WhenEvictionFails_DueToCandidateNotInCacheAsync()
     {
         // arrange
 
@@ -110,7 +110,7 @@ public class FifoTests : CacheTestsBase
         var fakeCandidateList = new LinkedList<int>();
         fakeCandidateList.AddLast(fakeCandidate);
 
-        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), fakeCandidateList);
+        await cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), fakeCandidateList);
 
         // act & assert
 

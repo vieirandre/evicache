@@ -514,7 +514,7 @@ public class LruAsyncTests : CacheAsyncTestsBase
         var cache = CreateCache<int, string>(1, _loggerMock.Object);
         await cache.PutAsync(1, "value1");
 
-        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), new LinkedList<int>());
+        await cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), new LinkedList<int>());
 
         // act & assert
 
@@ -536,7 +536,7 @@ public class LruAsyncTests : CacheAsyncTestsBase
         var fakeCandidateList = new LinkedList<int>();
         fakeCandidateList.AddLast(fakeCandidate);
 
-        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), fakeCandidateList);
+        await cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), fakeCandidateList);
 
         // act & assert
 

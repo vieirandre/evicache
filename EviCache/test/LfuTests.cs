@@ -228,14 +228,14 @@ public class LfuTests : CacheTestsBase
     }
 
     [Fact]
-    public void Should_ThrowException_WhenEvictionFails_DueToNoCandidate()
+    public async Task Should_ThrowException_WhenEvictionFails_DueToNoCandidateAsync()
     {
         // arrange
 
         var cache = CreateCache<int, string>(1, _loggerMock.Object);
         cache.Put(1, "value1");
 
-        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), new SortedDictionary<int, LinkedList<int>>());
+        await cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), new SortedDictionary<int, LinkedList<int>>());
 
         // act & assert
 
@@ -246,7 +246,7 @@ public class LfuTests : CacheTestsBase
     }
 
     [Fact]
-    public void Should_ThrowException_WhenEvictionFails_DueToCandidateNotInCache()
+    public async Task Should_ThrowException_WhenEvictionFails_DueToCandidateNotInCacheAsync()
     {
         // arrange
 
@@ -259,7 +259,7 @@ public class LfuTests : CacheTestsBase
         fakeCandidateList.AddLast(fakeCandidate);
         fakeFrequencyBuckets.Add(1, fakeCandidateList);
 
-        cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), fakeFrequencyBuckets);
+        await cache.OverrideEvictionCandidateCollection(EvictionPolicy.GetEvictionCandidateCollectionFieldName(), fakeFrequencyBuckets);
 
         // act & assert
 
