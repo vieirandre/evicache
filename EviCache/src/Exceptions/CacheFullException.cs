@@ -5,7 +5,7 @@ namespace EviCache.Exceptions;
 /// <summary>
 /// The exception thrown when the cache is full and unable to add new items.
 /// </summary>
-public class CacheFullException : Exception
+public sealed class CacheFullException : Exception
 {
     /// <summary>
     /// Gets the capacity of the cache at the time the exception was thrown.
