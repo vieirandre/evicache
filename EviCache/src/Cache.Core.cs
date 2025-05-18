@@ -19,6 +19,7 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
     private readonly EvictionPolicy _evictionPolicy;
     private readonly ExpirationOptions? _defaultExpiration;
 
+    private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly ILogger _logger;
 
     private readonly CacheHandlerBase<TKey> _cacheHandler;

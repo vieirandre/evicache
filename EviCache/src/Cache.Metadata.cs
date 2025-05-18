@@ -1,11 +1,12 @@
 ﻿using EviCache.Abstractions;
+using EviCache.Extensions;
 using EviCache.Models;
 
 namespace EviCache;
 
 public sealed partial class Cache<TKey, TValue> : ICacheMetadata<TKey> where TKey : notnull
 {
-    public CacheItemMetadata GetMetadata(TKey key) => WithLock(() =>
+    public CacheItemMetadata GetMetadata(TKey key) => _gate.Execute(() =>
     {
         if (TryGetItem(key, out var item))
             return item.Metadata;
@@ -17,7 +18,7 @@ public sealed partial class Cache<TKey, TValue> : ICacheMetadata<TKey> where TKe
     {
         CacheItemMetadata? tmp = null;
 
-        bool found = WithLock(() =>
+        bool found = _gate.Execute(() =>
         {
             if (TryGetItem(key, out var item))
             {

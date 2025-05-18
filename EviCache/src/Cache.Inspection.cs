@@ -1,4 +1,5 @@
 ﻿using EviCache.Abstractions;
+using EviCache.Extensions;
 using System.Collections.Immutable;
 
 namespace EviCache;
@@ -6,11 +7,11 @@ namespace EviCache;
 public sealed partial class Cache<TKey, TValue> : ICacheInspection<TKey, TValue> where TKey : notnull
 {
     public ImmutableList<TKey> GetKeys() =>
-        WithLock(_cacheHandler.GetKeys);
+        _gate.Execute(_cacheHandler.GetKeys);
 
     public ImmutableList<KeyValuePair<TKey, TValue>> GetSnapshot()
     {
-        return WithLock(() =>
+        return _gate.Execute(() =>
         {
             var builder = ImmutableList.CreateBuilder<KeyValuePair<TKey, TValue>>();
 
