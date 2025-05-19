@@ -12,7 +12,13 @@ public sealed partial class Cache<TKey, TValue> : ICacheMetrics where TKey : not
     public int Capacity => _capacity;
 
     public int Count
-        => _gate.Execute(() => _cacheMap.Count);
+    {
+        get
+        {
+            using var _ = _gate.Lock();
+            return _cacheMap.Count;
+        }
+    }
 
     public long Hits => Interlocked.Read(ref _hits);
     public long Misses => Interlocked.Read(ref _misses);

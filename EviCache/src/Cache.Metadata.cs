@@ -6,30 +6,27 @@ namespace EviCache;
 
 public sealed partial class Cache<TKey, TValue> : ICacheMetadata<TKey> where TKey : notnull
 {
-    public CacheItemMetadata GetMetadata(TKey key) => _gate.Execute(() =>
+    public CacheItemMetadata GetMetadata(TKey key)
     {
+        using var _ = _gate.Lock();
+
         if (TryGetItem(key, out var item))
             return item.Metadata;
 
         throw new KeyNotFoundException($"The key '{key}' was not found in the cache");
-    });
+    }
 
     public bool TryGetMetadata(TKey key, out CacheItemMetadata? metadata)
     {
-        CacheItemMetadata? tmp = null;
+        using var _ = _gate.Lock();
 
-        bool found = _gate.Execute(() =>
+        if (TryGetItem(key, out var item))
         {
-            if (TryGetItem(key, out var item))
-            {
-                tmp = item.Metadata;
-                return true;
-            }
+            metadata = item.Metadata;
+            return true;
+        }
 
-            return false;
-        });
-
-        metadata = tmp;
-        return found;
+        metadata = null;
+        return false;
     }
 }

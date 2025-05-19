@@ -6,40 +6,70 @@ namespace EviCache;
 
 public sealed partial class Cache<TKey, TValue> : ICacheOperationsAsync<TKey, TValue> where TKey : notnull
 {
-    public Task<TValue> GetAsync(TKey key, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => GetCore(key), ct);
+    public async Task<TValue> GetAsync(TKey key, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        return GetCore(key);
+    }
 
-    public Task<(bool Found, TValue Value)> TryGetAsync(TKey key, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() =>
-        {
-            bool found = TryGetCore(key, out var value);
-            return (found, value);
-        }, ct);
+    public async Task<(bool Found, TValue Value)> TryGetAsync(TKey key, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        bool found = TryGetCore(key, out var value);
+        return (found, value);
+    }
 
-    public Task<bool> ContainsKeyAsync(TKey key, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => ContainsKeyCore(key), ct);
+    public async Task<bool> ContainsKeyAsync(TKey key, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        return ContainsKeyCore(key);
+    }
 
-    public Task PutAsync(TKey key, TValue value, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => PutCore(key, value), ct);
+    public async Task PutAsync(TKey key, TValue value, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        PutCore(key, value);
+    }
 
-    public Task PutAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => PutCore(key, value, options), ct);
+    public async Task PutAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        PutCore(key, value, options);
+    }
 
-    public Task<TValue> GetOrAddAsync(TKey key, TValue value, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => GetOrAddCore(key, value), ct);
+    public async Task<TValue> GetOrAddAsync(TKey key, TValue value, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        return GetOrAddCore(key, value);
+    }
 
-    public Task<TValue> GetOrAddAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => GetOrAddCore(key, value, options), ct);
+    public async Task<TValue> GetOrAddAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        return GetOrAddCore(key, value, options);
+    }
 
-    public Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => AddOrUpdateCore(key, value), ct);
+    public async Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        return AddOrUpdateCore(key, value);
+    }
 
-    public Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => AddOrUpdateCore(key, value, options), ct);
+    public async Task<TValue> AddOrUpdateAsync(TKey key, TValue value, CacheItemOptions options, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        return AddOrUpdateCore(key, value, options);
+    }
 
-    public Task<bool> RemoveAsync(TKey key, CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => RemoveCore(key), ct);
+    public async Task<bool> RemoveAsync(TKey key, CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        return RemoveCore(key);
+    }
 
-    public Task ClearAsync(CancellationToken ct = default)
-        => _gate.ExecuteAsync(() => ClearCore(ct), ct);
+    public async Task ClearAsync(CancellationToken ct = default)
+    {
+        await using var _ = await _gate.LockAsync(ct);
+        ClearCore(ct);
+    }
 }
