@@ -222,11 +222,7 @@ public sealed partial class Cache<TKey, TValue> where TKey : notnull
         if (isUpdate)
         {
             var item = _cacheMap[key];
-
-            if (defaultExpirationExists)
-                item.UpdateItem(value, new CacheItemOptions { Expiration = _defaultExpiration });
-            else
-                item.UpdateItem(value);
+            item.UpdateItem(value);
 
             _cacheHandler.RegisterUpdate(key);
         }
