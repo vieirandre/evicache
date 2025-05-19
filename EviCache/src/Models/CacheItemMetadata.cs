@@ -1,5 +1,4 @@
-﻿using EviCache.Enums;
-using EviCache.Options;
+﻿using EviCache.Options;
 
 namespace EviCache.Models;
 
@@ -32,12 +31,22 @@ public sealed class CacheItemMetadata
     /// <summary>
     /// Gets a value indicating whether the cache item has expired based on its expiration settings.
     /// </summary>
-    public bool IsExpired => Expiration?.Mode switch
+    public bool IsExpired
     {
-        ExpirationMode.Absolute when ExpiresAt is { } abs => DateTimeOffset.UtcNow >= abs,
-        ExpirationMode.Sliding when Expiration.TimeToLive is { } ttl => DateTimeOffset.UtcNow > LastAccessedAt + ttl,
-        _ => false
-    };
+        get
+        {
+            var now = DateTimeOffset.UtcNow;
+
+            return Expiration switch
+            {
+                ExpirationOptions.Absolute _
+                    => ExpiresAt is { } ts && now >= ts,
+                ExpirationOptions.Sliding s
+                    => now - LastAccessedAt > s.TimeToLive,
+                _ => false
+            };
+        }
+    }
 
     /// <summary>
     /// Gets the expiration settings for the cache item, if configured; otherwise, null.

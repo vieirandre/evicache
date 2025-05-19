@@ -49,14 +49,11 @@ public sealed partial class Cache<TKey, TValue> : ICache<TKey, TValue> where TKe
 
         _logger = logger;
 
-        _logger.LogInformation("Cache initialized with capacity {Capacity}, " +
-            "eviction policy {EvictionPolicy}, " +
-            "default expiration {DefaultExpiration}",
+        _logger.LogInformation(
+            "Cache initialized with capacity of {Capacity}, " +
+            "{EvictionPolicy} eviction policy",
             _capacity,
-            _evictionPolicy,
-            _defaultExpiration != null
-            ? $"TTL: {_defaultExpiration.TimeToLive}, Mode: {_defaultExpiration.Mode}"
-            : "not set");
+            _evictionPolicy);
     }
 
     /// <inheritdoc cref="Cache{TKey, TValue}.Cache(CacheOptions, ILogger)" />

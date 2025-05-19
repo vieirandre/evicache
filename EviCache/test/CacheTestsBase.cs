@@ -61,9 +61,8 @@ public abstract partial class CacheTestsBase
         // assert
 
         _loggerMock.VerifyLog(LogLevel.Information,
-            $"Cache initialized with capacity {capacity}, " +
-            $"eviction policy {EvictionPolicy}, " +
-            $"default expiration not set",
+            $"Cache initialized with capacity of {capacity}, " +
+            $"{EvictionPolicy} eviction policy",
             Times.Once());
     }
 

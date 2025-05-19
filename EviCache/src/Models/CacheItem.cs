@@ -1,5 +1,4 @@
-﻿using EviCache.Enums;
-using EviCache.Options;
+﻿using EviCache.Options;
 
 namespace EviCache.Models;
 
@@ -53,14 +52,12 @@ internal sealed class CacheItem<TValue> : IDisposable
 
     private void SetExpiration(ExpirationOptions? expiration)
     {
-        if (expiration is null)
-            return;
-
         Metadata.Expiration = expiration;
 
-        if (expiration.TimeToLive.HasValue && expiration.Mode == ExpirationMode.Absolute)
-            Metadata.ExpiresAt = DateTimeOffset.UtcNow.Add(expiration.TimeToLive.Value);
-        else
-            Metadata.ExpiresAt = null;
+        Metadata.ExpiresAt = expiration switch
+        {
+            ExpirationOptions.Absolute abs => DateTimeOffset.UtcNow + abs.TimeToLive,
+            _ => null
+        };
     }
 }
