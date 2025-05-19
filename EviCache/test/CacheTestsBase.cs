@@ -1053,9 +1053,8 @@ public abstract partial class CacheTestsBase
 
         // assert
 
-        Assert.InRange(meta.CreatedAt, beforePut, afterPut);
         Assert.InRange(meta.LastAccessedAt, beforePut, afterPut);
-        Assert.InRange(meta.LastUpdatedAt, beforePut, afterPut);
+        Assert.Null(meta.LastUpdatedAt);
         Assert.Equal(0, meta.AccessCount);
     }
 
@@ -1102,7 +1101,8 @@ public abstract partial class CacheTestsBase
 
         // assert
 
-        Assert.True(metaAfter.LastUpdatedAt >= initialUpdate);
+        Assert.Null(initialUpdate);
+        Assert.NotNull(metaAfter.LastUpdatedAt);
         Assert.NotEqual(initialAccess, metaAfter.LastAccessedAt);
         Assert.NotEqual(initialAccessCount, metaAfter.AccessCount);
     }
