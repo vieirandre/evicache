@@ -6,13 +6,8 @@ namespace EviCache.Models;
 /// <summary>
 /// Represents metadata for a cache item.
 /// </summary>
-public class CacheItemMetadata
+public sealed class CacheItemMetadata
 {
-    /// <summary>
-    /// Gets the time when the cache item was created.
-    /// </summary>
-    public DateTimeOffset CreatedAt { get; }
-
     /// <summary>
     /// Gets the time when the cache item was last accessed.
     /// </summary>
@@ -21,7 +16,7 @@ public class CacheItemMetadata
     /// <summary>
     /// Gets the time when the cache item was last updated.
     /// </summary>
-    public DateTimeOffset LastUpdatedAt { get; private set; }
+    public DateTimeOffset? LastUpdatedAt { get; private set; }
 
     /// <summary>
     /// Gets the number of times this item has been accessed.
@@ -37,18 +32,12 @@ public class CacheItemMetadata
     /// <summary>
     /// Gets a value indicating whether the cache item has expired based on its expiration settings.
     /// </summary>
-    public bool IsExpired
+    public bool IsExpired => Expiration?.Mode switch
     {
-        get
-        {
-            return Expiration?.Mode switch
-            {
-                ExpirationMode.Absolute when ExpiresAt.HasValue => DateTimeOffset.UtcNow >= ExpiresAt.Value,
-                ExpirationMode.Sliding when Expiration.TimeToLive.HasValue => DateTimeOffset.UtcNow > LastAccessedAt + Expiration.TimeToLive.Value,
-                _ => false
-            };
-        }
-    }
+        ExpirationMode.Absolute when ExpiresAt is { } abs => DateTimeOffset.UtcNow >= abs,
+        ExpirationMode.Sliding when Expiration.TimeToLive is { } ttl => DateTimeOffset.UtcNow > LastAccessedAt + ttl,
+        _ => false
+    };
 
     /// <summary>
     /// Gets the expiration settings for the cache item, if configured; otherwise, null.
@@ -57,10 +46,7 @@ public class CacheItemMetadata
 
     internal CacheItemMetadata()
     {
-        var now = DateTimeOffset.UtcNow;
-        CreatedAt = now;
-        LastAccessedAt = now;
-        LastUpdatedAt = now;
+        LastAccessedAt = DateTimeOffset.UtcNow;
         _accessCount = 0;
     }
 
