@@ -33,7 +33,6 @@ public record CacheOptions
     /// </summary>
     /// <param name="capacity">The maximum number of items that the cache can store.</param>
     /// <param name="evictionPolicy">The eviction policy to use when the cache reaches its capacity.</param>
-    /// <param name="timeToLive">The default Time To Live (TTL) for cache items.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="capacity"/> is less than or equal to zero.</exception>
     public CacheOptions(int capacity, EvictionPolicy evictionPolicy)
     {
