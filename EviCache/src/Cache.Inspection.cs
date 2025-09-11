@@ -9,7 +9,17 @@ public sealed partial class Cache<TKey, TValue> : ICacheInspection<TKey, TValue>
     public ImmutableList<TKey> GetKeys()
     {
         using var _ = _gate.Lock();
-        return _cacheHandler.GetKeys();
+        var keys = _cacheHandler.GetKeys();
+
+        var builder = ImmutableList.CreateBuilder<TKey>();
+
+        foreach (var key in keys)
+        {
+            if (_cacheMap.TryGetValue(key, out var item) && !IsExpired(key, item))
+                builder.Add(key);
+        }
+
+        return builder.ToImmutable();
     }
 
     public ImmutableList<KeyValuePair<TKey, TValue>> GetSnapshot()

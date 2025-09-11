@@ -1124,4 +1124,40 @@ public abstract partial class CacheTestsBase
     }
 
     #endregion
+
+    [Fact]
+    public void GetKeys_ShouldNotReturnExpiredKeys_WhenAbsoluteTtlHasElapsed()
+    {
+        // arrange
+
+        var cache = CreateCache<string, string>(2);
+
+        cache.Put("short", "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(100))
+        });
+
+        cache.Put("long", "v2", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromSeconds(5))
+        });
+
+        Thread.Sleep(200);
+
+        // act
+
+        var keys = cache.GetKeys();
+
+        // assert
+
+        Assert.DoesNotContain("short", keys);
+        Assert.Contains("long", keys);
+
+        var foundShort = cache.TryGet("short", out _);
+        Assert.False(foundShort);
+
+        var foundLong = cache.TryGet("long", out var longVal);
+        Assert.True(foundLong);
+        Assert.Equal("v2", longVal);
+    }
 }
