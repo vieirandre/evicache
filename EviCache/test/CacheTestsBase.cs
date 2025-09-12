@@ -1160,4 +1160,31 @@ public abstract partial class CacheTestsBase
         Assert.True(foundLong);
         Assert.Equal("v2", longVal);
     }
+
+    [Fact]
+    public void GetKeys_ShouldIncludeSlidingKey_WhenAccessedWithinWindow()
+    {
+        // arrange
+
+        var cache = CreateCache<string, string>(1);
+
+        cache.Put("sliding", "vs", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Sliding(TimeSpan.FromMilliseconds(200))
+        });
+
+        Thread.Sleep(120);
+        Assert.True(cache.TryGet("sliding", out _));
+
+        Thread.Sleep(120);
+        Assert.True(cache.TryGet("sliding", out _));
+
+        // act
+
+        var keys = cache.GetKeys();
+
+        // assert
+
+        Assert.Contains("sliding", keys);
+    }
 }
