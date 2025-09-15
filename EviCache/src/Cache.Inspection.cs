@@ -28,7 +28,7 @@ public sealed partial class Cache<TKey, TValue> : ICacheInspection<TKey, TValue>
 
         var builder = ImmutableList.CreateBuilder<KeyValuePair<TKey, TValue>>();
 
-        foreach (var (key, cacheItem) in _cacheMap)
+        foreach (var (key, cacheItem) in _cacheMap.ToArray())
         {
             if (IsExpired(key, cacheItem)) continue;
             builder.Add(new(key, cacheItem.Value));
