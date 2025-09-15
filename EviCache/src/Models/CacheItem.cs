@@ -34,6 +34,9 @@ internal sealed class CacheItem<TValue> : IDisposable
 
         Value = newValue;
 
+        if (Metadata.Expiration is ExpirationOptions.Absolute abs)
+            SetExpiration(abs);
+
         Metadata.RegisterUpdate();
         Metadata.RegisterAccess();
     }
