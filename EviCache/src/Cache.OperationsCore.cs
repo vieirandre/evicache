@@ -262,24 +262,33 @@ public sealed partial class Cache<TKey, TValue> where TKey : notnull
 
     private void EnsureCapacityForKey(TKey key)
     {
+        PurgeExpiredItems();
+
         if (_cacheMap.Count < _capacity)
             return;
 
         if (_evictionCandidateSelector is null)
             throw new CacheFullException(
                 $"Cache is full (capacity: {_capacity}) and uses {_evictionPolicy} policy",
-                _capacity,
-                key!.ToString(),
-                _evictionPolicy
+                _capacity, key!.ToString(), _evictionPolicy
             );
 
         if (!TryEvictItem())
+        {
+            if (_cacheMap.Count < _capacity)
+                return;
+
             throw new CacheFullException(
                 $"Cache is full (capacity: {_capacity}). Failed to evict any item while adding key: {key}",
-                _capacity,
-                key!.ToString(),
-                _evictionPolicy
+                _capacity, key!.ToString(), _evictionPolicy
             );
+        }
+    }
+
+    private void PurgeExpiredItems()
+    {
+        foreach (var (k, item) in _cacheMap.ToArray())
+            IsExpired(k, item);
     }
 
     private bool TryEvictItem()
