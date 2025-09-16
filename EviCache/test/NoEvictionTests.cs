@@ -1,5 +1,6 @@
 ﻿using EviCache.Enums;
 using EviCache.Exceptions;
+using EviCache.Options;
 using EviCache.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -200,5 +201,24 @@ public class NoEvictionTests : CacheTestsBase
         Assert.Equal("value3", value3);
 
         _loggerMock.VerifyLog(LogLevel.Information, "Cache cleared. Removed 2 items", Times.Once());
+    }
+
+    [Fact]
+    public void Should_AllowInsertAfterTTL()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(1, new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(50)));
+
+        // act
+
+        cache.Put(1, "value1");
+        Thread.Sleep(60);
+        cache.Put(2, "value2");
+
+        // assert
+
+        Assert.True(cache.ContainsKey(2));
+        Assert.False(cache.ContainsKey(1));
     }
 }

@@ -15,6 +15,8 @@ public abstract partial class CacheTestsBase
     protected virtual bool SupportsEviction => true;
     protected readonly Mock<ILogger> _loggerMock;
 
+    #region Cache creation
+
     protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity) where TKey : notnull
     {
         var options = new CacheOptions(capacity, EvictionPolicy);
@@ -26,6 +28,20 @@ public abstract partial class CacheTestsBase
         var options = new CacheOptions(capacity, EvictionPolicy);
         return new Cache<TKey, TValue>(options, logger);
     }
+
+    protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity, ExpirationOptions expirationOptions) where TKey : notnull
+    {
+        var options = new CacheOptions(capacity, EvictionPolicy, expirationOptions);
+        return new Cache<TKey, TValue>(options);
+    }
+
+    protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity, ExpirationOptions expirationOptions, ILogger logger) where TKey : notnull
+    {
+        var options = new CacheOptions(capacity, EvictionPolicy, expirationOptions);
+        return new Cache<TKey, TValue>(options, logger);
+    }
+
+    #endregion
 
     protected CacheTestsBase()
     {
