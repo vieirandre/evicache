@@ -1126,7 +1126,7 @@ public abstract partial class CacheTestsBase
     #endregion
 
     [Fact]
-    public void GetKeys_ShouldNotReturnExpiredKeys_WhenAbsoluteTtlHasElapsed()
+    public void Should_NotReturnExpiredKeys_WhenAbsoluteTtlHasElapsed_OnGetKeys()
     {
         // arrange
 
@@ -1162,7 +1162,7 @@ public abstract partial class CacheTestsBase
     }
 
     [Fact]
-    public void GetKeys_ShouldIncludeSlidingKey_WhenAccessedWithinWindow()
+    public void Should_IncludeSlidingKey_WhenAccessedWithinWindow_OnGetKeys()
     {
         // arrange
 
@@ -1174,9 +1174,15 @@ public abstract partial class CacheTestsBase
         });
 
         Thread.Sleep(120);
+
+        // assert
+
         Assert.True(cache.TryGet("sliding", out _));
 
         Thread.Sleep(120);
+
+        // assert
+
         Assert.True(cache.TryGet("sliding", out _));
 
         // act
@@ -1186,5 +1192,27 @@ public abstract partial class CacheTestsBase
         // assert
 
         Assert.Contains("sliding", keys);
+    }
+
+    [Fact]
+    public void Should_SkipExpiredEntries_AndDoNotThrow_OnGetSnapshot()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        cache.Put(1, "value1", new CacheItemOptions { Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(50)) });
+        cache.Put(2, "value2");
+
+        Thread.Sleep(60);
+
+        // act
+
+        var snapshot = cache.GetSnapshot();
+
+        // assert
+
+        Assert.DoesNotContain(snapshot, kv => kv.Key.Equals(1));
+        Assert.Contains(snapshot, kv => kv.Key.Equals(2));
     }
 }
