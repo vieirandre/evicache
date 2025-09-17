@@ -16,6 +16,8 @@ public sealed partial class Cache<TKey, TValue> : ICacheMetrics where TKey : not
         get
         {
             using var _ = _gate.Lock();
+            PurgeExpiredItems();
+
             return _cacheMap.Count;
         }
     }

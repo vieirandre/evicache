@@ -1231,4 +1231,36 @@ public abstract partial class CacheTestsBase
         Assert.DoesNotContain(snapshot, kv => kv.Key.Equals(1));
         Assert.Contains(snapshot, kv => kv.Key.Equals(2));
     }
+
+    [Fact]
+    public void Should_ReturnLiveCount_AfterPurgingExpiredEntries_OnCount()
+    {
+        // arrange
+
+        var cache = CreateCache<string, string>(2);
+
+        cache.Put("short", "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(60))
+        });
+
+        cache.Put("long", "v2", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromSeconds(5))
+        });
+
+        Thread.Sleep(90);
+
+        // act
+
+        int count = cache.Count;
+
+        // assert
+
+        Assert.Equal(1, count);
+
+        var keys = cache.GetKeys();
+        Assert.DoesNotContain("short", keys);
+        Assert.Contains("long", keys);
+    }
 }
