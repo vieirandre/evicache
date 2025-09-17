@@ -40,7 +40,7 @@ public sealed class CacheItemMetadata
             return Expiration switch
             {
                 ExpirationOptions.Absolute _
-                    => ExpiresAt is { } ts && now >= ts,
+                    => ExpiresAt is { } ts && now > ts,
                 ExpirationOptions.Sliding s
                     => now - LastAccessedAt > s.TimeToLive,
                 _ => false
