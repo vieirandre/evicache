@@ -1263,4 +1263,30 @@ public abstract partial class CacheTestsBase
         Assert.DoesNotContain("short", keys);
         Assert.Contains("long", keys);
     }
+
+    [Fact]
+    public void Should_NotRefreshSlidingTtl_OnContainsKey()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(1);
+        var ttl = TimeSpan.FromMilliseconds(100);
+
+        cache.Put(1, "value1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Sliding(ttl)
+        });
+
+        // act
+
+        Thread.Sleep(70);
+        Assert.True(cache.ContainsKey(1));
+
+        Thread.Sleep(50);
+
+        // assert
+
+        Assert.False(cache.TryGet(1, out _)); // item should have expired
+        Assert.DoesNotContain(1, cache.GetKeys());
+    }
 }
