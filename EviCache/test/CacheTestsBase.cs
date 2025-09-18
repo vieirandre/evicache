@@ -1311,4 +1311,179 @@ public abstract partial class CacheTestsBase
         Assert.DoesNotContain(1, cache.GetKeys());
         Assert.Equal(0, cache.Count);
     }
+
+    [Fact]
+    public void Should_NotExtendAbsoluteTtl_OnGetOrTryGet()
+    {
+        // arrange:
+
+        var ttl = TimeSpan.FromMilliseconds(100);
+        var cache = CreateCache<int, string>(1);
+
+        cache.Put(1, "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(ttl)
+        });
+
+        // act
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(60));
+        Assert.True(cache.TryGet(1, out _));
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(90));
+
+        // assert
+
+        Assert.False(cache.ContainsKey(1));
+        Assert.DoesNotContain(1, cache.GetKeys());
+    }
+
+    [Fact]
+    public void Should_ResetAbsoluteTtl_OnUpdate_WithoutOptions_WhenDefaultExists()
+    {
+        // arrange
+
+        var ttl = TimeSpan.FromMilliseconds(100);
+        var cache = CreateCache<int, string>(2, new ExpirationOptions.Absolute(ttl));
+
+        cache.Put(1, "v1");
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+
+        // act
+
+        cache.AddOrUpdate(1, "v1_updated");
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(60));
+
+        // assert
+
+        Assert.True(cache.TryGet(1, out var v));
+        Assert.Equal("v1_updated", v);
+    }
+
+    [Fact]
+    public void Should_ResetAbsoluteTtl_OnUpdate_WithExplicitOptions()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        cache.Put(1, "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(80))
+        });
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+
+        // act
+
+        cache.AddOrUpdate(1, "v1_updated", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(200))
+        });
+
+        // original 80ms = expired
+        // shorter than refreshed 200ms
+        Thread.Sleep(TimeSpan.FromMilliseconds(80));
+
+        // assert
+
+        Assert.True(cache.TryGet(1, out var v));
+        Assert.Equal("v1_updated", v);
+    }
+
+    [Fact]
+    public void Should_PurgeExpiredItems_BeforeEviction_AndNotCountAsEviction()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        // 1 = short TTL
+        // 2 is durable
+
+        cache.Put(1, "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(50))
+        });
+
+        cache.Put(2, "v2");
+
+        // 1 expires
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+
+        // act
+
+        // inserting 3 should purge 1 (expired) and NOT evict B
+        cache.Put(3, "v3");
+
+        // assert
+
+        Assert.True(cache.TryGet(2, out var value2) && value2 == "v2");
+        Assert.True(cache.TryGet(3, out var value3) && value3 == "v3");
+        Assert.False(cache.TryGet(1, out _)); // expired & purged
+
+        // purge isn't an eviction
+
+        Assert.Equal(0, cache.Evictions);
+        Assert.Equal(2, cache.Count);
+    }
+
+    [Fact]
+    public void Should_DisposeExpiredDisposable_OnAccess()
+    {
+        // arrange
+
+        var cache = CreateCache<int, SyncDisposable>(1);
+        var item = new SyncDisposable();
+
+        cache.Put(1, item, new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(50))
+        });
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+
+        // act
+
+        Assert.False(cache.TryGet(1, out _));
+
+        // assert
+
+        Assert.True(item.IsDisposed);
+        Assert.DoesNotContain(1, cache.GetKeys());
+        Assert.Equal(0, cache.Count);
+    }
+
+    [Fact]
+    public void Should_RefreshSlidingTtl_OnGetAndTryGet()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(1);
+        var ttl = TimeSpan.FromMilliseconds(100);
+
+        cache.Put(1, "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Sliding(ttl)
+        });
+
+        // act
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        cache.Get(1); // refresh sliding
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        bool found = cache.TryGet(1, out _); // refresh sliding
+
+        // assert
+
+        Assert.True(found);
+
+        // final wait shorter than another full ttl to confirm still alive
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+
+        found = cache.TryGet(1, out _);
+        Assert.True(found);
+    }
 }

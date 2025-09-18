@@ -15,6 +15,8 @@ public abstract class CacheAsyncTestsBase
     protected virtual bool SupportsEviction => true;
     protected readonly Mock<ILogger> _loggerMock;
 
+    #region Cache creation
+
     protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity) where TKey : notnull
     {
         var options = new CacheOptions(capacity, EvictionPolicy);
@@ -26,6 +28,20 @@ public abstract class CacheAsyncTestsBase
         var options = new CacheOptions(capacity, EvictionPolicy);
         return new Cache<TKey, TValue>(options, logger);
     }
+
+    protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity, ExpirationOptions expirationOptions) where TKey : notnull
+    {
+        var options = new CacheOptions(capacity, EvictionPolicy, expirationOptions);
+        return new Cache<TKey, TValue>(options);
+    }
+
+    protected Cache<TKey, TValue> CreateCache<TKey, TValue>(int capacity, ExpirationOptions expirationOptions, ILogger logger) where TKey : notnull
+    {
+        var options = new CacheOptions(capacity, EvictionPolicy, expirationOptions);
+        return new Cache<TKey, TValue>(options, logger);
+    }
+
+    #endregion
 
     protected CacheAsyncTestsBase()
     {
@@ -1188,5 +1204,211 @@ public abstract class CacheAsyncTestsBase
         var (found, _) = await cache.TryGetAsync(1);
         Assert.False(found); // item should have expired
         Assert.DoesNotContain(1, cache.GetKeys());
+    }
+
+    [Fact]
+    public async Task Should_ApplyDefaultAbsoluteTtl_WhenOptionsNotProvided()
+    {
+        // arrange
+
+        var ttl = TimeSpan.FromMilliseconds(80);
+        var cache = CreateCache<int, string>(2, new ExpirationOptions.Absolute(ttl));
+
+        await cache.PutAsync(1, "v1");
+
+        // act
+
+        Thread.Sleep(ttl + TimeSpan.FromMilliseconds(40));
+
+        // assert
+
+        var (found, _) = await cache.TryGetAsync(1);
+        Assert.False(found);
+        Assert.DoesNotContain(1, cache.GetKeys());
+        Assert.Equal(0, cache.Count);
+    }
+
+    [Fact]
+    public async Task Should_NotExtendAbsoluteTtl_OnGetOrTryGet()
+    {
+        // arrange:
+
+        var ttl = TimeSpan.FromMilliseconds(100);
+        var cache = CreateCache<int, string>(1);
+
+        await cache.PutAsync(1, "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(ttl)
+        });
+
+        // act
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(60));
+
+        var (found, _) = await cache.TryGetAsync(1);
+        Assert.True(found);
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(90));
+
+        // assert
+
+        Assert.False(cache.ContainsKey(1));
+        Assert.DoesNotContain(1, cache.GetKeys());
+    }
+
+    [Fact]
+    public async Task Should_ResetAbsoluteTtl_OnUpdate_WithoutOptions_WhenDefaultExists()
+    {
+        // arrange
+
+        var ttl = TimeSpan.FromMilliseconds(100);
+        var cache = CreateCache<int, string>(2, new ExpirationOptions.Absolute(ttl));
+
+        await cache.PutAsync(1, "v1");
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+
+        // act
+
+        await cache.AddOrUpdateAsync(1, "v1_updated");
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(60));
+
+        // assert
+
+        var (found, v) = await cache.TryGetAsync(1);
+        Assert.True(found);
+        Assert.Equal("v1_updated", v);
+    }
+
+    [Fact]
+    public async Task Should_ResetAbsoluteTtl_OnUpdate_WithExplicitOptions()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        await cache.PutAsync(1, "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(80))
+        });
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+
+        // act
+
+        await cache.AddOrUpdateAsync(1, "v1_updated", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(200))
+        });
+
+        // original 80ms = expired
+        // shorter than refreshed 200ms
+        Thread.Sleep(TimeSpan.FromMilliseconds(80));
+
+        // assert
+
+        var (found, v) = await cache.TryGetAsync(1);
+        Assert.True(found);
+        Assert.Equal("v1_updated", v);
+    }
+
+    [Fact]
+    public async Task Should_PurgeExpiredItems_BeforeEviction_AndNotCountAsEviction()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        // 1 = short TTL
+        // 2 is durable
+
+        await cache.PutAsync(1, "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(50))
+        });
+
+        await cache.PutAsync(2, "v2");
+
+        // 1 expires
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+
+        // act
+
+        // inserting 3 should purge 1 (expired) and NOT evict B
+        await cache.PutAsync(3, "v3");
+
+        // assert
+
+        var (found2, value2) = await cache.TryGetAsync(2);
+        var (found3, value3) = await cache.TryGetAsync(3);
+        var (found1, _) = await cache.TryGetAsync(1);
+
+        Assert.True(found2 && value2 == "v2");
+        Assert.True(found3 && value3 == "v3");
+        Assert.False(found1); // expired & purged
+
+        // purge isn't an eviction
+
+        Assert.Equal(0, cache.Evictions);
+        Assert.Equal(2, cache.Count);
+    }
+
+    [Fact]
+    public async Task Should_DisposeExpiredDisposable_OnAccess()
+    {
+        // arrange
+
+        var cache = CreateCache<int, SyncDisposable>(1);
+        var item = new SyncDisposable();
+
+        await cache.PutAsync(1, item, new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(50))
+        });
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+
+        // act
+
+        var (found, _) = await cache.TryGetAsync(1);
+        Assert.False(found);
+
+        // assert
+
+        Assert.True(item.IsDisposed);
+        Assert.DoesNotContain(1, cache.GetKeys());
+        Assert.Equal(0, cache.Count);
+    }
+
+    [Fact]
+    public async Task Should_RefreshSlidingTtl_OnGetAndTryGet()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(1);
+        var ttl = TimeSpan.FromMilliseconds(100);
+
+        await cache.PutAsync(1, "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Sliding(ttl)
+        });
+
+        // act
+
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        await cache.GetAsync(1); // refresh sliding
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        var (found, _) = await cache.TryGetAsync(1); // refresh sliding
+
+        // assert
+
+        Assert.True(found);
+
+        // final wait shorter than another full ttl to confirm still alive
+        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+
+        var (foundAgain, _) = await cache.TryGetAsync(1);
+        Assert.True(foundAgain);
     }
 }
