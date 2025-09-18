@@ -1037,4 +1037,156 @@ public abstract class CacheAsyncTestsBase
         Assert.Contains("value1", cacheValues);
         Assert.Contains("value2", cacheValues);
     }
+
+    [Fact]
+    public async Task Should_NotReturnExpiredKeys_WhenAbsoluteTtlHasElapsed_OnGetKeys()
+    {
+        // arrange
+
+        var cache = CreateCache<string, string>(2);
+
+        await cache.PutAsync("short", "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(100))
+        });
+
+        await cache.PutAsync("long", "v2", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromSeconds(5))
+        });
+
+        Thread.Sleep(200);
+
+        // act
+
+        var keys = cache.GetKeys();
+
+        // assert
+
+        Assert.DoesNotContain("short", keys);
+        Assert.Contains("long", keys);
+
+        var (foundShort, _) = await cache.TryGetAsync("short");
+        Assert.False(foundShort);
+
+        var (foundLong, longVal) = await cache.TryGetAsync("long");
+        Assert.True(foundLong);
+        Assert.Equal("v2", longVal);
+    }
+
+    [Fact]
+    public async Task Should_IncludeSlidingKey_WhenAccessedWithinWindow_OnGetKeys()
+    {
+        // arrange
+
+        var cache = CreateCache<string, string>(1);
+
+        await cache.PutAsync("sliding", "vs", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Sliding(TimeSpan.FromMilliseconds(200))
+        });
+
+        Thread.Sleep(120);
+
+        // assert
+
+        var (found, _) = await cache.TryGetAsync("sliding");
+        Assert.True(found);
+
+        Thread.Sleep(120);
+
+        // assert
+
+        (found, _) = await cache.TryGetAsync("sliding");
+        Assert.True(found);
+
+        // act
+
+        var keys = cache.GetKeys();
+
+        // assert
+
+        Assert.Contains("sliding", keys);
+    }
+
+    [Fact]
+    public async Task Should_SkipExpiredEntries_AndDoNotThrow_OnGetSnapshot()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(2);
+
+        await cache.PutAsync(1, "value1", new CacheItemOptions { Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(50)) });
+        await cache.PutAsync(2, "value2");
+
+        Thread.Sleep(60);
+
+        // act
+
+        var snapshot = cache.GetSnapshot();
+
+        // assert
+
+        Assert.DoesNotContain(snapshot, kv => kv.Key.Equals(1));
+        Assert.Contains(snapshot, kv => kv.Key.Equals(2));
+    }
+
+    [Fact]
+    public async Task Should_ReturnLiveCount_AfterPurgingExpiredEntries_OnCount()
+    {
+        // arrange
+
+        var cache = CreateCache<string, string>(2);
+
+        await cache.PutAsync("short", "v1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMilliseconds(60))
+        });
+
+        await cache.PutAsync("long", "v2", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Absolute(TimeSpan.FromSeconds(5))
+        });
+
+        Thread.Sleep(90);
+
+        // act
+
+        int count = cache.Count;
+
+        // assert
+
+        Assert.Equal(1, count);
+
+        var keys = cache.GetKeys();
+        Assert.DoesNotContain("short", keys);
+        Assert.Contains("long", keys);
+    }
+
+    [Fact]
+    public async Task Should_NotRefreshSlidingTtl_OnContainsKey()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(1);
+        var ttl = TimeSpan.FromMilliseconds(100);
+
+        await cache.PutAsync(1, "value1", new CacheItemOptions
+        {
+            Expiration = new ExpirationOptions.Sliding(ttl)
+        });
+
+        // act
+
+        Thread.Sleep(70);
+        Assert.True(cache.ContainsKey(1));
+
+        Thread.Sleep(50);
+
+        // assert
+
+        var (found, _) = await cache.TryGetAsync(1);
+        Assert.False(found); // item should have expired
+        Assert.DoesNotContain(1, cache.GetKeys());
+    }
 }
