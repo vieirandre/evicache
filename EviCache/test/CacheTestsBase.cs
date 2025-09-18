@@ -1270,7 +1270,7 @@ public abstract partial class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(1);
-        var ttl = TimeSpan.FromMilliseconds(100);
+        var ttl = TimeSpan.FromMilliseconds(150);
 
         cache.Put(1, "value1", new CacheItemOptions
         {
@@ -1279,14 +1279,36 @@ public abstract partial class CacheTestsBase
 
         // act
 
-        Thread.Sleep(70);
+        Thread.Sleep(90);
         Assert.True(cache.ContainsKey(1));
 
-        Thread.Sleep(50);
+        Thread.Sleep(120);
 
         // assert
 
-        Assert.False(cache.TryGet(1, out _)); // item should have expired
+        Assert.False(cache.ContainsKey(1));
         Assert.DoesNotContain(1, cache.GetKeys());
+        Assert.Equal(0, cache.Count);
+    }
+
+    [Fact]
+    public void Should_ApplyDefaultAbsoluteTtl_WhenOptionsNotProvided()
+    {
+        // arrange
+
+        var ttl = TimeSpan.FromMilliseconds(80);
+        var cache = CreateCache<int, string>(2, new ExpirationOptions.Absolute(ttl));
+
+        cache.Put(1, "v1");
+
+        // act
+
+        Thread.Sleep(ttl + TimeSpan.FromMilliseconds(40));
+
+        // assert
+
+        Assert.False(cache.TryGet(1, out _));
+        Assert.DoesNotContain(1, cache.GetKeys());
+        Assert.Equal(0, cache.Count);
     }
 }
