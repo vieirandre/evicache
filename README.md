@@ -10,124 +10,132 @@ It supports multiple eviction policies and offers extended cache operations. Mor
 
 ## Table of Contents
 - [About](#about)
-- [Key Features](#key-features)
-- [How&nbsp;to&nbsp;Use](#how-to-use)
+- [Overview](#usage)
 - [Feedback & Contributing](#feedback)
 
-## Key Features
+## Overview
 
-- **Thread-safe operations**: All cache operations are synchronized, ensuring thread safety for concurrent access.
-- **Multiple eviction policies**:
-    - Least Recently Used (LRU): Evicts the item that has not been accessed for the longest period.
-    - Least Frequently Used (LFU): Evicts the item with the lowest access frequency.
-    - First-In, First-Out (FIFO): Evicts the item that was inserted first.
-    - No Eviction: New items are not accepted when the cache is full.
-- **Built-in metrics**: Tracks cache count, hits, misses, and evictions.
-- **Cache inspection**: Retrieves snapshots and list of keys currently in the cache.
-
-## How to Use
-
-**Interfaces**
-
-* `ICache<TKey, TValue>`: Combines all functionality exposed by the interfaces below.
-* `ICacheOperations<TKey, TValue>`: Provides cache operations (`Get`, `Put`, etc.).
-* `ICacheOperationsAsync<TKey, TValue>`: Provides asynchronous versions of cache operations (`GetAsync`, `PutAsync`, etc.).
-* `ICacheMetrics`: Access performance and usage metrics.
-* `ICacheInspection<TKey, TValue>`: Inspect cache contents (keys and snapshots).
-* `ICacheItemMetadata<TKey>`: Provides access to cache item metadata.
-
-**Exceptions**
-
-* `KeyNotFoundException`: Thrown when attempting to retrieve a key that does not exist (only via `Get`).
-* `CacheFullException`: Thrown when the cache is full and (a) eviction fails, or (b) eviction is disabled (`NoEviction` policy).
-  * The exception’s **`Data`** dictionary is populated for easy diagnostics: `Capacity` (int), `AttemptedKey` (string), and `EvictionPolicy` (string).
-
-**Initializing the cache**
+### Quick start
 
 ```csharp
 using EviCache;
-using EviCache.Options;
 using EviCache.Enums;
+using EviCache.Options;
 
-// Create cache options with a capacity of 5 and LRU eviction policy
-var cacheOptions = new CacheOptions(5, EvictionPolicy.LRU);
+// Create a cache with LRU and capacity 100
+var cache = new Cache<string, string>(new CacheOptions(
+    capacity: 100,
+    evictionPolicy: EvictionPolicy.LRU));
 
-// Instantiate the cache
-var cache = new Cache<int, string>(cacheOptions);
+// Put & Get
+cache.Put("user:1", "André");
+var name = cache.Get("user:1"); // "André"
 
-// Optionally, provide an ILogger instance
-var cache = new Cache<int, string>(cacheOptions, logger);
+// GetOrAdd (adds on miss, returns existing on hit)
+var color = cache.GetOrAdd("color", "blue");
+
+// Per-item absolute expiration (e.g., 1 minute)
+cache.Put("otp", "123456",
+    new CacheItemOptions {
+        Expiration = new ExpirationOptions.Absolute(TimeSpan.FromMinutes(1))
+    });
 ```
 
-**Inserting and retrieving values**
+#### Async
 
 ```csharp
-// Insert a new value into the cache
-cache.Put(1, "one");
-
-// Retrieve the value (throws KeyNotFoundException if key does not exist)
-string value = cache.Get(1);
-
-// Retrieve the value without throwing an exception if the key is missing
-bool retrieved = cache.TryGet(1, out string value);
+// Same semantics, but async + cancellation support
+await cache.PutAsync("k", "v", ct);
+var value = await cache.GetAsync("k", ct);
+var (found, v) = await cache.TryGetAsync("missing", ct);
 ```
 
-**Conditional retrieval and updates**
+### Eviction policies
+
+Choose via `CacheOptions.EvictionPolicy`:
+
+* LRU: evicts least-recently-used.
+* LFU: evicts least-frequently-used.
+* FIFO: evicts oldest inserted.
+* NoEviction: refuse to add when full; throws `CacheFullException`.
+
+When capacity is full, the cache evicts one candidate (if the policy allows). If no candidate can be evicted or policy is `NoEviction`, a `CacheFullException` is thrown with diagnostic data (capacity, attempted key, policy).
+
+### Expiration (TTL)
+
+Set expiration globally (default for all items) or per item:
+
+* `ExpirationOptions.Absolute(TimeSpan ttl)`: expires at `now + ttl`.
+* `ExpirationOptions.Sliding(TimeSpan ttl)`: expires if not accessed within `ttl`.
+* `ExpirationOptions.None`: no expiration.
+
+#### Examples:
 
 ```csharp
-// Return the existing value for a key or add a new key/value pair if not found
-string value = cache.GetOrAdd(2, "two");
+// Global default expiration: absolute 10 minutes
+var cache = new Cache<string, byte[]>(new CacheOptions(
+    100, EvictionPolicy.LFU,
+    new ExpirationOptions.Absolute(TimeSpan.FromMinutes(10))));
 
-// Update the value if the key exists; otherwise, add it
-string newValue = cache.AddOrUpdate(1, "newOne");
+// Per-item sliding expiration: 5 minutes
+cache.Put("session:12", session,
+    new CacheItemOptions {
+        Expiration = new ExpirationOptions.Sliding(TimeSpan.FromMinutes(5))
+    });
 ```
 
-**Checking, removing, and clearing entries**
+> Expired items are purged lazily on access and during capacity checks; they won’t appear in `GetKeys()`/`GetSnapshot()`.
 
-```csharp
-// Check if a key exists in the cache
-bool exists = cache.ContainsKey(1);
+### API overview
 
-// Remove a key from the cache
-bool removed = cache.Remove(1);
+* Retrieval
+  * `Get(key)` → value (throws if missing).
+  * `TryGet(key, out value)` / `TryGetAsync` → no throw.
+  * `ContainsKey(key)` / `ContainsKeyAsync` → does not affect hit/miss counters.
+* Mutation
+  * `Put(key, value)` / `Put(key, value, options)` → insert or update.
+  * `AddOrUpdate(key, value)` → inserts on miss; returns the provided value.
+  * `GetOrAdd(key, value)` → returns existing value on hit; otherwise, inserts and returns the provided value.
+  * `Remove(key)` → bool; `Clear()` → clears all.
+* Inspection
+  * `GetKeys()` → `ImmutableList<TKey>` of non-expired keys (order depends on policy).
+  * `GetSnapshot()` → `ImmutableList<KeyValuePair<TKey,TValue>>` of non-expired entries.
+* Metadata
+  * `GetMetadata(key)` / `TryGetMetadata(key, out meta)` → last access/update, access count, expiration, etc.
+* Metrics
+  * `Capacity`, `Count` (purges expired first), `Hits`, `Misses`, `Evictions`.
 
-// Clear the entire cache
-cache.Clear();
-```
+### Hits & Misses
 
-**Inspecting cache contents**
+* Successful `Get`/`TryGet`/`GetOrAdd` (hit path) increments **Hits** and updates access metadata + policy structures.
+* Miss paths increment **Misses**.
+* `ContainsKey` is intentionally “cold”: it checks existence without touching metrics or access ordering.
 
-```csharp
-// Retrieve a snapshot of the cache
-ImmutableList<KeyValuePair<TKey, TValue>> snapshot = cache.GetSnapshot();
+### Thread-safety
 
-// Retrieve all keys
-ImmutableList<TKey> keys = cache.GetKeys();
-```
+All public operations are protected by an internal `SemaphoreSlim`, ensuring a single writer/reader critical section. Both sync and async APIs are safe to call concurrently.
 
-**Accessing cache metrics**
+### Disposal semantics
 
-```csharp
-Console.WriteLine($"Cache Capacity: {cache.Capacity}");
-Console.WriteLine($"Cache Count: {cache.Count}");
-Console.WriteLine($"Cache Hits: {cache.Hits}");
-Console.WriteLine($"Cache Misses: {cache.Misses}");
-Console.WriteLine($"Cache Evictions: {cache.Evictions}");
-```
+* If a cached value implements `IDisposable`/`IAsyncDisposable`, it is disposed when the entry is removed, evicted, updated (when replacing a different instance), or during `Clear()`.
+* `Clear()` gathers disposables and disposes them in the background (respecting the provided cancellation token in `ClearAsync`). Errors during disposal are logged.
 
-**Accessing cache item metadata**
+### Logging
 
-```csharp
-var meta = cache.GetMetadata("key1"); // throws KeyNotFoundException if key does not exist
+Pass an `ILogger` to the constructor or rely on the default `NullLogger`. Notable events:
 
-// A "try" option is available
-// bool found = cache.TryGetMetadata("key1", out var meta);
+* Initialization (capacity, policy) at `Information`.
+* Evictions at `Debug`.
+* Errors during eviction selection or background disposal at `Error`.
 
-Console.WriteLine($"Created: {meta.CreatedAt}");
-Console.WriteLine($"Last accessed: {meta.LastAccessedAt}");
-Console.WriteLine($"Last updated: {meta.LastUpdatedAt}");
-Console.WriteLine($"Access count: {meta.AccessCount}");
-```
+### Exceptions
+
+* `KeyNotFoundException`: Get on a non-existing/expired key.
+* `CacheFullException`: when full and:
+  * policy is `NoEviction`, or
+  * an eviction candidate couldn’t be selected/removed.
+
+`CacheFullException` includes `Capacity`, the attempted key (if available), and `EvictionPolicy` for diagnostics.
 
 <a id="feedback"></a>
 ## Feedback & Contributing
