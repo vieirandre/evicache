@@ -137,6 +137,12 @@ Pass an `ILogger` to the constructor or rely on the default `NullLogger`. Notabl
 
 `CacheFullException` includes `Capacity`, the attempted key (if available), and `EvictionPolicy` for diagnostics.
 
+### Performance notes
+
+* Keys are tracked per policy for fast candidate selection; `GetKeys()` returns a filtered, immutable snapshot without expired entries.
+* `Count` triggers a purge of expired items before returning the size.
+* Avoid calling `ContainsKey` as a pre-check before `Get` — do a single `TryGet` to minimize lock acquisitions.
+
 <a id="feedback"></a>
 ## Feedback & Contributing
 
