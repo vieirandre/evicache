@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 
 		<PackageId>EviCache</PackageId>
-		<Version>2.1.0</Version>
+		<Version>2.2.0</Version>
 		<Authors>André Vieira</Authors>
 		<Description>A lightweight, thread-safe, in-memory cache.</Description>
 
