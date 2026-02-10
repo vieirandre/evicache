@@ -25,4 +25,14 @@ public sealed partial class Cache<TKey, TValue> : ICacheMetrics where TKey : not
     public long Hits => Interlocked.Read(ref _hits);
     public long Misses => Interlocked.Read(ref _misses);
     public long Evictions => Interlocked.Read(ref _evictions);
+
+    public double HitRate
+    {
+        get
+        {
+            var h = Hits;
+            var total = h + Misses;
+            return total == 0 ? 0 : (double)h / total;
+        }
+    }
 }

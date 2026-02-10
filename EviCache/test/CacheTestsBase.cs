@@ -932,6 +932,66 @@ public abstract partial class CacheTestsBase
     }
 
     [Fact]
+    public void Should_ReturnZero_WhenNoOperationsHaveOccurred_OnHitRate()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+
+        // act
+
+        double hitRate = cache.HitRate;
+
+        // assert
+
+        Assert.Equal(0, hitRate);
+    }
+
+    [Fact]
+    public void Should_CalculateCorrectHitRate_AfterMixedOperations()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(5);
+        cache.Put(1, "value1");
+        cache.Put(2, "value2");
+
+        // act
+
+        cache.Get(1);
+        cache.Get(2);
+        cache.TryGet(3, out _);
+        cache.TryGet(4, out _);
+
+        // assert
+
+        Assert.Equal(2, cache.Hits);
+        Assert.Equal(2, cache.Misses);
+        Assert.Equal(0.5, cache.HitRate);
+    }
+
+    [Fact]
+    public void Should_ReturnOne_WhenAllOperationsAreHits_OnHitRate()
+    {
+        // arrange
+
+        var cache = CreateCache<int, string>(3);
+        cache.Put(1, "value1");
+
+        // act
+
+        cache.Get(1);
+        cache.TryGet(1, out _);
+        cache.GetOrAdd(1, "value1");
+
+        // assert
+
+        Assert.Equal(3, cache.Hits);
+        Assert.Equal(0, cache.Misses);
+        Assert.Equal(1.0, cache.HitRate);
+    }
+
+    [Fact]
     public async Task Should_YieldSameResults_ForSyncAndAsyncOperations() // TODO: expand
     {
         // arrange

@@ -29,4 +29,9 @@ public interface ICacheMetrics
     /// Gets the total number of evictions performed by the cache.
     /// </summary>
     long Evictions { get; }
+
+    /// <summary>
+    /// Gets the cache hit rate as a value between 0.0 and 1.0.
+    /// </summary>
+    double HitRate { get; }
 }
