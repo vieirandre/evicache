@@ -1377,7 +1377,7 @@ public abstract partial class CacheTestsBase
     {
         // arrange:
 
-        var ttl = TimeSpan.FromMilliseconds(100);
+        var ttl = TimeSpan.FromMilliseconds(150);
         var cache = CreateCache<int, string>(1);
 
         cache.Put(1, "v1", new CacheItemOptions
@@ -1387,10 +1387,10 @@ public abstract partial class CacheTestsBase
 
         // act
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(60));
+        Thread.Sleep(TimeSpan.FromMilliseconds(80));
         Assert.True(cache.TryGet(1, out _));
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(90));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
 
         // assert
 
@@ -1403,18 +1403,18 @@ public abstract partial class CacheTestsBase
     {
         // arrange
 
-        var ttl = TimeSpan.FromMilliseconds(100);
+        var ttl = TimeSpan.FromMilliseconds(150);
         var cache = CreateCache<int, string>(2, new ExpirationOptions.Absolute(ttl));
 
         cache.Put(1, "v1");
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
 
         // act
 
         cache.AddOrUpdate(1, "v1_updated");
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(60));
+        Thread.Sleep(TimeSpan.FromMilliseconds(80));
 
         // assert
 
@@ -1522,7 +1522,7 @@ public abstract partial class CacheTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(1);
-        var ttl = TimeSpan.FromMilliseconds(100);
+        var ttl = TimeSpan.FromMilliseconds(150);
 
         cache.Put(1, "v1", new CacheItemOptions
         {
@@ -1531,9 +1531,9 @@ public abstract partial class CacheTestsBase
 
         // act
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
         cache.Get(1); // refresh sliding
-        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
         bool found = cache.TryGet(1, out _); // refresh sliding
 
         // assert
@@ -1541,7 +1541,7 @@ public abstract partial class CacheTestsBase
         Assert.True(found);
 
         // final wait shorter than another full ttl to confirm still alive
-        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
 
         found = cache.TryGet(1, out _);
         Assert.True(found);

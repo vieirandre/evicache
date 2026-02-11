@@ -1233,7 +1233,7 @@ public abstract class CacheAsyncTestsBase
     {
         // arrange:
 
-        var ttl = TimeSpan.FromMilliseconds(100);
+        var ttl = TimeSpan.FromMilliseconds(150);
         var cache = CreateCache<int, string>(1);
 
         await cache.PutAsync(1, "v1", new CacheItemOptions
@@ -1243,12 +1243,12 @@ public abstract class CacheAsyncTestsBase
 
         // act
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(60));
+        Thread.Sleep(TimeSpan.FromMilliseconds(80));
 
         var (found, _) = await cache.TryGetAsync(1);
         Assert.True(found);
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(90));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
 
         // assert
 
@@ -1261,18 +1261,18 @@ public abstract class CacheAsyncTestsBase
     {
         // arrange
 
-        var ttl = TimeSpan.FromMilliseconds(100);
+        var ttl = TimeSpan.FromMilliseconds(150);
         var cache = CreateCache<int, string>(2, new ExpirationOptions.Absolute(ttl));
 
         await cache.PutAsync(1, "v1");
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
 
         // act
 
         await cache.AddOrUpdateAsync(1, "v1_updated");
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(60));
+        Thread.Sleep(TimeSpan.FromMilliseconds(80));
 
         // assert
 
@@ -1387,7 +1387,7 @@ public abstract class CacheAsyncTestsBase
         // arrange
 
         var cache = CreateCache<int, string>(1);
-        var ttl = TimeSpan.FromMilliseconds(100);
+        var ttl = TimeSpan.FromMilliseconds(150);
 
         await cache.PutAsync(1, "v1", new CacheItemOptions
         {
@@ -1396,9 +1396,9 @@ public abstract class CacheAsyncTestsBase
 
         // act
 
-        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
         await cache.GetAsync(1); // refresh sliding
-        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
         var (found, _) = await cache.TryGetAsync(1); // refresh sliding
 
         // assert
@@ -1406,7 +1406,7 @@ public abstract class CacheAsyncTestsBase
         Assert.True(found);
 
         // final wait shorter than another full ttl to confirm still alive
-        Thread.Sleep(TimeSpan.FromMilliseconds(70));
+        Thread.Sleep(TimeSpan.FromMilliseconds(100));
 
         var (foundAgain, _) = await cache.TryGetAsync(1);
         Assert.True(foundAgain);
