@@ -217,19 +217,21 @@ public sealed partial class Cache<TKey, TValue> where TKey : notnull
 
     private void AddOrUpdateItem(TKey key, TValue value, bool isUpdate)
     {
-        bool defaultExpirationExists = _defaultExpiration is not null;
-
         if (isUpdate)
         {
             var item = _cacheMap[key];
-            item.UpdateItem(value);
+            
+            if (_defaultExpiration is not null)
+                item.UpdateItem(value, new CacheItemOptions { Expiration = _defaultExpiration });
+            else
+                item.UpdateItem(value);
 
             _cacheHandler.RegisterUpdate(key);
         }
         else
         {
             _cacheMap.Add(key,
-                defaultExpirationExists
+                _defaultExpiration is not null
                 ? new CacheItem<TValue>(value, new CacheItemOptions { Expiration = _defaultExpiration })
                 : new CacheItem<TValue>(value));
 
